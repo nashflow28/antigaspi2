@@ -86,8 +86,8 @@
         <!-- Current Session Steps -->
         <div v-if="activeTab === 'current'" class="steps-container px-3 sm:px-4 lg:px-6">
           <div v-if="!currentSession || currentSession.steps.length === 0" class="empty-state">
-            <Brain class="h-6 w-6 text-gray-400" />
-            <p class="text-sm text-gray-700">No active thinking session</p>
+            <Brain class="h-6 w-6 text-neutral-400" />
+            <p class="text-sm text-neutral-700">No active thinking session</p>
             <button class="button-start-empty" @click="startNewSession">
               Start Thinking Session
             </button>
@@ -150,8 +150,8 @@
         <!-- Sessions History -->
         <div v-if="activeTab === 'history'" class="history-container px-3 sm:px-4 lg:px-6">
           <div v-if="sessions.length === 0" class="empty-state">
-            <History class="h-6 w-6 text-gray-400" />
-            <p class="text-sm text-gray-700">No completed sessions</p>
+            <History class="h-6 w-6 text-neutral-400" />
+            <p class="text-sm text-neutral-700">No completed sessions</p>
           </div>
           <div v-else class="sessions-list">
             <div

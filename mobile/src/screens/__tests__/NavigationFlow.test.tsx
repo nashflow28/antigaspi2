@@ -30,7 +30,7 @@ describe('Navigation Flow - Design System 2025', () => {
         </View>
       )
 
-      expect(getByText('🌱 Antigaspi')).toBeTruthy()
+      expect(getByText('🌱 GÊLADAL')).toBeTruthy()
       expect(getByText('Luttons contre le gaspillage')).toBeTruthy()
       expect(getByText('Chargement...')).toBeTruthy()
     })
@@ -41,7 +41,7 @@ describe('Navigation Flow - Design System 2025', () => {
       const { getByText } = renderWithTheme(
         <View>
           <Typography variant="displayMd" weight="bold">
-            Bienvenue sur Antigaspi
+            Bienvenue sur GÊLADAL
           </Typography>
           <Typography variant="body" color="secondary">
             Découvrez les produits à prix réduits près de chez vous
@@ -49,7 +49,7 @@ describe('Navigation Flow - Design System 2025', () => {
         </View>
       )
 
-      expect(getByText('Bienvenue sur Antigaspi')).toBeTruthy()
+      expect(getByText('Bienvenue sur GÊLADAL')).toBeTruthy()
       expect(getByText('Découvrez les produits à prix réduits près de chez vous')).toBeTruthy()
     })
 

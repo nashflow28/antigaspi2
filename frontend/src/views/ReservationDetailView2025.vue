@@ -163,7 +163,7 @@
           </Card>
 
           <!-- Actions -->
-          <Card v-if="canPerformActions">
+          <Card v-if="canPerformActions || delivery || deliveryLoading">
             <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mt-3">
               Actions disponibles
             </h3>
@@ -192,6 +192,52 @@
                 <Download class="h-4 w-4" />
                 Télécharger le reçu
               </Button>
+
+              <Button
+                v-if="canRequestDelivery"
+                variant="primary"
+                @click="requestDelivery"
+              >
+                <Truck class="h-4 w-4" />
+                Demander une livraison
+              </Button>
+
+              <Button
+                v-if="canTrackDelivery"
+                variant="outline"
+                @click="trackDelivery"
+              >
+                <Truck class="h-4 w-4" />
+                Suivre la livraison
+              </Button>
+
+              <Button
+                v-if="canRateDelivery"
+                variant="outline"
+                @click="rateDelivery"
+              >
+                <Truck class="h-4 w-4" />
+                Noter la livraison
+              </Button>
+
+              <Button
+                v-if="canCancelDelivery"
+                variant="destructive"
+                @click="cancelDelivery"
+              >
+                <X class="h-4 w-4" />
+                Annuler la livraison
+              </Button>
+            </div>
+
+            <p v-if="deliveryLoading" class="mt-4 text-sm text-neutral-500 dark:text-neutral-400">
+              Chargement des informations de livraison...
+            </p>
+            <p v-else-if="deliveryError" class="mt-4 text-sm text-accent-red">
+              {{ deliveryError }}
+            </p>
+            <div v-else-if="delivery" class="mt-4 text-sm text-neutral-600 dark:text-neutral-300">
+              Statut livraison : <span class="font-semibold">{{ delivery.status }}</span>
             </div>
           </Card>
         </div>
@@ -266,16 +312,17 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { formatPrice } from '@/utils/currency'
 import { notify } from '@/composables/useNotifications'
 import { apiService } from '@/services/api'
+import { deliveryService } from '@/services/deliveryService'
 import { useReservationsStore } from '@/stores/reservations'
 import {
   AlertCircle, ArrowLeft, Calendar, Check, DollarSign,
   Download, MapPin, Package, Phone, Store, Truck, X
 } from 'lucide-vue-next'
-import type { Reservation } from '@/types'
+import type { Reservation, Delivery } from '@/types'
 
 // Import 2025 Design System components
 import Card from '@/components/ui/2025/Card.vue'
@@ -283,16 +330,38 @@ import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
 
 const route = useRoute()
+const router = useRouter()
 const reservationsStore = useReservationsStore()
 
 // State
 const loading = ref(true)
 const error = ref<string | null>(null)
 const reservation = ref<Reservation | null>(null)
+const delivery = ref<Delivery | null>(null)
+const deliveryLoading = ref(false)
+const deliveryError = ref<string | null>(null)
 
 // Computed
 const canPerformActions = computed(() => {
   return reservation.value && ['pending', 'confirmed', 'ready'].includes(reservation.value.status)
+})
+
+const canRequestDelivery = computed(() => {
+  return reservation.value &&
+    ['pending', 'confirmed'].includes(reservation.value.status) &&
+    !delivery.value
+})
+
+const canTrackDelivery = computed(() => {
+  return delivery.value && !['cancelled', 'failed'].includes(delivery.value.status)
+})
+
+const canRateDelivery = computed(() => {
+  return delivery.value && delivery.value.status === 'delivered' && !delivery.value.consumer_rating
+})
+
+const canCancelDelivery = computed(() => {
+  return Boolean(delivery.value?.can_cancel)
 })
 
 const statusSteps = computed(() => {
@@ -390,6 +459,8 @@ const loadReservation = async () => {
       pickup_notes: res.pickup_notes ?? res.notes ?? '',
       reservation_code: res.reservation_code || `ANT-${res.id.toString().padStart(3, '0')}`
     }
+
+    await loadDelivery(reservationId)
   } catch (err: any) {
     const message = err?.message || 'Erreur lors du chargement de la réservation'
     error.value = message
@@ -473,6 +544,52 @@ const downloadReceipt = () => {
   // Future: Implement PDF receipt generation
   // This feature will generate a PDF receipt for the reservation
   alert('Fonctionnalité de téléchargement à venir')
+}
+
+const loadDelivery = async (reservationId: number) => {
+  deliveryLoading.value = true
+  deliveryError.value = null
+
+  try {
+    const response = await deliveryService.getHistory()
+    const deliveries = Array.isArray(response.data)
+      ? response.data
+      : (response.data as any)?.data || []
+    delivery.value = deliveries.find((item: Delivery) => item.reservation_id === reservationId) || null
+  } catch (err: any) {
+    deliveryError.value = err?.message || 'Impossible de charger la livraison associée'
+  } finally {
+    deliveryLoading.value = false
+  }
+}
+
+const requestDelivery = () => {
+  if (!reservation.value) return
+  router.push({ name: 'delivery-request', params: { reservationId: reservation.value.id } })
+}
+
+const trackDelivery = () => {
+  if (!delivery.value) return
+  router.push({ name: 'delivery-tracking', params: { deliveryId: delivery.value.id } })
+}
+
+const rateDelivery = () => {
+  if (!delivery.value) return
+  router.push({ name: 'delivery-rating', params: { deliveryId: delivery.value.id } })
+}
+
+const cancelDelivery = async () => {
+  if (!delivery.value) return
+  const reason = window.prompt('Pourquoi souhaitez-vous annuler la livraison ?')
+  if (!reason) return
+
+  try {
+    const response = await deliveryService.cancelDelivery(delivery.value.id, reason)
+    delivery.value = response.data
+    notify.success('Livraison annulée')
+  } catch (err: any) {
+    notify.error(err?.message || 'Impossible d’annuler la livraison')
+  }
 }
 
 onMounted(() => {

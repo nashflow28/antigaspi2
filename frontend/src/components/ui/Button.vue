@@ -88,26 +88,26 @@ const emit = defineEmits<{
 const attrs = useAttrs()
 
 const baseClasses =
-  'group inline-flex items-center justify-center gap-2 rounded font-medium tracking-tight transition-all duration-300 ease-spring-out focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none relative overflow-hidden isolate select-none will-change-transform'
+  'group inline-flex items-center justify-center gap-2 rounded font-medium tracking-tight transition-all duration-300 ease-spring-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none relative overflow-hidden isolate select-none will-change-transform'
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-xl hover:shadow-lg hover:brightness-[1.05] focus-visible:ring-blue-300',
+    'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-xl hover:shadow-lg hover:brightness-[1.05] focus-visible:ring-primary-300',
   secondary:
-    'bg-white text-blue-900 border border-blue-200 shadow-lg hover:border-blue-300 hover:bg-blue-50/60 hover:text-blue-800 dark:bg-gray-900 dark:text-gray-50 dark:border-blue-500/40 dark:hover:bg-blue-700/10',
+    'bg-white text-primary-900 border border-primary-200 shadow-lg hover:border-primary-300 hover:bg-primary-50/60 hover:text-primary-800 dark:bg-neutral-900 dark:text-neutral-50 dark:border-primary-500/40 dark:hover:bg-primary-700/10',
   ghost:
-    'bg-transparent text-blue-600 dark:text-blue-200 hover:text-blue-800 hover:bg-blue-200/20 dark:hover:text-white dark:hover:bg-blue-800/30',
+    'bg-transparent text-primary-600 dark:text-primary-200 hover:text-primary-800 hover:bg-primary-200/20 dark:hover:text-white dark:hover:bg-primary-800/30',
   outline:
-    'border border-blue-400 text-blue-900 bg-transparent hover:bg-blue-200/20 hover:text-blue-900 dark:text-blue-200 dark:border-blue-300/60 dark:hover:bg-blue-800/40',
+    'border border-primary-400 text-primary-900 bg-transparent hover:bg-primary-200/20 hover:text-primary-900 dark:text-primary-200 dark:border-primary-300/60 dark:hover:bg-primary-800/40',
   promo:
-    'bg-orange-500 text-gray-900 shadow-lg hover:shadow-xl hover:brightness-[1.03]',
+    'bg-orange-500 text-neutral-900 shadow-lg hover:shadow-xl hover:brightness-[1.03]',
   destructive:
     'bg-red-600 text-white shadow-lg hover:bg-red-600/90 focus-visible:ring-accent-red/40'
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
   sm: 'px-3 py-2 text-sm rounded',
-  default: 'px-xl py-2.5 text-gray-700',
+  default: 'px-xl py-2.5 text-neutral-700',
   lg: 'px-4 py-3 text-h4',
   xl: 'px-7 py-3.5 text-lg',
   icon: 'p-2.5 rounded'

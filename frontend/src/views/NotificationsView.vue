@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4 py-10 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-gradient-to-br from-primary-50 via-white to-indigo-50 px-4 py-10 sm:px-6 lg:px-8">
     <div class="mx-auto flex max-w-6xl flex-col gap-6">
       <div class="flex flex-col gap-2">
         <Button
@@ -14,17 +14,17 @@
         </Button>
         <h1 class="text-3xl font-semibold text-neutral-900">Mes notifications</h1>
         <p class="max-w-3xl text-sm text-neutral-600">
-          Retrouvez l&apos;ensemble de vos alertes Antigaspi : réservations, rappels de retrait, offres personnalisées et messages importants.
+          Retrouvez l&apos;ensemble de vos alertes GÊLADAL : réservations, rappels de retrait, offres personnalisées et messages importants.
         </p>
       </div>
 
       <Card variant="elevated" class="overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-600/95 to-indigo-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
+        <div class="bg-gradient-to-r from-primary-600/95 to-indigo-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
           <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-wide text-blue-100">Centre d&apos;alertes</p>
+              <p class="text-xs font-semibold uppercase tracking-wide text-primary-100">Centre d&apos;alertes</p>
               <h2 class="text-2xl font-semibold">Historique et rappels</h2>
-              <p class="mt-2 max-w-2xl text-sm text-blue-100/85">
+              <p class="mt-2 max-w-2xl text-sm text-primary-100/85">
                 Filtrez vos messages, marquez-les comme lus et gérez vos préférences de contact depuis une interface dédiée.
               </p>
             </div>
@@ -93,7 +93,7 @@
                 }"
               >
                 <template #icon>
-                  <BellOff class="h-12 w-12 text-blue-500" aria-hidden="true" />
+                  <BellOff class="h-12 w-12 text-primary-500" aria-hidden="true" />
                 </template>
               </EmptyState>
             </template>
@@ -106,13 +106,13 @@
                   'rounded-3xl border p-5 transition-shadow duration-200',
                   notification.is_read
                     ? 'bg-white border-neutral-200 hover:shadow-lg'
-                    : 'border-blue-200/70 bg-blue-50/70 shadow-blue-200/40 hover:shadow-xl'
+                    : 'border-primary-200/70 bg-primary-50/70 shadow-primary-200/40 hover:shadow-xl'
                 ]"
               >
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div class="space-y-3">
                     <div class="flex items-start gap-3">
-                      <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/30">
+                      <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-indigo-500 text-white shadow-lg shadow-primary-500/30">
                         <component :is="typeIcon(notification.type)" class="h-5 w-5" aria-hidden="true" />
                       </span>
                       <div class="space-y-1">
@@ -133,7 +133,7 @@
                         <span>{{ formatRelativeTime(notification.sent_at || notification.created_at) }}</span>
                       </div>
                       <div class="flex items-center gap-2">
-                        <component :is="channelIcon(notification.sent_via)" class="h-4 w-4 text-blue-500" aria-hidden="true" />
+                        <component :is="channelIcon(notification.sent_via)" class="h-4 w-4 text-primary-500" aria-hidden="true" />
                         <span>{{ formatChannelLabel(notification.sent_via) }}</span>
                       </div>
                     </div>
@@ -234,7 +234,7 @@ const lastRefreshLabel = computed(() => {
 })
 
 const formatTypeLabel = (value?: string | null) => {
-  if (!value) return 'Notification Antigaspi'
+  if (!value) return 'Notification GÊLADAL'
   return value
     .replace(/[_-]+/g, ' ')
     .replace(/\s+/g, ' ')

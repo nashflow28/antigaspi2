@@ -2,10 +2,10 @@
   <div class="create-surprise-basket">
     <!-- Header -->
     <div class="mt-4">
-      <h2 class="text-xl font-semibold text-gray-900 mt-2">
+      <h2 class="text-xl font-semibold text-neutral-900 mt-2">
         Créer un Panier Surprise
       </h2>
-      <p class="text-gray-700">
+      <p class="text-neutral-700">
         Créez des paniers surprise avec vos produits invendus pour maximiser vos ventes
       </p>
     </div>
@@ -13,13 +13,13 @@
     <!-- Form -->
     <form class="space-y-6" @submit.prevent="handleSubmit">
       <!-- Basic Information -->
-      <div class="bg-white rounded border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mt-3">Informations générales</h3>
+      <div class="bg-white rounded border border-neutral-200 p-6">
+        <h3 class="text-lg font-semibold text-neutral-900 mt-3">Informations générales</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
           <!-- Name -->
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-800 mt-2">
+            <label for="name" class="block text-sm font-medium text-neutral-800 mt-2">
               Nom du panier surprise *
             </label>
             <input
@@ -27,20 +27,20 @@
               v-model="form.name"
               type="text"
               required
-              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="Ex: Panier Boulangerie du jour"
             >
           </div>
 
           <!-- Category -->
           <div>
-            <label for="category" class="block text-sm font-medium text-gray-800 mt-2">
+            <label for="category" class="block text-sm font-medium text-neutral-800 mt-2">
               Catégorie
             </label>
             <select
               id="category"
               v-model="form.category_id"
-              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">Sélectionnez une catégorie</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -51,7 +51,7 @@
 
           <!-- Price -->
           <div>
-            <label for="price" class="block text-sm font-medium text-gray-800 mt-2">
+            <label for="price" class="block text-sm font-medium text-neutral-800 mt-2">
               Prix du panier (XOF) *
             </label>
             <input
@@ -61,14 +61,14 @@
               min="0"
               step="0.01"
               required
-              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="2000"
             >
           </div>
 
           <!-- Quantity -->
           <div>
-            <label for="quantity" class="block text-sm font-medium text-gray-800 mt-2">
+            <label for="quantity" class="block text-sm font-medium text-neutral-800 mt-2">
               Nombre de paniers disponibles *
             </label>
             <input
@@ -77,7 +77,7 @@
               type="number"
               min="1"
               required
-              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="5"
             >
           </div>
@@ -85,43 +85,43 @@
 
         <!-- Description -->
         <div class="mt-6">
-          <label for="description" class="block text-sm font-medium text-gray-800 mt-2">
+          <label for="description" class="block text-sm font-medium text-neutral-800 mt-2">
             Description générale
           </label>
           <textarea
             id="description"
             v-model="form.description"
             rows="3"
-            class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Décrivez brièvement ce panier surprise..."
           />
         </div>
 
         <!-- Surprise Description -->
         <div class="mt-6">
-          <label for="surprise-description" class="block text-sm font-medium text-gray-800 mt-2">
+          <label for="surprise-description" class="block text-sm font-medium text-neutral-800 mt-2">
             Description mystère (visible par les clients)
           </label>
           <textarea
             id="surprise-description"
             v-model="form.surprise_description"
             rows="2"
-            class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Ex: Un assortiment de viennoiseries fraîches du jour..."
           />
-          <p class="text-sm text-gray-500 mt-1">
+          <p class="text-sm text-neutral-500 mt-1">
             Cette description sera visible par les clients sans révéler le contenu exact
           </p>
         </div>
       </div>
 
       <!-- Products Selection -->
-      <div class="bg-white rounded border border-gray-200 p-6">
+      <div class="bg-white rounded border border-neutral-200 p-6">
         <div class="flex items-center justify-start sm:justify-between mt-3">
-          <h3 class="text-lg font-semibold text-gray-900">Produits inclus</h3>
+          <h3 class="text-lg font-semibold text-neutral-900">Produits inclus</h3>
           <button
             type="button"
-            class="px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
+            class="px-3 py-3 bg-primary-600 text-white rounded hover:transition-colors"
             @click="showProductSelector = true"
           >
             <Plus class="h-4 w-4 inline mr-2" />
@@ -130,8 +130,8 @@
         </div>
 
         <!-- Selected Products -->
-        <div v-if="selectedProducts.length === 0" class="text-left sm:text-center py-6 sm:py-8 text-gray-500">
-          <Package class="w-12 h-10 mx-auto mb-4 text-gray-500" />
+        <div v-if="selectedProducts.length === 0" class="text-left sm:text-center py-6 sm:py-8 text-neutral-500">
+          <Package class="w-12 h-10 mx-auto mb-4 text-neutral-500" />
           <p>Aucun produit sélectionné</p>
           <p class="text-sm">Ajoutez des produits pour créer votre panier surprise</p>
         </div>
@@ -140,7 +140,7 @@
           <div
             v-for="item in selectedProducts"
             :key="item.product.id"
-            class="flex items-center justify-start sm:justify-between p-4 bg-gray-50 rounded"
+            class="flex items-center justify-start sm:justify-between p-4 bg-neutral-50 rounded"
           >
             <div class="flex items-center space-y-2 sm:space-x-3">
               <img
@@ -151,13 +151,13 @@
               >
               <div
                 v-else
-                class="w-12 h-10 bg-gray-200 rounded flex items-center justify-center"
+                class="w-12 h-10 bg-neutral-200 rounded flex items-center justify-center"
               >
-                <Package class="h-6 w-6 text-gray-400" />
+                <Package class="h-6 w-6 text-neutral-400" />
               </div>
               <div>
-                <h4 class="font-medium text-gray-900">{{ item.product.name }}</h4>
-                <p class="text-sm text-gray-500">{{ item.product.original_price }} XOF l'unité</p>
+                <h4 class="font-medium text-neutral-900">{{ item.product.name }}</h4>
+                <p class="text-sm text-neutral-500">{{ item.product.original_price }} XOF l'unité</p>
               </div>
             </div>
             <div class="flex items-center space-y-2 sm:space-x-3">
@@ -165,15 +165,15 @@
                 <button
                   type="button"
                   :disabled="item.quantity <= 1"
-                  class="h-6 w-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="h-6 w-6 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed"
                   @click="updateProductQuantity(item.product.id, item.quantity - 1)"
                 >
                   <Minus class="h-4 w-4" />
                 </button>
-                <span class="font-medium text-gray-900 w-12 text-left sm:text-center">{{ item.quantity }}</span>
+                <span class="font-medium text-neutral-900 w-12 text-left sm:text-center">{{ item.quantity }}</span>
                 <button
                   type="button"
-                  class="h-6 w-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                  class="h-6 w-6 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100"
                   @click="updateProductQuantity(item.product.id, item.quantity + 1)"
                 >
                   <Plus class="h-4 w-4" />
@@ -190,31 +190,31 @@
           </div>
 
           <!-- Summary -->
-          <div class="mt-6 p-4 bg-green-50 border border-blue-200 rounded">
+          <div class="mt-6 p-4 bg-green-50 border border-primary-200 rounded">
             <div class="flex justify-start sm:justify-between items-center text-sm">
               <span class="text-green-700">Valeur totale des produits:</span>
-              <span class="font-semibold text-blue-900">{{ totalOriginalValue }} XOF</span>
+              <span class="font-semibold text-primary-900">{{ totalOriginalValue }} XOF</span>
             </div>
             <div class="flex justify-start sm:justify-between items-center text-sm mt-1">
               <span class="text-green-700">Prix du panier:</span>
-              <span class="font-semibold text-blue-900">{{ form.discounted_price || 0 }} XOF</span>
+              <span class="font-semibold text-primary-900">{{ form.discounted_price || 0 }} XOF</span>
             </div>
             <div class="flex justify-start sm:justify-between items-center text-sm mt-1">
               <span class="text-green-700">Économies pour le client:</span>
-              <span class="font-semibold text-blue-900">{{ totalSavings }} XOF ({{ discountPercentage }}%)</span>
+              <span class="font-semibold text-primary-900">{{ totalSavings }} XOF ({{ discountPercentage }}%)</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Additional Options -->
-      <div class="bg-white rounded border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mt-3">Options avancées</h3>
+      <div class="bg-white rounded border border-neutral-200 p-6">
+        <h3 class="text-lg font-semibold text-neutral-900 mt-3">Options avancées</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
           <!-- Min Items -->
           <div>
-            <label for="min-items" class="block text-sm font-medium text-gray-800 mt-2">
+            <label for="min-items" class="block text-sm font-medium text-neutral-800 mt-2">
               Nombre minimum d'articles
             </label>
             <input
@@ -222,14 +222,14 @@
               v-model.number="form.min_items"
               type="number"
               min="1"
-              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="3"
             >
           </div>
 
           <!-- Max Items -->
           <div>
-            <label for="max-items" class="block text-sm font-medium text-gray-800 mt-2">
+            <label for="max-items" class="block text-sm font-medium text-neutral-800 mt-2">
               Nombre maximum d'articles
             </label>
             <input
@@ -237,14 +237,14 @@
               v-model.number="form.max_items"
               type="number"
               min="1"
-              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="8"
             >
           </div>
 
           <!-- Expiration Date -->
           <div>
-            <label for="expiration" class="block text-sm font-medium text-gray-800 mt-2">
+            <label for="expiration" class="block text-sm font-medium text-neutral-800 mt-2">
               Date d'expiration
             </label>
             <input
@@ -252,20 +252,20 @@
               v-model="form.expiration_date"
               type="date"
               :min="tomorrow"
-              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
           </div>
 
           <!-- Image URL -->
           <div>
-            <label for="image" class="block text-sm font-medium text-gray-800 mt-2">
+            <label for="image" class="block text-sm font-medium text-neutral-800 mt-2">
               URL de l'image
             </label>
             <input
               id="image"
               v-model="form.image_url"
               type="url"
-              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="https://example.com/image.jpg"
             >
           </div>
@@ -276,7 +276,7 @@
       <div class="flex items-center justify-center sm:justify-end space-y-4 sm:space-x-4 pt-2xl">
         <button
           type="button"
-          class="px-4 py-3 border border-gray-300 text-gray-800 rounded hover:transition-colors"
+          class="px-4 py-3 border border-neutral-300 text-neutral-800 rounded hover:transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
@@ -284,7 +284,7 @@
         <button
           type="submit"
           :disabled="!canSubmit || creating"
-          class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors"
+          class="px-4 py-3 bg-primary-600 text-white rounded hover:transition-colors"
         >
           <div v-if="creating" class="flex items-center">
             <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />

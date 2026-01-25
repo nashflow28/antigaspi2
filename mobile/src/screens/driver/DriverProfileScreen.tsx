@@ -238,7 +238,7 @@ const DriverProfileScreen: React.FC = () => {
           <MenuItem
             icon="help-circle-outline"
             label="Aide et support"
-            onPress={() => Alert.alert('Support', 'Contactez-nous à support@antigaspi.com')}
+            onPress={() => Alert.alert('Support', 'Contactez-nous à support@geladal.com')}
           />
           <MenuItem
             icon="document-text-outline"

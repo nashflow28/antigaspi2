@@ -1,15 +1,15 @@
 <template>
-  <div class="bg-white rounded shadow-lg border border-gray-100">
-    <div class="px-4 py-4 border-b border-gray-200">
+  <div class="bg-white rounded shadow-lg border border-neutral-100">
+    <div class="px-4 py-4 border-b border-neutral-200">
       <div class="flex items-center justify-start sm:justify-between">
-        <h3 class="text-xl font-semibold text-gray-900">
+        <h3 class="text-xl font-semibold text-neutral-900">
           Avis en attente de modération
-          <span v-if="pagination" class="text-gray-500 font-normal">
+          <span v-if="pagination" class="text-neutral-500 font-normal">
             ({{ pagination.total }} au total)
           </span>
         </h3>
         <button
-          class="inline-flex items-center px-3 py-3 text-sm text-blue-600 hover:transition-colors"
+          class="inline-flex items-center px-3 py-3 text-sm text-primary-600 hover:transition-colors"
           :disabled="loading"
           @click="() => loadReviews()"
         >
@@ -22,15 +22,15 @@
     <div class="divide-y divide-neutral-200">
       <!-- Loading State -->
       <div v-if="loading" class="px-4 py-6 sm:py-8 text-left sm:text-center">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" />
-        <p class="text-gray-500 mt-2">Chargement des avis...</p>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
+        <p class="text-neutral-500 mt-2">Chargement des avis...</p>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="reviews.length === 0" class="px-4 py-6 sm:py-8 text-left sm:text-center">
-        <CheckCircle class="w-12 h-10 text-blue-400 mx-auto mt-3" />
-        <h4 class="text-lg font-medium text-gray-900 mt-2">Aucun avis en attente</h4>
-        <p class="text-gray-700">Tous les avis ont été modérés !</p>
+        <CheckCircle class="w-12 h-10 text-primary-400 mx-auto mt-3" />
+        <h4 class="text-lg font-medium text-neutral-900 mt-2">Aucun avis en attente</h4>
+        <p class="text-neutral-700">Tous les avis ont été modérés !</p>
       </div>
 
       <!-- Reviews List -->
@@ -49,23 +49,23 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="pagination && pagination.last_page > 1" class="px-4 py-4 border-t border-gray-200">
+    <div v-if="pagination && pagination.last_page > 1" class="px-4 py-4 border-t border-neutral-200">
       <div class="flex items-center justify-start sm:justify-between">
-        <div class="text-sm text-gray-500">
+        <div class="text-sm text-neutral-500">
           Page {{ pagination.current_page }} sur {{ pagination.last_page }}
           ({{ pagination.total }} avis au total)
         </div>
         <div class="flex space-y-4 sm:space-x-2">
           <button
             :disabled="pagination.current_page <= 1"
-            class="px-3 py-3 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            class="px-3 py-3 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page - 1)"
           >
             Précédent
           </button>
           <button
             :disabled="pagination.current_page >= pagination.last_page"
-            class="px-3 py-3 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            class="px-3 py-3 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page + 1)"
           >
             Suivant

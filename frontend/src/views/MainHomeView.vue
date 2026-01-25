@@ -8,7 +8,7 @@
           </div>
           <div class="space-y-4">
             <p class="text-sm font-medium text-neutral-500">Bienvenue</p>
-            <h1 class="text-h2 font-semibold text-neutral-900">Antigaspi</h1>
+            <h1 class="text-h2 font-semibold text-neutral-900">GÊLADAL</h1>
           </div>
         </div>
 

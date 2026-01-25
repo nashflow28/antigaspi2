@@ -2,10 +2,10 @@
   <div class="space-y-6">
     <!-- Header -->
     <div class="text-left sm:text-center animate-fade-in-up">
-      <h3 class="text-xl font-semibold text-gray-900 mt-2">
-        Bienvenue sur Antigaspi
+      <h3 class="text-xl font-semibold text-neutral-900 mt-2">
+        Bienvenue sur GÊLADAL
       </h3>
-      <p class="text-gray-700">
+      <p class="text-neutral-700">
         Connectez-vous avec votre numéro de téléphone
       </p>
     </div>
@@ -14,13 +14,13 @@
     <form class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;" @submit.prevent="handleSubmit">
       <!-- Phone Number Input -->
       <div class="space-y-4">
-        <label for="phone" class="block text-sm font-medium text-gray-900">
+        <label for="phone" class="block text-sm font-medium text-neutral-900">
           Numéro de téléphone
         </label>
         <div class="flex gap-2">
-          <div class="flex items-center px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg">
-            <Phone class="h-4 w-4 text-gray-500 mr-2" />
-            <span class="font-semibold text-gray-900">+228</span>
+          <div class="flex items-center px-4 py-3 bg-neutral-100 border border-neutral-300 rounded-lg">
+            <Phone class="h-4 w-4 text-neutral-500 mr-2" />
+            <span class="font-semibold text-neutral-900">+228</span>
           </div>
           <Input
             id="phone"
@@ -34,7 +34,7 @@
             @input="formatPhoneInput"
           />
         </div>
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-neutral-600">
           Format: 90 XX XX XX (8 chiffres)
         </p>
       </div>
@@ -53,7 +53,7 @@
           <Loader2 v-if="loading" class="h-4 w-4 animate-spin" />
           <span>{{ loading ? 'Vérification...' : 'Continuer' }}</span>
         </span>
-        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500/90 opacity-0 group-hover:transition-opacity duration-300" />
+        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500/90 opacity-0 group-hover:transition-opacity duration-300" />
       </Button>
 
       <!-- Error Message -->
@@ -69,22 +69,22 @@
     </form>
 
     <!-- Info about the auth flow -->
-    <div class="space-y-3 text-sm text-gray-600 animate-fade-in-up" style="animation-delay: 0.4s;">
+    <div class="space-y-3 text-sm text-neutral-600 animate-fade-in-up" style="animation-delay: 0.4s;">
       <div class="flex items-start gap-3">
-        <ShieldCheck class="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        <ShieldCheck class="h-5 w-5 text-primary-600 flex-shrink-0 mt-0.5" />
         <p>Connexion sécurisée par code SMS</p>
       </div>
       <div class="flex items-start gap-3">
-        <Lock class="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        <Lock class="h-5 w-5 text-primary-600 flex-shrink-0 mt-0.5" />
         <p>Code PIN pour connexion rapide sur cet appareil</p>
       </div>
     </div>
 
     <!-- Switch to email login -->
-    <div class="text-left sm:text-center text-sm text-gray-700 animate-fade-in-up" style="animation-delay: 0.6s;">
+    <div class="text-left sm:text-center text-sm text-neutral-700 animate-fade-in-up" style="animation-delay: 0.6s;">
       <button
         type="button"
-        class="font-semibold text-blue-600 hover:text-blue-900"
+        class="font-semibold text-primary-600 hover:text-primary-900"
         @click="$emit('switch-to-email')"
       >
         Utiliser l'email à la place
@@ -118,7 +118,7 @@ const emit = defineEmits<{
 
 // Log migration usage
 logMigration('PhoneLoginForm', 'Using 2025 components', {
-  components: ['Button', 'Input'],
+  components: ['Button', 'Input']
 })
 
 // Reactive state
@@ -127,7 +127,7 @@ const phoneNumber = ref('')
 const errorMessage = ref('')
 
 const errors = ref({
-  phone: '',
+  phone: ''
 })
 
 // Computed

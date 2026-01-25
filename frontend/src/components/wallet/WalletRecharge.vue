@@ -2,7 +2,7 @@
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <Card class="w-full max-w-xl">
       <div class="flex items-center justify-start sm:justify-between mt-4">
-        <h3 class="text-xl font-semibold text-gray-900">Recharger le portefeuille</h3>
+        <h3 class="text-xl font-semibold text-neutral-900">Recharger le portefeuille</h3>
         <Button
           variant="ghost"
           size="sm"
@@ -43,10 +43,10 @@
                 :error="errors.amount"
                 required
               />
-              <span class="relative sm:absolute right-3 top-3 text-gray-500 text-sm">XOF</span>
+              <span class="relative sm:absolute right-3 top-3 text-neutral-500 text-sm">XOF</span>
             </div>
             <p v-if="errors.amount" class="mt-1 text-sm text-red-600">{{ errors.amount }}</p>
-            <p class="mt-1 text-xs text-gray-500">Montant minimum: 100 XOF, maximum: 1 000 000 XOF</p>
+            <p class="mt-1 text-xs text-neutral-500">Montant minimum: 100 XOF, maximum: 1 000 000 XOF</p>
           </div>
 
           <div>
@@ -57,8 +57,8 @@
               <label
                 v-for="method in paymentMethods"
                 :key="method.value"
-                class="flex items-center p-3 border border-gray-200 rounded cursor-pointer hover:bg-gray-50"
-                :class="{'border-blue-500 bg-green-50': form.payment_method === method.value}"
+                class="flex items-center p-3 border border-neutral-200 rounded cursor-pointer hover:bg-neutral-50"
+                :class="{'border-primary-500 bg-green-50': form.payment_method === method.value}"
               >
                 <input
                   v-model="form.payment_method"
@@ -67,17 +67,17 @@
                   class="sr-only"
                 >
                 <div class="flex items-center space-y-2 sm:space-x-3 flex-1">
-                  <div class="h-6 w-6 bg-gray-100 rounded flex items-center justify-center">
-                    <component :is="method.icon" class="h-6 w-6 text-gray-700" />
+                  <div class="h-6 w-6 bg-neutral-100 rounded flex items-center justify-center">
+                    <component :is="method.icon" class="h-6 w-6 text-neutral-700" />
                   </div>
                   <div>
-                    <div class="font-medium text-gray-900">{{ method.name }}</div>
-                    <div class="text-sm text-gray-500">{{ method.description }}</div>
+                    <div class="font-medium text-neutral-900">{{ method.name }}</div>
+                    <div class="text-sm text-neutral-500">{{ method.description }}</div>
                   </div>
                 </div>
                 <div
                   class="h-4 w-4 border-2 rounded-full"
-                  :class="form.payment_method === method.value ? 'border-blue-500 bg-blue-500' : 'border-gray-300'"
+                  :class="form.payment_method === method.value ? 'border-primary-500 bg-primary-500' : 'border-neutral-300'"
                 >
                   <div v-if="form.payment_method === method.value" class="w-full h-full bg-white rounded-full scale-50" />
                 </div>
@@ -100,9 +100,9 @@
             <p v-if="errors.phone" class="text-sm text-red-600">{{ errors.phone }}</p>
           </div>
 
-          <div class="bg-blue-50 border border-blue-200 rounded p-4">
+          <div class="bg-primary-50 border border-primary-200 rounded p-4">
             <div class="flex items-stretch sm:items-start space-y-4 sm:space-x-2">
-              <svg class="h-4 w-4 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="h-4 w-4 text-primary-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
               </svg>
               <div class="text-sm text-secondary-700">

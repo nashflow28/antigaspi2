@@ -196,6 +196,7 @@ class ReservationService
             'notes' => $options['notes'] ?? null,
             'pickup_date' => $options['pickup_date'] ?? null,
             'pickup_time' => $options['pickup_time'] ?? null,
+            'expires_at' => now()->addHours(24), // 24h pour confirmer/récupérer
         ]);
 
         $product->decrement('quantity_available', $quantity);

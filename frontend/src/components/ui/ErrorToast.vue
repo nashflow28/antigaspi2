@@ -26,10 +26,10 @@
               </div>
 
               <div class="ml-4 w-none flex-1 pt-0.5">
-                <p class="text-sm font-medium text-gray-900">
+                <p class="text-sm font-medium text-neutral-900">
                   {{ getErrorTitle(error.severity) }}
                 </p>
-                <p class="mt-1 text-sm text-gray-500">
+                <p class="mt-1 text-sm text-neutral-500">
                   {{ error.userMessage }}
                 </p>
 
@@ -51,7 +51,7 @@
               <div class="ml-6 flex flex-shrink-0">
                 <button
                   type="button"
-                  class="inline-flex rounded bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  class="inline-flex rounded bg-white text-neutral-400 hover:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   @click="dismissError(error.id)"
                 >
                   <span class="sr-only">Fermer</span>
@@ -64,7 +64,7 @@
           <!-- Auto-dismiss progress bar -->
           <div
             v-if="error.severity !== 'critical' && getTimeRemaining(error) > 0"
-            class="h-3 bg-gray-200"
+            class="h-3 bg-neutral-200"
           >
             <div
               class="h-full transition-all duration-100 ease-linear"
@@ -154,7 +154,7 @@ const getErrorClasses = (severity: ErrorSeverity): string => {
     case 'critical': return 'border-l-4 border-red-400'
     case 'error': return 'border-l-4 border-orange-400'
     case 'warning': return 'border-l-4 border-yellow-400'
-    case 'info': return 'border-l-4 border-blue-400'
+    case 'info': return 'border-l-4 border-primary-400'
     default: return 'border-l-4 border-surface-400'
   }
 }
@@ -174,7 +174,7 @@ const getProgressClasses = (severity: ErrorSeverity): string => {
     case 'error': return 'bg-orange-400'
     case 'warning': return 'bg-yellow-400'
     case 'info': return 'bg-secondary-400'
-    default: return 'bg-gray-50-400'
+    default: return 'bg-neutral-400'
   }
 }
 

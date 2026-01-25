@@ -1,19 +1,19 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-neutral-50">
     <!-- TopBar intégrée directement -->
-    <header class="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40" role="banner">
+    <header class="fixed top-0 left-0 right-0 bg-white border-b border-neutral-200 z-40" role="banner">
       <div class="max-w-xl mx-auto px-3">
         <div class="flex items-center justify-start sm:justify-between h-10">
           <!-- Logo et titre -->
           <div class="flex items-center gap-3">
-            <div class="h-6 w-6 bg-blue-600 rounded flex items-center justify-center">
+            <div class="h-6 w-6 bg-primary-600 rounded flex items-center justify-center">
               <span class="text-white text-lg font-semibold">🌱</span>
             </div>
             <div class="flex flex-col">
-              <h1 class="text-lg font-semibold text-gray-900">
-                Antigaspi
+              <h1 class="text-lg font-semibold text-neutral-900">
+                GÊLADAL
               </h1>
-              <p class="text-xs text-gray-500">
+              <p class="text-xs text-neutral-500">
                 TopBar Test
               </p>
             </div>
@@ -23,7 +23,7 @@
           <div class="flex items-center gap-2">
             <!-- Bouton de recherche -->
             <button
-              class="p-2 rounded text-gray-700 hover:text-info hover:transition-colors"
+              class="p-2 rounded text-neutral-700 hover:text-info hover:transition-colors"
               aria-label="Rechercher"
               @click="handleSearch"
             >
@@ -32,7 +32,7 @@
 
             <!-- Bouton notifications -->
             <button
-              class="relative p-2 rounded text-gray-700 hover:text-info hover:transition-colors"
+              class="relative p-2 rounded text-neutral-700 hover:text-info hover:transition-colors"
               aria-label="Notifications"
               @click="handleNotifications"
             >
@@ -44,12 +44,12 @@
 
             <!-- Bouton panier -->
             <button
-              class="relative p-2 rounded text-gray-700 hover:text-info hover:transition-colors"
+              class="relative p-2 rounded text-neutral-700 hover:text-info hover:transition-colors"
               aria-label="Panier"
               @click="handleCart"
             >
               🛒
-              <div class="relative sm:absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center padding-x-xs">
+              <div class="relative sm:absolute -top-1 -right-1 bg-primary-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center padding-x-xs">
                 2
               </div>
             </button>
@@ -59,7 +59,7 @@
               class="p-1 rounded hover:transition-colors"
               @click="handleUser"
             >
-              <div class="h-6 w-6 bg-blue-600 rounded flex items-center justify-center">
+              <div class="h-6 w-6 bg-primary-600 rounded flex items-center justify-center">
                 <span class="text-white text-sm font-medium">U</span>
               </div>
             </button>
@@ -71,7 +71,7 @@
     <!-- Main content avec padding pour la TopBar -->
     <main class="pt-16 p-4">
       <div class="bg-white rounded shadow p-6 mt-3">
-        <h2 class="text-xl font-semibold text-gray-900 mt-3">
+        <h2 class="text-xl font-semibold text-neutral-900 mt-3">
           🎯 TopBar Test Standalone
         </h2>
 
@@ -84,7 +84,7 @@
         </div>
 
         <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="bg-blue-50 p-4 rounded">
+          <div class="bg-primary-50 p-4 rounded">
             <h3 class="font-medium text-secondary-900 mt-2">Actions TopBar</h3>
             <div class="space-y-4 text-sm">
               <div>🔍 Recherche: {{ searchClicks }} clics</div>
@@ -95,23 +95,23 @@
           </div>
 
           <div class="bg-green-50 p-4 rounded">
-            <h3 class="font-medium text-blue-900 mt-2">Navigation</h3>
+            <h3 class="font-medium text-primary-900 mt-2">Navigation</h3>
             <div class="space-y-4">
               <router-link
                 to="/"
-                class="block text-info hover:text-gray-800 underline text-sm"
+                class="block text-info hover:text-neutral-800 underline text-sm"
               >
                 → Retour à l'accueil
               </router-link>
               <router-link
                 to="/onboarding"
-                class="block text-info hover:text-gray-800 underline text-sm"
+                class="block text-info hover:text-neutral-800 underline text-sm"
               >
                 → Onboarding
               </router-link>
               <router-link
                 to="/gaspiz-demo"
-                class="block text-info hover:text-gray-800 underline text-sm"
+                class="block text-info hover:text-neutral-800 underline text-sm"
               >
                 → Gaspiz Demo
               </router-link>

@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
     <!-- Header -->
-    <div class="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+    <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
       <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 py-6">
         <div class="flex flex-col lg:flex-row lg:items-center justify-start sm:justify-between gap-3">
           <div>
-            <h1 class="text-xl font-semibold text-gray-900">Carte des commerçants</h1>
-            <p class="text-gray-700 mt-1">
+            <h1 class="text-xl font-semibold text-neutral-900">Carte des commerçants</h1>
+            <p class="text-neutral-700 mt-1">
               {{ merchantsLoading ? 'Chargement...' : `${merchantsWithLocation.length} commerçant${merchantsWithLocation.length > 1 ? 's' : ''} référencé${merchantsWithLocation.length > 1 ? 's' : ''}` }}
             </p>
           </div>
@@ -15,7 +15,7 @@
           <div class="flex flex-col sm:flex-row gap-3">
             <button
               :disabled="geoLoading"
-              class="inline-flex items-center px-3 py-3 text-sm font-medium text-gray-800 bg-white border border-gray-300 rounded hover:transition-colors"
+              class="inline-flex items-center px-3 py-3 text-sm font-medium text-neutral-800 bg-white border border-neutral-300 rounded hover:transition-colors"
               @click="getCurrentLocation"
             >
               <MapPin class="w-4 h-4 mr-2" :class="{ 'animate-pulse': geoLoading }" />
@@ -23,7 +23,7 @@
             </button>
             <button
               :disabled="merchantsLoading"
-              class="inline-flex items-center px-3 py-3 text-sm font-medium text-white bg-blue-600 rounded hover:transition-colors disabled:opacity-50"
+              class="inline-flex items-center px-3 py-3 text-sm font-medium text-white bg-primary-600 rounded hover:transition-colors disabled:opacity-50"
               @click="refreshMerchants"
             >
               <RefreshCw class="w-4 h-4 mr-2" :class="{ 'animate-spin': merchantsLoading }" />
@@ -36,12 +36,12 @@
         <div class="mt-4 flex flex-col lg:flex-row gap-4">
           <!-- Search -->
           <div class="relative flex-1">
-            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Rechercher un commerçant..."
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               @input="handleSearch"
             >
           </div>
@@ -49,7 +49,7 @@
           <!-- Category Filter -->
           <select
             v-model="selectedCategory"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             @change="filterMerchants"
           >
             <option value="">Toutes les catégories</option>
@@ -59,7 +59,7 @@
           <!-- Distance Filter -->
           <select
             v-model="maxDistance"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             :disabled="!position"
             @change="filterMerchants"
           >
@@ -71,11 +71,11 @@
           </select>
 
           <!-- View Toggle -->
-          <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+          <div class="flex rounded-lg border border-neutral-300 overflow-hidden">
             <button
               :class="[
                 'px-4 py-2 text-sm font-medium',
-                viewMode === 'map' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
+                viewMode === 'map' ? 'bg-primary-600 text-white' : 'bg-white text-neutral-700 hover:bg-neutral-50'
               ]"
               @click="viewMode = 'map'"
             >
@@ -85,7 +85,7 @@
             <button
               :class="[
                 'px-4 py-2 text-sm font-medium',
-                viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
+                viewMode === 'list' ? 'bg-primary-600 text-white' : 'bg-white text-neutral-700 hover:bg-neutral-50'
               ]"
               @click="viewMode = 'list'"
             >
@@ -103,7 +103,7 @@
       <div v-if="viewMode === 'map'" class="bg-white rounded shadow-lg p-6">
         <div
           ref="mapContainer"
-          class="w-full rounded border border-gray-300 map-container px-3 sm:px-4 lg:px-6"
+          class="w-full rounded border border-neutral-300 map-container px-3 sm:px-4 lg:px-6"
           style="height: 600px;"
         >
           <!-- Map will be loaded here -->
@@ -112,8 +112,8 @@
         <!-- Loading overlay -->
         <div v-if="merchantsLoading" class="relative sm:absolute inset-6 bg-white/80 rounded flex items-center justify-center">
           <div class="text-left sm:text-center">
-            <div class="animate-spin rounded-full w-5 h-5 border-b-2 border-blue-600 mx-auto mt-3" />
-            <p class="text-gray-700">Chargement des commerçants...</p>
+            <div class="animate-spin rounded-full w-5 h-5 border-b-2 border-primary-600 mx-auto mt-3" />
+            <p class="text-neutral-700">Chargement des commerçants...</p>
           </div>
         </div>
       </div>
@@ -121,13 +121,13 @@
       <!-- List View -->
       <div v-else class="space-y-4">
         <div v-if="merchantsLoading" class="flex justify-center py-12">
-          <div class="animate-spin rounded-full w-8 h-8 border-b-2 border-blue-600" />
+          <div class="animate-spin rounded-full w-8 h-8 border-b-2 border-primary-600" />
         </div>
 
         <div v-else-if="filteredMerchants.length === 0" class="text-center py-12 bg-white rounded shadow-lg">
-          <MapPin class="w-16 h-16 mx-auto text-gray-300 mb-4" />
-          <h3 class="text-lg font-medium text-gray-900">Aucun commerçant trouvé</h3>
-          <p class="text-gray-600 mt-2">Essayez de modifier vos critères de recherche</p>
+          <MapPin class="w-16 h-16 mx-auto text-neutral-300 mb-4" />
+          <h3 class="text-lg font-medium text-neutral-900">Aucun commerçant trouvé</h3>
+          <p class="text-neutral-600 mt-2">Essayez de modifier vos critères de recherche</p>
         </div>
 
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -138,32 +138,32 @@
             @click="selectedMerchant = merchant"
           >
             <!-- Merchant Image/Avatar -->
-            <div class="h-32 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+            <div class="h-32 bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
               <Building class="w-16 h-16 text-white/80" />
             </div>
 
             <!-- Merchant Info -->
             <div class="p-4">
-              <h3 class="font-semibold text-gray-900 text-lg">{{ merchant.business_name }}</h3>
-              <p class="text-sm text-gray-600 mt-1">{{ merchant.business_type }}</p>
+              <h3 class="font-semibold text-neutral-900 text-lg">{{ merchant.business_name }}</h3>
+              <p class="text-sm text-neutral-600 mt-1">{{ merchant.business_type }}</p>
 
-              <div class="flex items-center gap-2 mt-3 text-sm text-gray-500">
+              <div class="flex items-center gap-2 mt-3 text-sm text-neutral-500">
                 <MapPin class="w-4 h-4" />
                 <span>{{ merchant.user?.city || merchant.city || 'Lomé' }}</span>
               </div>
 
-              <div v-if="merchant.distance_km && position" class="flex items-center gap-2 mt-2 text-sm text-blue-600">
+              <div v-if="merchant.distance_km && position" class="flex items-center gap-2 mt-2 text-sm text-primary-600">
                 <Navigation class="w-4 h-4" />
                 <span>{{ merchant.distance_km.toFixed(1) }} km</span>
               </div>
 
-              <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+              <div class="flex items-center justify-between mt-4 pt-4 border-t border-neutral-100">
                 <div class="flex items-center gap-2 text-sm text-green-600">
                   <Package class="w-4 h-4" />
                   <span>{{ merchant.products_count ?? 0 }} produits</span>
                 </div>
                 <button
-                  class="text-sm font-medium text-blue-600 hover:text-blue-700"
+                  class="text-sm font-medium text-primary-600 hover:text-primary-700"
                   @click.stop="viewMerchantDetail(merchant)"
                 >
                   Voir →
@@ -190,36 +190,36 @@
           @click.stop
         >
           <!-- Header -->
-          <div class="px-6 py-4 border-b border-gray-200">
+          <div class="px-6 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-start sm:justify-between">
-              <h3 class="text-lg font-semibold text-gray-900">{{ selectedMerchant.business_name }}</h3>
+              <h3 class="text-lg font-semibold text-neutral-900">{{ selectedMerchant.business_name }}</h3>
               <button
                 class="p-2 hover:transition-colors"
                 @click="selectedMerchant = null"
               >
-                <X class="w-4 h-4 text-gray-400" />
+                <X class="w-4 h-4 text-neutral-400" />
               </button>
             </div>
           </div>
 
           <!-- Content -->
           <div class="px-6 py-6 space-y-4">
-            <div class="flex items-center space-y-2 sm:space-x-3 text-gray-700">
+            <div class="flex items-center space-y-2 sm:space-x-3 text-neutral-700">
               <Building class="w-4 h-4" />
               <span>{{ selectedMerchant.business_type }}</span>
             </div>
 
-            <div class="flex items-center space-y-2 sm:space-x-3 text-gray-700">
+            <div class="flex items-center space-y-2 sm:space-x-3 text-neutral-700">
               <MapPin class="w-4 h-4" />
               <span>{{ selectedMerchant.user?.address || selectedMerchant.user?.city || selectedMerchant.city }}</span>
             </div>
 
-            <div v-if="selectedMerchant.distance_km" class="flex items-center space-y-2 sm:space-x-3 text-gray-700">
+            <div v-if="selectedMerchant.distance_km" class="flex items-center space-y-2 sm:space-x-3 text-neutral-700">
               <Navigation class="w-4 h-4" />
               <span>{{ selectedMerchant.distance_km.toFixed(1) }} km de votre position</span>
             </div>
 
-            <div class="flex items-center space-y-2 sm:space-x-3 text-gray-700">
+            <div class="flex items-center space-y-2 sm:space-x-3 text-neutral-700">
               <Phone class="w-4 h-4" />
               <span>{{ selectedMerchant.user?.phone || 'Non renseigné' }}</span>
             </div>
@@ -236,9 +236,9 @@
           </div>
 
           <!-- Actions -->
-          <div class="px-6 py-4 border-t border-gray-200 flex justify-center sm:justify-end space-y-2 sm:space-x-3">
+          <div class="px-6 py-4 border-t border-neutral-200 flex justify-center sm:justify-end space-y-2 sm:space-x-3">
             <button
-              class="px-6 py-3 bg-blue-600 text-white rounded hover:transition-colors"
+              class="px-6 py-3 bg-primary-600 text-white rounded hover:transition-colors"
               @click="viewMerchantProducts"
             >
               Voir les produits
@@ -419,11 +419,11 @@ const addMerchantMarkers = async () => {
       // Add popup with merchant info
       const popup = L.popup().setContent(`
         <div class="p-3">
-          <h4 class="font-semibold text-gray-900 mt-2">${merchant.business_name}</h4>
-          <p class="text-sm text-gray-700 mb-1">${merchant.business_type}</p>
-          <p class="text-sm text-gray-700 mt-2">${merchant.products_count} produit(s) disponible(s)</p>
+          <h4 class="font-semibold text-neutral-900 mt-2">${merchant.business_name}</h4>
+          <p class="text-sm text-neutral-700 mb-1">${merchant.business_type}</p>
+          <p class="text-sm text-neutral-700 mt-2">${merchant.products_count} produit(s) disponible(s)</p>
           <div class="mt-3 text-left sm:text-center">
-            <button id="details-btn-${merchant.id}" class="bg-blue-600 text-white px-6 py-3 rounded text-sm hover:transition-colors">
+            <button id="details-btn-${merchant.id}" class="bg-primary-600 text-white px-6 py-3 rounded text-sm hover:transition-colors">
               Voir les détails
             </button>
           </div>

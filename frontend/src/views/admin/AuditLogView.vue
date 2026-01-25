@@ -405,8 +405,8 @@ const filters = reactive({
 })
 
 // Config - Use 'as any' to bypass strict DashboardLayout typing since we only need minimal props
-const sidebar = { brand: { name: 'Antigaspi Admin' }, navigation: [] } as any
-const header = { user: { name: 'Admin', email: 'admin@antigaspi.com' } } as any
+const sidebar = { brand: { name: 'GÊLADAL Admin' }, navigation: [] } as any
+const header = { user: { name: 'Admin', email: 'admin@geladal.com' } } as any
 
 // Dashboard Filters - Cast as any to allow additional properties like 'type'
 const dashboardFilters = [

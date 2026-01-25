@@ -474,7 +474,10 @@ class ReservationController extends Controller
                 ], 400);
             }
 
-            $reservation->update(['status' => 'ready']);
+            $reservation->update([
+                'status' => 'ready',
+                'ready_at' => now(),
+            ]);
             $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
 
             // Notification push non-bloquante

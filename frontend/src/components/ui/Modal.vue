@@ -22,13 +22,13 @@
         >
           <header v-if="title || showCloseButton" class="flex items-stretch sm:items-start justify-start sm:justify-between gap-3 px-4 py-xl">
             <div class="space-y-4">
-              <h2 v-if="title" :id="modalTitleId" class="text-h2 font-semibold text-blue-900 dark:text-blue-200">
+              <h2 v-if="title" :id="modalTitleId" class="text-h2 font-semibold text-primary-900 dark:text-primary-200">
                 {{ title }}
               </h2>
               <p
                 v-if="description"
                 :id="modalDescriptionId"
-                class="text-sm text-gray-500 dark:text-gray-500"
+                class="text-sm text-neutral-500 dark:text-neutral-500"
               >
                 {{ description }}
               </p>
@@ -63,7 +63,7 @@
 
           <footer
             v-if="$slots.footer"
-            class="mt-6 flex flex-col gap-3 border-t border-gray-200/60 px-4 pb-2xl pt-4 dark:border-gray-700/60 sm:flex-row sm:items-center sm:justify-end"
+            class="mt-6 flex flex-col gap-3 border-t border-neutral-200/60 px-4 pb-2xl pt-4 dark:border-neutral-700/60 sm:flex-row sm:items-center sm:justify-end"
           >
             <slot name="footer" />
           </footer>
@@ -120,10 +120,10 @@ const sizeClasses: Record<ModalSize, string> = {
 
 const variantClasses: Record<ModalVariant, string> = {
   surface:
-    'bg-white text-gray-800 border border-gray-200 shadow-lg dark:bg-gray-900 dark:text-gray-50 dark:border-gray-800',
+    'bg-white text-neutral-800 border border-neutral-200 shadow-lg dark:bg-neutral-900 dark:text-neutral-50 dark:border-neutral-800',
   glass:
-    'bg-white/90 text-gray-800 border border-blue-500/15 shadow-xl backdrop-blur-xl dark:bg-gray-900/80 dark:text-gray-50',
-  dark: 'bg-gray-900 text-gray-50 border border-gray-700 shadow-xl'
+    'bg-white/90 text-neutral-800 border border-primary-500/15 shadow-xl backdrop-blur-xl dark:bg-neutral-900/80 dark:text-neutral-50',
+  dark: 'bg-neutral-900 text-neutral-50 border border-neutral-700 shadow-xl'
 }
 
 const externalClass = computed(() => (attrs.class as string | undefined) ?? '')

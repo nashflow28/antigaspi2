@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 transition-colors duration-500">
+  <div id="app" class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 transition-colors duration-500">
     <!-- Navigation -->
     <NavBar />
 
@@ -33,9 +33,9 @@
 
     <!-- Background Pattern -->
     <div class="fixed inset-0 -z-10 opacity-20 dark:opacity-10">
-      <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-blue-500/15" />
-      <div class="relative sm:absolute top-0 -left-4 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
-      <div class="relative sm:absolute top-0 -right-4 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
+      <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-500/10 via-primary-500/5 to-primary-500/15" />
+      <div class="relative sm:absolute top-0 -left-4 w-72 h-72 bg-primary-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
+      <div class="relative sm:absolute top-0 -right-4 w-72 h-72 bg-primary-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
       <div class="relative sm:absolute -bottom-8 left-80 w-72 h-72 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
     </div>
   </div>

@@ -36,7 +36,7 @@
             <!-- Skip Link -->
             <a
               href="#modal-close"
-              class="skip-link sr-only focus:not-sr-only focus:relative sm:absolute focus:top-2 focus:right-2 bg-blue-600 text-white px-3 py-3 rounded text-sm z-10"
+              class="skip-link sr-only focus:not-sr-only focus:relative sm:absolute focus:top-2 focus:right-2 bg-primary-600 text-white px-3 py-3 rounded text-sm z-10"
             >
               Skip to close button
             </a>
@@ -74,7 +74,7 @@
               <p
                 v-if="description || slots.description"
                 :id="descriptionId"
-                class="text-sm text-gray-700 dark:text-gray-400 mt-2"
+                class="text-sm text-neutral-700 dark:text-neutral-400 mt-2"
               >
                 <slot name="description">{{ description }}</slot>
               </p>
@@ -308,7 +308,7 @@ const bodyClasses = computed(() => [
 const footerClasses = computed(() => [
   'px-4',
   'py-4',
-  'bg-gray-50-50',
+  'bg-neutral-50',
   'dark:bg-dark-900',
   'border-t',
   'border-surface-200',

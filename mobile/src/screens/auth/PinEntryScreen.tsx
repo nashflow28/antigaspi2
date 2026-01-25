@@ -18,10 +18,12 @@ import { AppDispatch } from '../../store'
 import { setAuthFromDeviceLogin } from '../../store/slices/authSlice'
 import { Card, Typography } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
+import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 import { useTheme } from '../../theme'
 import { useAlert } from '../../contexts/AlertContext'
 import { deviceService } from '../../services/deviceService'
 import { secureStorage } from '../../services/secureStorage'
+import { reset as navigationReset } from '../../navigation/NavigationRef'
 
 const PIN_LENGTH = 4
 
@@ -106,8 +108,11 @@ const PinEntryScreen: React.FC<Props> = ({ navigation, route }) => {
           token: result.data.token,
         }))
 
-        // Close auth modal
-        navigation.getParent()?.getParent()?.goBack()
+        // Reset navigation to Main screen (closes auth modal)
+        navigationReset({
+          index: 0,
+          routes: [{ name: 'Main' }],
+        })
       } else {
         // Wrong PIN
         Vibration.vibrate(200)
@@ -164,7 +169,10 @@ const PinEntryScreen: React.FC<Props> = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.content, { paddingHorizontal: theme.spacing.lg }]}>
+      <KeyboardAwareContainer
+        contentContainerStyle={[styles.content, { paddingHorizontal: theme.spacing.lg }]}
+        extraScrollHeight={60}
+      >
         {/* Logo and Title */}
         <View style={[styles.logoContainer, { marginBottom: theme.spacing['2xl'] }]}>
           <BrandLogo color={theme.colors.primary[500]} style={{ marginBottom: theme.spacing.md }} />
@@ -255,7 +263,7 @@ const PinEntryScreen: React.FC<Props> = ({ navigation, route }) => {
             Se connecter avec un code SMS
           </Typography>
         </TouchableOpacity>
-      </View>
+      </KeyboardAwareContainer>
     </View>
   )
 }
@@ -272,7 +280,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
   },
   logoContainer: {

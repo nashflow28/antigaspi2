@@ -30,7 +30,7 @@ const rounding: Record<SkeletonRadius, string> = {
 }
 
 const wrapperClasses = computed(() => [
-  'relative overflow-hidden bg-gray-200/70 dark:bg-gray-800/60',
+  'relative overflow-hidden bg-neutral-200/70 dark:bg-neutral-800/60',
   rounding[props.rounded],
   (attrs.class as string | undefined) ?? ''
 ])

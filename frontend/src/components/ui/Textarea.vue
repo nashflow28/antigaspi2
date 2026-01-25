@@ -23,7 +23,7 @@
       />
 
       <span
-        class="pointer-events-none relative sm:absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-blue-500 transition-transform duration-200"
+        class="pointer-events-none relative sm:absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary-500 transition-transform duration-200"
         :style="focusUnderlineStyle"
         aria-hidden="true"
       />
@@ -51,7 +51,7 @@
     <p
       v-else-if="helperText"
       :id="`${textareaId}-helper`"
-      class="text-xs text-gray-500"
+      class="text-xs text-neutral-500"
     >
       {{ helperText }}
     </p>
@@ -100,20 +100,20 @@ const attrs = useAttrs()
 const isFocused = ref(false)
 
 const baseClasses =
-  'flex w-full rounded border bg-white/95 px-3 py-3 text-gray-700 text-gray-800 transition-all duration-200 ease-spring-out placeholder:text-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus-visible:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-60 resize-y'
+  'flex w-full rounded border bg-white/95 px-3 py-3 text-neutral-700 text-neutral-800 transition-all duration-200 ease-spring-out placeholder:text-neutral-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-400 dark:focus-visible:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-60 resize-y'
 
 const variantClasses: Record<TextareaVariant, string> = {
   subtle:
-    'border-gray-200 hover:border-blue-300 focus:border-blue-400 dark:border-gray-700 dark:focus:border-blue-500',
+    'border-neutral-200 hover:border-primary-300 focus:border-primary-400 dark:border-neutral-700 dark:focus:border-primary-500',
   filled:
-    'border-transparent bg-gray-100 hover:bg-gray-50 focus:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800',
+    'border-transparent bg-neutral-100 hover:bg-neutral-50 focus:bg-white dark:bg-neutral-800/70 dark:hover:bg-neutral-800',
   transparent:
-    'border-blue-500/20 bg-blue-500/5 hover:border-blue-500/40 focus:bg-white dark:bg-blue-900/30 dark:border-blue-700/40'
+    'border-primary-500/20 bg-primary-500/5 hover:border-primary-500/40 focus:bg-white dark:bg-primary-900/30 dark:border-primary-700/40'
 }
 
 const sizeClasses: Record<TextareaSize, string> = {
   md: 'min-h-[120px]',
-  lg: 'min-h-[180px] text-gray-700'
+  lg: 'min-h-[180px] text-neutral-700'
 }
 
 const externalClass = computed(() => (attrs.class as string | undefined) ?? '')
@@ -134,8 +134,8 @@ const textareaClass = computed(() => [
 ])
 
 const labelClass = computed(() => [
-  'text-sm font-medium text-gray-700 transition-colors dark:text-gray-200',
-  isFocused.value && !props.error ? 'text-blue-600' : '',
+  'text-sm font-medium text-neutral-700 transition-colors dark:text-neutral-200',
+  isFocused.value && !props.error ? 'text-primary-600' : '',
   props.error ? 'text-red-600' : ''
 ])
 

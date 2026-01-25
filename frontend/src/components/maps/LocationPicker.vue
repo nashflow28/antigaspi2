@@ -18,7 +18,7 @@
       <div
         ref="mapContainer"
         :class="[
-          'w-full border border-gray-300 rounded overflow-hidden sm:block',
+          'w-full border border-neutral-300 rounded overflow-hidden sm:block',
           heightClass
         ]"
         :style="{ height: mapHeight }"
@@ -32,8 +32,8 @@
         class="relative sm:absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center rounded"
       >
         <div class="text-left sm:text-center">
-          <div class="animate-spin rounded-full w-6 h-6 border-b-2 border-blue-600 mx-auto mt-2" />
-          <p class="text-sm text-gray-700">Chargement de la carte...</p>
+          <div class="animate-spin rounded-full w-6 h-6 border-b-2 border-primary-600 mx-auto mt-2" />
+          <p class="text-sm text-neutral-700">Chargement de la carte...</p>
         </div>
       </div>
 
@@ -47,7 +47,7 @@
           title="Me localiser"
           @click="getCurrentLocation"
         >
-          <MapPin class="w-4 h-4 text-gray-800" :class="{ 'animate-pulse': geoLoading }" />
+          <MapPin class="w-4 h-4 text-neutral-800" :class="{ 'animate-pulse': geoLoading }" />
         </button>
 
         <!-- Reset View Button -->
@@ -57,7 +57,7 @@
           title="Réinitialiser la vue"
           @click="resetMapView"
         >
-          <RotateCcw class="w-4 h-4 text-gray-800" />
+          <RotateCcw class="w-4 h-4 text-neutral-800" />
         </button>
 
         <!-- Fullscreen Toggle -->
@@ -66,21 +66,21 @@
           :title="isFullscreen ? 'Quitter le plein écran' : 'Plein écran'"
           @click="toggleFullscreen"
         >
-          <Minimize v-if="isFullscreen" class="w-4 h-4 text-gray-800" />
-          <Maximize v-else class="w-4 h-4 text-gray-800" />
+          <Minimize v-if="isFullscreen" class="w-4 h-4 text-neutral-800" />
+          <Maximize v-else class="w-4 h-4 text-neutral-800" />
         </button>
       </div>
 
       <!-- Map Instructions -->
       <div
         v-if="!selectedLocation && showInstructions"
-        class="relative sm:absolute bottom-4 left-4 right-4 bg-white bg-opacity-95 backdrop-blur-sm border border-gray-200 rounded p-3 shadow-sm"
+        class="relative sm:absolute bottom-4 left-4 right-4 bg-white bg-opacity-95 backdrop-blur-sm border border-neutral-200 rounded p-3 shadow-sm"
       >
         <div class="flex items-stretch sm:items-start space-y-4 sm:space-x-2">
-          <Info class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-          <div class="text-sm text-gray-800">
+          <Info class="w-4 h-4 text-primary-500 mt-0.5 flex-shrink-0" />
+          <div class="text-sm text-neutral-800">
             <p class="font-medium mb-1">Sélectionner un emplacement</p>
-            <p class="text-xs text-gray-700">
+            <p class="text-xs text-neutral-700">
               Cliquez sur la carte ou utilisez la recherche pour choisir votre adresse
             </p>
           </div>
@@ -88,21 +88,21 @@
             class="ml-auto p-1 hover:transition-colors"
             @click="showInstructions = false"
           >
-            <X class="w-3 h-3 text-gray-400" />
+            <X class="w-3 h-3 text-neutral-400" />
           </button>
         </div>
       </div>
     </div>
 
     <!-- Selected Location Info -->
-    <div v-if="selectedLocation" class="mt-4 p-4 bg-green-50 border border-blue-200 rounded">
+    <div v-if="selectedLocation" class="mt-4 p-4 bg-green-50 border border-primary-200 rounded">
       <div class="flex items-stretch sm:items-start justify-start sm:justify-between">
         <div class="flex items-stretch sm:items-start space-y-2 sm:space-x-3">
           <div class="p-2 bg-green-100 rounded">
             <MapPin class="w-4 h-4 text-green-600" />
           </div>
           <div class="flex-1">
-            <h4 class="font-medium text-blue-900 mb-1">Emplacement sélectionné</h4>
+            <h4 class="font-medium text-primary-900 mb-1">Emplacement sélectionné</h4>
             <p class="text-sm text-green-700 mt-2">
               {{ selectedLocation.display_name || selectedLocation.formatted_address }}
             </p>
@@ -128,14 +128,14 @@
     <div v-if="showActions" class="mt-4 flex justify-center sm:justify-end space-y-2 sm:space-x-3">
       <button
         v-if="allowClear"
-        class="px-3 py-3 text-gray-800 bg-gray-100 hover:transition-colors"
+        class="px-3 py-3 text-neutral-800 bg-neutral-100 hover:transition-colors"
         @click="clearSelection"
       >
         Effacer
       </button>
       <button
         :disabled="!selectedLocation"
-        class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors"
+        class="px-4 py-3 bg-primary-600 text-white rounded hover:transition-colors"
         @click="confirmSelection"
       >
         {{ confirmText }}
@@ -328,7 +328,7 @@ const addUserLocationMarker = async () => {
 
     const userIcon = L.divIcon({
       html: `
-        <div class="bg-blue-500 border-2 border-white rounded-full w-4 h-4 animate-pulse shadow-lg"></div>
+        <div class="bg-primary-500 border-2 border-white rounded-full w-4 h-4 animate-pulse shadow-lg"></div>
       `,
       className: 'user-location-marker',
       iconSize: [16, 16],

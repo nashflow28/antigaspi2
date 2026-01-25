@@ -13,7 +13,7 @@
       :checked="isSelected"
       class="mt-1 h-4 w-4 text-primary-600 focus:ring-2 focus:ring-primary-500"
       @change="handleChange"
-    />
+    >
     <div class="flex-1">
       <slot />
     </div>
@@ -30,7 +30,7 @@ const props = defineProps<{
 const radioGroup = inject<{
   selectedValue: { value: string | number }
   selectOption: (value: string | number) => void
-}>('radioGroup')
+    }>('radioGroup')
 
 const isSelected = computed(() => {
   return radioGroup?.selectedValue.value === props.value

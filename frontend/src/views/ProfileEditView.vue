@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 px-4 py-10 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-gradient-to-br from-primary-50 via-white to-emerald-50 px-4 py-10 sm:px-6 lg:px-8">
     <div class="mx-auto flex max-w-5xl flex-col gap-6">
       <div class="flex flex-col gap-2">
         <Button
@@ -14,30 +14,30 @@
         </Button>
         <h1 class="text-3xl font-semibold text-neutral-900">Modifier mon profil</h1>
         <p class="max-w-2xl text-sm text-neutral-600">
-          Mettez à jour vos informations personnelles pour synchroniser vos préférences sur tous vos appareils Antigaspi.
+          Mettez à jour vos informations personnelles pour synchroniser vos préférences sur tous vos appareils GÊLADAL.
         </p>
       </div>
 
       <Card variant="elevated" class="overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-600/90 to-indigo-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
+        <div class="bg-gradient-to-r from-primary-600/90 to-indigo-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
           <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-wide text-blue-100">Informations du compte</p>
+              <p class="text-xs font-semibold uppercase tracking-wide text-primary-100">Informations du compte</p>
               <h2 class="mt-2 text-2xl font-semibold">Profil personnel</h2>
-              <p class="mt-2 text-sm text-blue-100/90">
+              <p class="mt-2 text-sm text-primary-100/90">
                 Ajoutez un maximum d'informations pour recevoir des recommandations personnalisées et faciliter vos réservations.
               </p>
             </div>
             <div class="flex flex-col items-center gap-3">
               <div class="relative">
-                <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-gradient-to-br from-blue-200 via-white to-blue-500/80 shadow-2xl shadow-blue-900/20">
+                <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-gradient-to-br from-primary-200 via-white to-primary-500/80 shadow-2xl shadow-primary-900/20">
                   <img
                     v-if="hasAvatarImage"
                     :src="avatarImage"
                     :alt="`Avatar de ${profileForm.first_name}`"
                     class="h-full w-full object-cover"
                   >
-                  <span v-else class="text-3xl font-semibold text-blue-700">{{ userInitials }}</span>
+                  <span v-else class="text-3xl font-semibold text-primary-700">{{ userInitials }}</span>
                 </div>
                 <Button
                   type="button"
@@ -52,7 +52,7 @@
                   Changer
                 </Button>
               </div>
-              <p class="text-xs text-blue-100/80">Formats acceptés : JPEG ou PNG - 5&nbsp;Mo max.</p>
+              <p class="text-xs text-primary-100/80">Formats acceptés : JPEG ou PNG - 5&nbsp;Mo max.</p>
             </div>
           </div>
         </div>
@@ -108,28 +108,28 @@
           </div>
 
           <div class="mt-8 grid gap-6 lg:grid-cols-[2fr_1fr]">
-            <div class="space-y-4 rounded-2xl bg-blue-50/70 p-5 text-sm text-blue-900">
+            <div class="space-y-4 rounded-2xl bg-primary-50/70 p-5 text-sm text-primary-900">
               <div class="flex items-start gap-3">
-                <CheckCircle2 class="mt-1 h-5 w-5 text-blue-600" aria-hidden="true" />
+                <CheckCircle2 class="mt-1 h-5 w-5 text-primary-600" aria-hidden="true" />
                 <p>
                   Ces informations seront utilisées pour préremplir vos réservations, personnaliser vos alertes et vous proposer des paniers adaptés.
                 </p>
               </div>
               <div class="flex items-start gap-3">
-                <Mail class="mt-1 h-5 w-5 text-blue-600" aria-hidden="true" />
+                <Mail class="mt-1 h-5 w-5 text-primary-600" aria-hidden="true" />
                 <p>Mise à jour instantanée sur tous vos appareils connectés.</p>
               </div>
             </div>
 
-            <div class="space-y-2 rounded-2xl border border-blue-100 bg-white p-5 text-sm text-neutral-600">
+            <div class="space-y-2 rounded-2xl border border-primary-100 bg-white p-5 text-sm text-neutral-600">
               <p class="font-medium text-neutral-900">Dernières synchronisations</p>
               <p class="flex items-center gap-2">
-                <CalendarClock class="h-4 w-4 text-blue-500" aria-hidden="true" />
+                <CalendarClock class="h-4 w-4 text-primary-500" aria-hidden="true" />
                 Dernière mise à jour :
                 <span class="font-semibold text-neutral-900">{{ lastUpdatedLabel }}</span>
               </p>
               <p class="flex items-center gap-2">
-                <ShieldCheck class="h-4 w-4 text-blue-500" aria-hidden="true" />
+                <ShieldCheck class="h-4 w-4 text-primary-500" aria-hidden="true" />
                 Données sécurisées et chiffrées
               </p>
             </div>
@@ -138,7 +138,7 @@
           <div class="mt-10 flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-xs text-neutral-500">
               Besoin de gérer vos préférences de communication ?
-              <RouterLink class="font-medium text-blue-600 hover:underline" to="/notifications/settings">
+              <RouterLink class="font-medium text-primary-600 hover:underline" to="/notifications/settings">
                 Rendez-vous sur la page notifications
               </RouterLink>
             </p>

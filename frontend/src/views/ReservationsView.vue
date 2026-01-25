@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-surface-light">
+  <div class="min-h-screen bg-surface-light dark:bg-surface-dark">
     <section class="bg-gradient-to-r from-primary-600 to-primary-700 text-surface-light">
       <div class="mx-auto max-w-full space-y-8 px-4 py-20 sm:max-w-6xl">
         <div class="space-y-2">
@@ -30,15 +30,15 @@
         <div class="space-y-6">
           <Card padding="lg" class="space-y-6">
             <template #header>
-              <h2 class="text-lg font-semibold text-neutral-900">Filtres</h2>
+              <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">Filtres</h2>
             </template>
 
             <div class="space-y-4">
               <label class="flex flex-col gap-2">
-                <span class="text-sm font-medium text-neutral-700">Statut</span>
+                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Statut</span>
                 <select
                   v-model="filters.status"
-                  class="w-full rounded-modern border border-neutral-200 bg-neutral-100 px-3 py-3 text-neutral-700 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  class="w-full rounded-modern border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 px-3 py-3 text-neutral-700 dark:text-neutral-200 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-500/30"
                 >
                   <option value="">Tous les statuts</option>
                   <option value="pending">En attente</option>
@@ -51,10 +51,10 @@
               </label>
 
               <label class="flex flex-col gap-2">
-                <span class="text-sm font-medium text-neutral-700">Période</span>
+                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Période</span>
                 <select
                   v-model="filters.period"
-                  class="w-full rounded-modern border border-neutral-200 bg-neutral-100 px-3 py-3 text-neutral-700 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  class="w-full rounded-modern border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 px-3 py-3 text-neutral-700 dark:text-neutral-200 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-500/30"
                 >
                   <option value="">Toutes</option>
                   <option value="today">Aujourd'hui</option>
@@ -65,12 +65,12 @@
               </label>
             </div>
 
-            <div class="space-y-2 border-t border-neutral-200/70 padding-t-lg">
-              <p class="text-sm font-semibold text-neutral-800">Actions rapides</p>
+            <div class="space-y-2 border-t border-neutral-200/70 dark:border-neutral-700/70 padding-t-lg">
+              <p class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">Actions rapides</p>
               <Button
                 variant="ghost"
                 size="sm"
-                class="w-full justify-center text-neutral-700"
+                class="w-full justify-center text-neutral-700 dark:text-neutral-300"
                 :disabled="!hasFilters"
                 @click="clearFilters"
               >
@@ -97,7 +97,7 @@
             </div>
           </Card>
 
-          <Card variant="highlight" padding="lg" class="space-y-4 text-neutral-900">
+          <Card variant="gradient" class="space-y-4 text-neutral-900">
             <template #header>
               <div class="flex items-center gap-3">
                 <div class="flex h-14 w-14 items-center justify-center rounded-modern bg-surface-light/20 text-surface-light">
@@ -125,8 +125,8 @@
                 <div class="flex items-center gap-3">
                   <Button
                     variant="ghost"
-                    size="icon"
-                    :class="viewMode === 'list' ? 'bg-primary-100 text-primary-900' : 'text-neutral-500'"
+                    size="sm"
+                    :class="viewMode === 'list' ? 'bg-primary-100 dark:bg-primary-500/20 text-primary-900 dark:text-primary-100' : 'text-neutral-500 dark:text-neutral-400'"
                     :aria-pressed="viewMode === 'list'"
                     aria-label="Vue liste"
                     :left-icon="List"
@@ -136,8 +136,8 @@
                   </Button>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    :class="viewMode === 'grid' ? 'bg-primary-100 text-primary-900' : 'text-neutral-500'"
+                    size="sm"
+                    :class="viewMode === 'grid' ? 'bg-primary-100 dark:bg-primary-500/20 text-primary-900 dark:text-primary-100' : 'text-neutral-500 dark:text-neutral-400'"
                     :aria-pressed="viewMode === 'grid'"
                     aria-label="Vue grille"
                     :left-icon="Grid3X3"
@@ -145,13 +145,13 @@
                   >
                     <span class="sr-only">Vue grille</span>
                   </Button>
-                  <p class="text-sm text-neutral-500">
+                  <p class="text-sm text-neutral-500 dark:text-neutral-400">
                     {{ filteredReservations.length }} réservation{{ filteredReservations.length > 1 ? 's' : '' }}
                   </p>
                 </div>
                 <select
                   v-model="sortBy"
-                  class="w-full rounded-modern border border-neutral-200 bg-neutral-100 px-3 py-3 text-neutral-700 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 sm:w-auto"
+                  class="w-full rounded-modern border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 px-3 py-3 text-neutral-700 dark:text-neutral-200 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-500/30 sm:w-auto"
                 >
                   <option value="created_at_desc">Plus récentes</option>
                   <option value="created_at_asc">Plus anciennes</option>
@@ -168,9 +168,9 @@
                 padding="sm"
                 class="space-y-4"
               >
-                <Skeleton class="h-6xl w-full" />
-                <Skeleton class="h-4 w-3/4" />
-                <Skeleton class="h-3 w-1/2" />
+                <Loading class="h-6xl w-full" />
+                <Loading class="h-4 w-3/4" />
+                <Loading class="h-3 w-1/2" />
               </Card>
             </div>
 
@@ -213,11 +213,11 @@
               </div>
             </div>
 
-            <div v-if="filteredReservations.length > 0 && totalPages > 1" class="border-t border-neutral-200/70 padding-t-xl">
+            <div v-if="filteredReservations.length > 0 && totalPages > 1" class="border-t border-neutral-200/70 dark:border-neutral-700/70 padding-t-xl">
               <div class="flex items-center justify-center gap-3">
                 <Button
                   variant="outline"
-                  size="icon"
+                  size="sm"
                   :disabled="currentPage <= 1"
                   :left-icon="ChevronLeft"
                   @click="currentPage--"
@@ -228,7 +228,7 @@
                     :key="page"
                     variant="ghost"
                     size="sm"
-                    :class="page === currentPage ? 'bg-primary-100 text-primary-900' : 'text-neutral-700'"
+                    :class="page === currentPage ? 'bg-primary-100 dark:bg-primary-500/20 text-primary-900 dark:text-primary-100' : 'text-neutral-700 dark:text-neutral-300'"
                     @click="currentPage = page"
                   >
                     {{ page }}
@@ -236,7 +236,7 @@
                 </div>
                 <Button
                   variant="outline"
-                  size="icon"
+                  size="sm"
                   :disabled="currentPage >= totalPages"
                   :left-icon="ChevronRight"
                   @click="currentPage++"
@@ -273,10 +273,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
-import Button from '@/components/ui/Button.vue'
-import Card from '@/components/ui/Card.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
-import Skeleton from '@/components/ui/Skeleton.vue'
+import { Button, Card, EmptyState, Loading } from '@/components/ui/2025'
 import Toast from '@/components/ui/Toast.vue'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import ReservationCard from '@/components/reservation/ReservationCard.vue'

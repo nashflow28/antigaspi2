@@ -1,22 +1,22 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-gray-50 via-white to-blue-50">
-    <div class="border-b border-gray-200/70 bg-white/80 backdrop-blur">
+  <div class="min-h-screen bg-gradient-to-b from-neutral-50 via-white to-primary-50">
+    <div class="border-b border-neutral-200/70 bg-white/80 backdrop-blur">
       <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-4 py-12">
         <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-blue-100/70 px-3 py-3 text-sm font-medium text-blue-900">
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-3 py-3 text-sm font-medium text-primary-900">
               <Star class="h-4 w-4" />
               Avis vérifiés de la communauté
             </p>
-            <h1 class="mt-3 text-3xl font-semibold tracking-tight text-gray-900">L'expérience AntiGaspi partagée</h1>
-            <p class="mt-2 max-w-full sm:max-w-80 text-gray-700">
+            <h1 class="mt-3 text-3xl font-semibold tracking-tight text-neutral-900">L'expérience GÊLADAL partagée</h1>
+            <p class="mt-2 max-w-full sm:max-w-80 text-neutral-700">
               Consultez les témoignages récents, filtrez par commerçant ou par note et découvrez les paniers plébiscités.
             </p>
           </div>
           <div class="flex flex-wrap gap-3">
             <select
               v-model="selectedMerchant"
-              class="rounded border border-gray-200 px-3 py-3 text-sm shadow-inner focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              class="rounded border border-neutral-200 px-3 py-3 text-sm shadow-inner focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
             >
               <option value="">Tous les commerçants</option>
               <option
@@ -29,7 +29,7 @@
             </select>
             <select
               v-model="selectedRating"
-              class="rounded border border-gray-200 px-3 py-3 text-sm shadow-inner focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              class="rounded border border-neutral-200 px-3 py-3 text-sm shadow-inner focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
             >
               <option value="">Toutes les notes</option>
               <option v-for="rating in [5,4,3,2,1]" :key="rating" :value="rating">
@@ -39,7 +39,7 @@
             <Button
               variant="ghost"
               size="sm"
-              class="text-gray-500"
+              class="text-neutral-500"
               @click="resetFilters"
             >
               Réinitialiser
@@ -55,8 +55,8 @@
           <template #header>
             <div class="flex items-center justify-between">
               <div>
-                <h2 class="text-xl font-semibold text-gray-900">Derniers avis publiés</h2>
-                <p class="text-sm text-gray-500">{{ filteredReviews.length }} avis affichés</p>
+                <h2 class="text-xl font-semibold text-neutral-900">Derniers avis publiés</h2>
+                <p class="text-sm text-neutral-500">{{ filteredReviews.length }} avis affichés</p>
               </div>
               <div class="flex items-center gap-2 text-sm text-amber-500">
                 <Star class="h-4 w-4 fill-amber-400" />
@@ -73,23 +73,23 @@
             </Card>
           </div>
 
-          <div v-else-if="filteredReviews.length === 0" class="rounded border border-dashed border-gray-300 bg-white/70 p-6 sm:p-12 lg:p-12 text-left sm:text-center">
-            <MessageSquare class="mx-auto h-6 w-6 text-gray-500" />
-            <h3 class="mt-3 text-lg font-semibold text-gray-800">Aucun avis ne correspond à vos filtres</h3>
-            <p class="mt-2 text-gray-500">Essayez une autre note ou découvrez un nouveau commerçant.</p>
+          <div v-else-if="filteredReviews.length === 0" class="rounded border border-dashed border-neutral-300 bg-white/70 p-6 sm:p-12 lg:p-12 text-left sm:text-center">
+            <MessageSquare class="mx-auto h-6 w-6 text-neutral-500" />
+            <h3 class="mt-3 text-lg font-semibold text-neutral-800">Aucun avis ne correspond à vos filtres</h3>
+            <p class="mt-2 text-neutral-500">Essayez une autre note ou découvrez un nouveau commerçant.</p>
           </div>
 
           <ul v-else class="space-y-4">
             <li
               v-for="review in filteredReviews"
               :key="review.id"
-              class="rounded border border-gray-200 bg-white p-6 shadow-sm"
+              class="rounded border border-neutral-200 bg-white p-6 shadow-sm"
             >
               <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p class="text-sm font-semibold text-blue-600">{{ review.merchant?.business_name ?? 'Commerçant AntiGaspi' }}</p>
-                  <p class="text-lg font-semibold text-gray-900">{{ review.title ?? 'Avis client' }}</p>
-                  <p class="text-sm text-gray-500">{{ review.product?.name ?? 'Panier AntiGaspi' }}</p>
+                  <p class="text-sm font-semibold text-primary-600">{{ review.merchant?.business_name ?? 'Commerçant GÊLADAL' }}</p>
+                  <p class="text-lg font-semibold text-neutral-900">{{ review.title ?? 'Avis client' }}</p>
+                  <p class="text-sm text-neutral-500">{{ review.product?.name ?? 'Panier GÊLADAL' }}</p>
                 </div>
                 <div class="flex items-center gap-2">
                   <div class="flex items-center gap-2">
@@ -97,15 +97,15 @@
                       v-for="star in 5"
                       :key="star"
                       class="h-4 w-4"
-                      :class="star <= review.rating ? 'text-yellow-400 fill-amber-400' : 'text-gray-500'"
+                      :class="star <= review.rating ? 'text-yellow-400 fill-amber-400' : 'text-neutral-500'"
                     />
                   </div>
-                  <span class="text-xs text-gray-400">{{ review.time_ago ?? '' }}</span>
+                  <span class="text-xs text-neutral-400">{{ review.time_ago ?? '' }}</span>
                 </div>
               </div>
-              <p class="mt-4 text-sm text-gray-800">{{ review.comment ?? 'Avis non renseigné.' }}</p>
-              <div class="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                <span v-if="review.is_verified_purchase" class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-3 text-blue-600">
+              <p class="mt-4 text-sm text-neutral-800">{{ review.comment ?? 'Avis non renseigné.' }}</p>
+              <div class="mt-4 flex flex-wrap items-center gap-3 text-xs text-neutral-500">
+                <span v-if="review.is_verified_purchase" class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-3 text-primary-600">
                   <ShieldCheck class="icon-xs" /> Achat vérifié
                 </span>
               </div>
@@ -117,28 +117,28 @@
       <aside class="space-y-6">
         <Card class="bg-white/90">
           <template #header>
-            <h2 class="text-xl font-semibold text-gray-900">Top commerçants</h2>
+            <h2 class="text-xl font-semibold text-neutral-900">Top commerçants</h2>
           </template>
-          <ul class="space-y-2 text-sm text-gray-700">
+          <ul class="space-y-2 text-sm text-neutral-700">
             <li
               v-for="entry in topMerchants"
               :key="entry.id"
               class="flex items-center justify-between"
             >
               <div>
-                <p class="font-semibold text-gray-800">{{ entry.name }}</p>
-                <p class="text-xs text-gray-500">{{ entry.reviews }} avis</p>
+                <p class="font-semibold text-neutral-800">{{ entry.name }}</p>
+                <p class="text-xs text-neutral-500">{{ entry.reviews }} avis</p>
               </div>
-              <span class="rounded-full bg-blue-50 px-3 py-3 text-xs font-semibold text-blue-600">{{ entry.rating.toFixed(1) }}/5</span>
+              <span class="rounded-full bg-primary-50 px-3 py-3 text-xs font-semibold text-primary-600">{{ entry.rating.toFixed(1) }}/5</span>
             </li>
           </ul>
         </Card>
 
-        <Card class="bg-blue-500/95 text-white">
+        <Card class="bg-primary-500/95 text-white">
           <template #header>
             <h2 class="text-lg font-semibold">Partager votre expérience</h2>
           </template>
-          <p class="text-sm text-blue-50">
+          <p class="text-sm text-primary-50">
             Après votre prochain retrait, laissez un avis pour aider la communauté à choisir ses paniers.
           </p>
           <Button
@@ -223,7 +223,7 @@ const topMerchants = computed(() => {
     if (!entry) {
       stats.set(merchantId, {
         id: merchantId,
-        name: review.merchant?.business_name ?? 'Commerçant AntiGaspi',
+        name: review.merchant?.business_name ?? 'Commerçant GÊLADAL',
         rating: review.rating,
         reviews: 1
       })

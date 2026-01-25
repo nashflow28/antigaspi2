@@ -31,6 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isConsumer = computed(() => user.value?.role === 'consumer')
   const isMerchant = computed(() => user.value?.role === 'merchant')
   const isAdmin = computed(() => user.value?.role === 'admin')
+  const isDriver = computed(() => user.value?.role === 'driver')
 
   // setError removed - using useNotifications composable
 
@@ -126,7 +127,7 @@ export const useAuthStore = defineStore('auth', () => {
           // Call both legacy logout and device logout
           await Promise.allSettled([
             apiService.logout(),
-            deviceService.logout(),
+            deviceService.logout()
           ])
         } catch (err: any) {
           // Ignore logout API errors - token will be cleared locally anyway
@@ -173,6 +174,7 @@ export const useAuthStore = defineStore('auth', () => {
     isConsumer,
     isMerchant,
     isAdmin,
+    isDriver,
 
     // Actions
     login,

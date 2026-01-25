@@ -1,8 +1,8 @@
 <template>
   <!-- Mobile Menu Button -->
   <button
-    class="md:hidden sm:block relative p-2 rounded text-gray-700 hover:text-gray-900 hover:transition-colors"
-    :class="{ 'text-blue-600': mobileMenuOpen }"
+    class="md:hidden sm:block relative p-2 rounded text-neutral-700 hover:text-neutral-900 hover:transition-colors"
+    :class="{ 'text-primary-600': mobileMenuOpen }"
     @click="toggleMobileMenu"
   >
     <span class="sr-only">Ouvrir le menu</span>
@@ -54,15 +54,15 @@
         class="fixed right-0 top-0 h-full w-80 bg-white shadow-80 z-50 md:hidden sm:block overflow-y-auto"
       >
         <!-- Mobile menu header -->
-        <div class="flex items-center justify-start sm:justify-between p-4 border-b border-gray-200">
+        <div class="flex items-center justify-start sm:justify-between p-4 border-b border-neutral-200">
           <div class="flex items-center space-y-2 sm:space-x-3">
-            <div class="h-6 w-6 bg-gradient-to-r from-blue-500 to-blue-500/50 rounded flex items-center justify-center">
+            <div class="h-6 w-6 bg-gradient-to-r from-primary-500 to-primary-500/50 rounded flex items-center justify-center">
               <span class="text-white text-lg">🌱</span>
             </div>
-            <span class="text-lg font-semibold text-gray-900 font-display">Antigaspi</span>
+            <span class="text-lg font-semibold text-neutral-900 font-display">GÊLADAL</span>
           </div>
           <button
-            class="p-2 rounded text-gray-400 hover:text-gray-700 hover:transition-colors"
+            class="p-2 rounded text-neutral-400 hover:text-neutral-700 hover:transition-colors"
             @click="closeMobileMenu"
           >
             <X class="h-4 w-4" />
@@ -70,18 +70,18 @@
         </div>
 
         <!-- User Profile Section (if authenticated) -->
-        <div v-if="authStore.isAuthenticated" class="p-4 bg-gray-50 border-b border-gray-200">
+        <div v-if="authStore.isAuthenticated" class="p-4 bg-neutral-50 border-b border-neutral-200">
           <div class="flex items-center space-y-2 sm:space-x-3">
-            <div class="w-12 h-10 bg-gradient-to-r from-blue-500 to-blue-500/50 rounded-full flex items-center justify-center">
+            <div class="w-12 h-10 bg-gradient-to-r from-primary-500 to-primary-500/50 rounded-full flex items-center justify-center">
               <span class="text-white font-medium text-lg">
                 {{ authStore.user?.first_name?.charAt(0) }}{{ authStore.user?.last_name?.charAt(0) }}
               </span>
             </div>
             <div>
-              <p class="font-medium text-gray-900 font-heading">
+              <p class="font-medium text-neutral-900 font-heading">
                 {{ authStore.user?.first_name }} {{ authStore.user?.last_name }}
               </p>
-              <p class="text-sm text-gray-500">{{ authStore.user?.email }}</p>
+              <p class="text-sm text-neutral-500">{{ authStore.user?.email }}</p>
               <span
                 class="inline-flex items-center px-3 py-1 rounded text-xs font-medium"
                 :class="getRoleBadgeClasses(authStore.user?.role)"
@@ -133,9 +133,9 @@
 
           <!-- Authenticated User Links -->
           <template v-if="authStore.isAuthenticated">
-            <div class="border-t border-gray-200 padding-t-lg mt-4">
+            <div class="border-t border-neutral-200 padding-t-lg mt-4">
               <router-link
-                to="/dashboard"
+                :to="getDashboardRoute()"
                 class="mobile-nav-link"
                 @click="closeMobileMenu"
               >
@@ -163,6 +163,16 @@
               </router-link>
 
               <router-link
+                v-if="authStore.isConsumer"
+                to="/deliveries/history"
+                class="mobile-nav-link"
+                @click="closeMobileMenu"
+              >
+                <Truck class="h-4 w-4" />
+                <span>Mes Livraisons</span>
+              </router-link>
+
+              <router-link
                 to="/profile"
                 class="mobile-nav-link"
                 @click="closeMobileMenu"
@@ -173,8 +183,8 @@
 
               <!-- Role-specific links -->
               <template v-if="authStore.user?.role === 'merchant'">
-                <div class="border-t border-gray-200 padding-t-lg mt-4">
-                  <p class="text-sm font-medium text-gray-500 uppercase tracking-wider mt-2">
+                <div class="border-t border-neutral-200 padding-t-lg mt-4">
+                  <p class="text-sm font-medium text-neutral-500 uppercase tracking-wider mt-2">
                     Espace Commerçant
                   </p>
                   <router-link
@@ -204,9 +214,41 @@
                 </div>
               </template>
 
+              <template v-if="authStore.user?.role === 'driver'">
+                <div class="border-t border-neutral-200 padding-t-lg mt-4">
+                  <p class="text-sm font-medium text-neutral-500 uppercase tracking-wider mt-2">
+                    Espace Livreur
+                  </p>
+                  <router-link
+                    to="/driver/deliveries/available"
+                    class="mobile-nav-link"
+                    @click="closeMobileMenu"
+                  >
+                    <Truck class="h-4 w-4" />
+                    <span>Livraisons disponibles</span>
+                  </router-link>
+                  <router-link
+                    to="/driver/deliveries/active"
+                    class="mobile-nav-link"
+                    @click="closeMobileMenu"
+                  >
+                    <Truck class="h-4 w-4" />
+                    <span>Livraison en cours</span>
+                  </router-link>
+                  <router-link
+                    to="/driver/earnings"
+                    class="mobile-nav-link"
+                    @click="closeMobileMenu"
+                  >
+                    <BarChart3 class="h-4 w-4" />
+                    <span>Gains</span>
+                  </router-link>
+                </div>
+              </template>
+
               <template v-if="authStore.user?.role === 'admin'">
-                <div class="border-t border-gray-200 padding-t-lg mt-4">
-                  <p class="text-sm font-medium text-gray-500 uppercase tracking-wider mt-2">
+                <div class="border-t border-neutral-200 padding-t-lg mt-4">
+                  <p class="text-sm font-medium text-neutral-500 uppercase tracking-wider mt-2">
                     Administration
                   </p>
                   <router-link
@@ -238,7 +280,7 @@
             </div>
 
             <!-- Logout Button -->
-            <div class="border-t border-gray-200 padding-t-lg mt-4">
+            <div class="border-t border-neutral-200 padding-t-lg mt-4">
               <button
                 class="mobile-nav-link text-red-600 hover:bg-red-50"
                 @click="handleLogout"
@@ -251,7 +293,7 @@
 
           <!-- Guest Links -->
           <template v-else>
-            <div class="border-t border-gray-200 padding-t-lg mt-4">
+            <div class="border-t border-neutral-200 padding-t-lg mt-4">
               <router-link
                 to="/auth/login"
                 class="mobile-nav-link"
@@ -262,7 +304,7 @@
               </router-link>
               <router-link
                 to="/auth/register"
-                class="mobile-nav-link bg-blue-50 text-blue-900 border border-blue-200"
+                class="mobile-nav-link bg-primary-50 text-primary-900 border border-primary-200"
                 @click="closeMobileMenu"
               >
                 <UserPlus class="h-4 w-4" />
@@ -273,9 +315,9 @@
         </nav>
 
         <!-- App Info -->
-        <div class="relative sm:absolute bottom-0 left-0 right-0 p-4 bg-gray-50 border-t border-gray-200">
-          <p class="text-xs text-gray-500 text-left sm:text-center">
-            Antigaspi © 2025<br>
+        <div class="relative sm:absolute bottom-0 left-0 right-0 p-4 bg-neutral-50 border-t border-neutral-200">
+          <p class="text-xs text-neutral-500 text-left sm:text-center">
+            GÊLADAL © 2025<br>
             Lutter contre le gaspillage alimentaire
           </p>
         </div>
@@ -291,7 +333,7 @@ import { useAuthStore } from '@/stores/auth'
 import {
   X, Package, MapPin, MessageSquare, BarChart3, Calendar, User,
   Briefcase, ShoppingCart, Star, Settings, Users, Grid, LogOut,
-  LogIn, UserPlus, Gift
+  LogIn, UserPlus, Gift, Truck
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -313,21 +355,37 @@ const handleLogout = async () => {
   router.push('/')
 }
 
+const getDashboardRoute = () => {
+  switch (authStore.user?.role) {
+    case 'admin':
+      return '/admin/dashboard'
+    case 'merchant':
+      return '/merchant/dashboard'
+    case 'driver':
+      return '/driver/dashboard'
+    case 'consumer':
+    default:
+      return '/dashboard'
+  }
+}
+
 const getRoleLabel = (role?: string) => {
   switch (role) {
     case 'admin': return 'Administrateur'
     case 'merchant': return 'Commerçant'
     case 'consumer': return 'Consommateur'
+    case 'driver': return 'Livreur'
     default: return 'Utilisateur'
   }
 }
 
 const getRoleBadgeClasses = (role?: string) => {
   switch (role) {
-    case 'admin': return 'bg-blue-100 text-blue-800'
+    case 'admin': return 'bg-primary-100 text-primary-800'
     case 'merchant': return 'bg-green-100 text-green-800'
-    case 'consumer': return 'bg-blue-100 text-gray-800'
-    default: return 'bg-gray-50-100 text-surface-800'
+    case 'driver': return 'bg-amber-100 text-amber-800'
+    case 'consumer': return 'bg-primary-100 text-neutral-800'
+    default: return 'bg-neutral-50-100 text-surface-800'
   }
 }
 
@@ -339,10 +397,10 @@ router.afterEach(() => {
 
 <style scoped>
 .mobile-nav-link {
-  @apply flex items-center space-x-3 px-3 py-3 rounded text-surface-700 hover:bg-gray-50-100 hover:text-surface-900 transition-colors font-medium;
+  @apply flex items-center space-x-3 px-3 py-3 rounded text-neutral-700 hover:bg-neutral-50-100 hover:text-neutral-900 transition-colors font-medium;
 }
 
 .mobile-nav-link.router-link-active {
-  @apply bg-blue-100 text-blue-900 border border-blue-200;
+  @apply bg-primary-100 text-primary-900 border border-primary-200;
 }
 </style>

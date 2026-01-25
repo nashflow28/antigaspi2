@@ -61,13 +61,12 @@ class CategoryController extends Controller
         try {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:100|unique:categories,name',
-                'description' => 'required|string|max:500',
+                'description' => 'nullable|string|max:500',
                 'icon' => 'nullable|string|max:50',
             ], [
                 'name.required' => 'Le nom de la catégorie est requis',
                 'name.unique' => 'Une catégorie avec ce nom existe déjà',
                 'name.max' => 'Le nom ne peut pas dépasser 100 caractères',
-                'description.required' => 'La description est requise',
                 'description.max' => 'La description ne peut pas dépasser 500 caractères',
                 'icon.max' => 'L\'icône ne peut pas dépasser 50 caractères',
             ]);
@@ -113,14 +112,13 @@ class CategoryController extends Controller
                     'max:100',
                     Rule::unique('categories', 'name')->ignore($category->id),
                 ],
-                'description' => 'required|string|max:500',
+                'description' => 'nullable|string|max:500',
                 'icon' => 'nullable|string|max:50',
                 'is_active' => 'boolean',
             ], [
                 'name.required' => 'Le nom de la catégorie est requis',
                 'name.unique' => 'Une catégorie avec ce nom existe déjà',
                 'name.max' => 'Le nom ne peut pas dépasser 100 caractères',
-                'description.required' => 'La description est requise',
                 'description.max' => 'La description ne peut pas dépasser 500 caractères',
                 'icon.max' => 'L\'icône ne peut pas dépasser 50 caractères',
             ]);

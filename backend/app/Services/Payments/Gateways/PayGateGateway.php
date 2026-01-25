@@ -100,6 +100,11 @@ class PayGateGateway implements PaymentGateway
             'description' => "Paiement réservation #{$reservation->reservation_code}",
         ];
 
+        // Add callback URL if configured (required for wallet recharge webhooks)
+        if (! empty($this->config['callback_url'])) {
+            $payload['callback_url'] = $this->config['callback_url'];
+        }
+
         Log::info('PayGate: Initializing payment', [
             'reservation_id' => $reservation->id,
             'reservation_code' => $reservation->reservation_code,
@@ -189,9 +194,12 @@ class PayGateGateway implements PaymentGateway
 
         try {
             // Use v2 API with identifier (our reference)
+            // Fix: Use str_replace to properly construct v2 URL
+            $v2Url = str_replace('/v1', '/v2', $this->config['base_url']).'/status';
+
             $response = Http::timeout(30)
                 ->acceptJson()
-                ->post(rtrim($this->config['base_url'], '/v1').'/api/v2/status', [
+                ->post($v2Url, [
                     'auth_token' => $this->config['auth_token'],
                     'identifier' => $payment->reference,
                 ]);

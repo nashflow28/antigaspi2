@@ -14,10 +14,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useFocusEffect } from '@react-navigation/native'
 import { Image } from 'expo-image'
 import { Ionicons } from '@expo/vector-icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { AppDispatch, RootState } from '../../store'
 import { useTheme } from '../../theme'
-import { Button, Card, Typography, QuantityStepperInline } from '../../components/2025'
+import { Button, Card, Typography, QuantityStepperInline, PhoneInput } from '../../components/2025'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { TEST_IDS } from '../../utils/testIds'
@@ -44,7 +45,8 @@ type Props = {
   navigation: any
 }
 
-const MOBILE_MONEY_METHODS: PaymentMethod[] = ['flooz', 'tmoney', 'orange_money', 'mtn_momo']
+const MOBILE_MONEY_METHODS: PaymentMethod[] = ['flooz', 'tmoney']
+const CART_BACKUP_KEY = 'cart_backup_for_retry'
 
 const CartScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
@@ -277,6 +279,23 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
+    // Validate that pickup datetime is not in the past
+    const today = new Date().toISOString().split('T')[0]
+    if (selectedPickupDate === today) {
+      const now = new Date()
+      const [pickupHours, pickupMinutes] = selectedPickupTime.split(':').map(Number)
+      const pickupDateTime = new Date()
+      pickupDateTime.setHours(pickupHours, pickupMinutes, 0, 0)
+
+      // Add 15 minutes buffer to allow for processing time
+      const minimumPickupTime = new Date(now.getTime() + 15 * 60 * 1000)
+
+      if (pickupDateTime < minimumPickupTime) {
+        showError('L\'heure de retrait doit être au moins 15 minutes dans le futur.')
+        return
+      }
+    }
+
     if (isMobileMoney && !customerPhone.trim()) {
       showError('Le numéro de téléphone est requis pour le paiement Mobile Money.')
       return
@@ -319,6 +338,20 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       // Haptic feedback on checkout initiation
       await haptics.mediumTap()
 
+      // For Mobile Money payments, backup cart data for potential retry
+      if (isMobileMoney && cart) {
+        try {
+          await AsyncStorage.setItem(CART_BACKUP_KEY, JSON.stringify({
+            items: cart.items,
+            merchantId: cart.merchant?.id,
+            total: cart.total_amount,
+            timestamp: Date.now(),
+          }))
+        } catch {
+          // Ignore backup errors - non-critical
+        }
+      }
+
       const response = await dispatch(
         checkoutCart({
           paymentMethod: selectedPaymentMethod,
@@ -345,6 +378,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       // Check if this is a Mobile Money payment that requires confirmation
       if (response.requiresPaymentConfirmation && response.payment) {
         // Navigate to PaymentStatusScreen for polling
+        // Cart backup is preserved for potential retry if payment fails
         const firstReservation = response.data?.[0]
         navigation.replace('PaymentStatus', {
           paymentId: response.payment.id,
@@ -352,8 +386,16 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
           provider: selectedPaymentMethod as MobileMoneyProvider,
           amount: response.totalAmount ?? cartTotal,
           reservationCode: firstReservation?.reservation_code ?? response.orderNumber ?? '',
+          hasCartBackup: true, // Signal that cart backup exists for retry
         })
         return
+      }
+
+      // Non-Mobile Money success: clear any cart backup
+      try {
+        await AsyncStorage.removeItem(CART_BACKUP_KEY)
+      } catch {
+        // Ignore
       }
 
       // Success haptic feedback for instant payments
@@ -622,6 +664,11 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
                           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                           value={parseTimeString(selectedPickupTime)}
                           onChange={handleTimeChange}
+                          minimumDate={
+                            selectedPickupDate === new Date().toISOString().split('T')[0]
+                              ? new Date(Date.now() + 15 * 60 * 1000) // 15 minutes from now
+                              : undefined
+                          }
                         />
                       )}
                     </View>
@@ -682,13 +729,12 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
                       <Typography variant="body" weight="semibold" style={{ marginBottom: 8 }}>
                         Numéro Mobile Money
                       </Typography>
-                      <TextInput
+                      <PhoneInput
                         value={customerPhone}
                         onChangeText={setCustomerPhone}
-                        placeholder="Ex: +22890000000"
-                        placeholderTextColor={theme.colors.neutral[400]}
-                        keyboardType="phone-pad"
-                        style={[styles.input, { borderColor: theme.colors.borderLight }]}
+                        placeholder="90 12 34 56"
+                        defaultCountryCode="+228"
+                        testID="checkout-phone-input"
                       />
                     </View>
                   )}

@@ -3,21 +3,21 @@
     <div class="flex items-center justify-center min-h-screen pt-4 px-3 pb-20 text-left sm:text-center">
       <!-- Background overlay -->
       <div
-        class="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity animate-fade-in"
+        class="fixed inset-0 bg-neutral-900/75 backdrop-blur-sm transition-opacity animate-fade-in"
         @click="onCancel"
       />
 
       <!-- Modal -->
-      <div class="relative bg-white rounded p-6 text-left overflow-hidden sm:block shadow-80 transform transition-all max-w-xl w-full animate-fade-in-up border border-gray-200">
+      <div class="relative bg-white rounded p-6 text-left overflow-hidden sm:block shadow-80 transform transition-all max-w-xl w-full animate-fade-in-up border border-neutral-200/70">
         <div class="flex items-stretch sm:items-start gap-3">
           <div class="flex-shrink-0 flex items-center justify-center w-12 h-10 rounded" :class="iconBgClass">
             <component :is="iconComponent" class="h-6 w-6" :class="iconClass" />
           </div>
           <div class="flex-1 min-w-none">
-            <h3 class="text-lg font-semibold text-gray-900 mt-2">
+            <h3 class="text-lg font-semibold text-neutral-900 mt-2">
               {{ title }}
             </h3>
-            <p class="text-sm text-gray-700 leading-relaxed">
+            <p class="text-sm text-neutral-700 leading-relaxed">
               {{ message }}
             </p>
           </div>
@@ -87,7 +87,7 @@ const iconBgClass = computed(() => {
     case 'danger':
       return 'bg-red-600/15'
     case 'success':
-      return 'bg-blue-100'
+      return 'bg-primary-100'
     default:
       return 'bg-orange-500/15'
   }
@@ -98,7 +98,7 @@ const iconClass = computed(() => {
     case 'danger':
       return 'text-red-600'
     case 'success':
-      return 'text-blue-600'
+      return 'text-primary-600'
     default:
       return 'text-orange-500'
   }

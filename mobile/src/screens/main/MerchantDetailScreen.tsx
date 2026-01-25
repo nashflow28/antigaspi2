@@ -346,7 +346,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         : null
 
     const message = [
-      `Découvrez ${business_name} sur Antigaspi !`,
+      `Découvrez ${business_name} sur GÊLADAL !`,
       address ? `${address}, ${city}` : city,
       mapsLink || undefined,
     ]

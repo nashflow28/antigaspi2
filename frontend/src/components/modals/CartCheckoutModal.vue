@@ -22,7 +22,7 @@
               :src="item.imageUrl"
               :alt="item.name"
               class="w-16 h-16 object-cover rounded"
-            />
+            >
             <div class="flex-1">
               <p class="font-semibold text-neutral-900">{{ item.name }}</p>
               <p class="text-sm text-neutral-600">
@@ -202,7 +202,7 @@
             <div class="flex items-center gap-3">
               <span class="text-2xl">💰</span>
               <div>
-                <div class="font-semibold text-neutral-900">Portefeuille Antigaspi</div>
+                <div class="font-semibold text-neutral-900">Portefeuille GÊLADAL</div>
                 <div class="text-sm" :class="walletBalance >= totalAmount ? 'text-green-600' : 'text-red-600'">
                   Solde: {{ formatCurrency(walletBalance) }}
                 </div>

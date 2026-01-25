@@ -3,12 +3,12 @@
     <!-- En-tête avec statut -->
     <div class="flex items-center justify-start sm:justify-between mt-3">
       <div class="flex items-center gap-3">
-        <div class="h-6 w-6 bg-blue-100 rounded flex items-center justify-center">
-          <ShoppingBag class="h-4 w-4 text-blue-600" />
+        <div class="h-6 w-6 bg-primary-100 rounded flex items-center justify-center">
+          <ShoppingBag class="h-4 w-4 text-primary-600" />
         </div>
         <div>
-          <div class="font-medium text-gray-900">{{ reservation.reservation_code }}</div>
-          <div class="text-sm text-gray-500">
+          <div class="font-medium text-neutral-900">{{ reservation.reservation_code }}</div>
+          <div class="text-sm text-neutral-500">
             {{ formatDate(reservation.created_at) }}
           </div>
         </div>
@@ -42,10 +42,10 @@
           <div
             v-if="showActions"
             v-click-outside="() => showActions = false"
-            class="relative sm:absolute right-0 top-10 bg-white border border-gray-200 rounded shadow-lg z-10 py-3 min-w-[150px]"
+            class="relative sm:absolute right-0 top-10 bg-white border border-neutral-200 rounded shadow-lg z-10 py-3 min-w-[150px]"
           >
             <button
-              class="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+              class="w-full px-3 py-3 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
               @click="$emit('view', reservation.id); showActions = false"
             >
               <Eye class="h-4 w-4" />
@@ -53,7 +53,7 @@
             </button>
             <button
               v-if="reservation.product.merchant.phone"
-              class="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+              class="w-full px-3 py-3 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
               @click="$emit('contact', reservation); showActions = false"
             >
               <Phone class="h-4 w-4" />
@@ -61,7 +61,7 @@
             </button>
             <button
               v-if="canCancel"
-              class="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 text-red-600 flex items-center gap-2"
+              class="w-full px-3 py-3 text-left text-sm hover:bg-neutral-50 text-red-600 flex items-center gap-2"
               @click="$emit('cancel', reservation.id); showActions = false"
             >
               <X class="h-4 w-4" />
@@ -78,37 +78,37 @@
       <div>
         <div class="flex items-stretch sm:items-start gap-3">
           <!-- Image du produit -->
-          <div class="w-12 h-10 bg-gradient-to-br from-blue-100 to-blue-500/10 rounded flex items-center justify-center flex-shrink-0">
-            <Package class="h-6 w-6 text-blue-400" />
+          <div class="w-12 h-10 bg-gradient-to-br from-primary-100 to-primary-500/10 rounded flex items-center justify-center flex-shrink-0">
+            <Package class="h-6 w-6 text-primary-400" />
           </div>
 
           <!-- Détails produit -->
           <div class="flex-1 min-w-none">
-            <h4 class="font-semibold text-gray-900 mb-1 line-clamp-2">
+            <h4 class="font-semibold text-neutral-900 mb-1 line-clamp-2">
               {{ reservation.product.name }}
             </h4>
-            <div class="flex items-center gap-2 text-sm text-gray-700 mt-2">
+            <div class="flex items-center gap-2 text-sm text-neutral-700 mt-2">
               <MapPin class="h-4 w-4 flex-shrink-0" />
               <span class="truncate">{{ reservation.product.merchant.name }}</span>
             </div>
-            <div class="text-sm text-gray-500">
+            <div class="text-sm text-neutral-500">
               {{ reservation.product.merchant.address }}
             </div>
           </div>
         </div>
 
         <!-- Prix et quantité -->
-        <div class="mt-4 padding-t-lg border-t border-gray-100">
+        <div class="mt-4 padding-t-lg border-t border-neutral-100">
           <div class="flex items-center justify-start sm:justify-between text-sm">
             <div class="flex items-center gap-2">
-              <span class="text-gray-700">Quantité:</span>
+              <span class="text-neutral-700">Quantité:</span>
               <span class="font-medium">{{ reservation.quantity }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-lg font-semibold text-blue-600">
+              <span class="text-lg font-semibold text-primary-600">
                 {{ formatPrice(reservation.discounted_price * reservation.quantity) }}
               </span>
-              <span class="text-sm text-gray-400 line-through">
+              <span class="text-sm text-neutral-400 line-through">
                 {{ formatPrice(reservation.original_price * reservation.quantity) }}
               </span>
             </div>
@@ -120,14 +120,14 @@
       <div>
         <div class="space-y-4">
           <!-- Informations paiement -->
-          <div v-if="paymentStatus" class="bg-blue-50 rounded p-3 border border-blue-100">
+          <div v-if="paymentStatus" class="bg-primary-50 rounded p-3 border border-primary-100">
             <div class="flex items-center justify-start sm:justify-between mt-2">
-              <span class="text-sm font-medium text-blue-900">Paiement</span>
-              <span class="text-sm font-semibold text-blue-800">
+              <span class="text-sm font-medium text-primary-900">Paiement</span>
+              <span class="text-sm font-semibold text-primary-800">
                 {{ paymentStatusLabels[paymentStatus] }}
               </span>
             </div>
-            <div v-if="latestPayment" class="space-y-4 text-xs text-blue-900">
+            <div v-if="latestPayment" class="space-y-4 text-xs text-primary-900">
               <div class="flex items-center justify-start sm:justify-between">
                 <span>Méthode</span>
                 <span class="font-medium">{{ paymentMethodLabels[latestPayment.payment_method] }}</span>
@@ -145,21 +145,21 @@
                 <span class="font-medium">{{ latestPayment.reference }}</span>
               </div>
             </div>
-            <div v-else class="text-xs text-blue-900">
+            <div v-else class="text-xs text-primary-900">
               Paiement en cours de synchronisation…
             </div>
           </div>
 
           <!-- Date et heure de retrait -->
           <div class="flex items-center gap-3">
-            <div class="h-6 w-6 bg-blue-500/10 rounded flex items-center justify-center">
-              <Clock class="h-4 w-4 text-blue-500" />
+            <div class="h-6 w-6 bg-primary-500/10 rounded flex items-center justify-center">
+              <Clock class="h-4 w-4 text-primary-500" />
             </div>
             <div>
-              <div class="font-medium text-gray-900">
+              <div class="font-medium text-neutral-900">
                 {{ formatPickupDate(reservation.pickup_date) }}
               </div>
-              <div class="text-sm text-gray-500">
+              <div class="text-sm text-neutral-500">
                 {{ formatPickupTime(reservation.pickup_date) }}
               </div>
             </div>
@@ -170,16 +170,16 @@
             <div class="h-6 w-6 bg-orange-500/10 rounded flex items-center justify-center flex-shrink-0">
               <MessageCircle class="h-4 w-4 text-orange-500" />
             </div>
-            <div class="text-sm text-gray-700">
+            <div class="text-sm text-neutral-700">
               {{ reservation.pickup_notes }}
             </div>
           </div>
 
           <!-- Countdown ou statut -->
           <div v-if="reservation.status !== 'completed' && reservation.status !== 'cancelled' && reservation.status !== 'expired'">
-            <div class="bg-gray-50 rounded p-3">
+            <div class="bg-neutral-50 rounded p-3">
               <div class="flex items-center justify-start sm:justify-between">
-                <span class="text-sm font-medium text-gray-800">
+                <span class="text-sm font-medium text-neutral-800">
                   {{ getStatusMessage() }}
                 </span>
                 <span v-if="timeLeft && timeLeft.total > 0" class="text-sm font-semibold text-orange-500">
@@ -188,7 +188,7 @@
               </div>
 
               <!-- Barre de progression pour le temps restant -->
-              <div v-if="timeLeft && timeLeft.total > 0" class="mt-2 w-full bg-gray-200 rounded-full h-3">
+              <div v-if="timeLeft && timeLeft.total > 0" class="mt-2 w-full bg-neutral-200 rounded-full h-3">
                 <div
                   class="bg-orange-500 h-3 rounded-full transition-all duration-300"
                   :style="{ width: `${Math.max(0, Math.min(100, (timeLeft.total / (24 * 60 * 60 * 1000)) * 100))}%` }"
@@ -198,17 +198,17 @@
           </div>
 
           <!-- Impact environnemental -->
-          <div v-if="reservation.status === 'completed'" class="bg-blue-50 rounded p-3">
+          <div v-if="reservation.status === 'completed'" class="bg-primary-50 rounded p-3">
             <div class="flex items-center gap-2 mt-2">
-              <Leaf class="h-4 w-4 text-blue-600" />
-              <span class="text-sm font-medium text-blue-800">Impact positif</span>
+              <Leaf class="h-4 w-4 text-primary-600" />
+              <span class="text-sm font-medium text-primary-800">Impact positif</span>
             </div>
             <div class="grid grid-cols-2 gap-3 text-xs">
-              <div class="text-blue-900">
+              <div class="text-primary-900">
                 <div class="font-semibold">{{ reservation.quantity }}kg</div>
                 <div>Nourriture sauvée</div>
               </div>
-              <div class="text-blue-900">
+              <div class="text-primary-900">
                 <div class="font-semibold">{{ (reservation.quantity * 2.5).toFixed(1) }}kg</div>
                 <div>CO₂ évité</div>
               </div>
@@ -219,7 +219,7 @@
     </div>
 
     <!-- Actions en bas -->
-    <div v-if="!isExpiredOrCancelled" class="flex items-center justify-start sm:justify-between mt-6 padding-t-lg border-t border-gray-100">
+    <div v-if="!isExpiredOrCancelled" class="flex items-center justify-start sm:justify-between mt-6 padding-t-lg border-t border-neutral-100">
       <div class="flex items-center gap-2">
         <Button
           v-if="reservation.product.merchant.phone"
@@ -290,10 +290,10 @@ const timeLeft = ref<{
 // Classes de statut
 const statusClasses = {
   pending: 'bg-orange-500/15 text-orange-500/95',
-  confirmed: 'bg-blue-500/10 text-blue-500/95',
-  ready: 'bg-blue-100 text-blue-800',
-  completed: 'bg-blue-100 text-blue-800',
-  cancelled: 'bg-gray-100 text-gray-700',
+  confirmed: 'bg-primary-500/10 text-primary-500/95',
+  ready: 'bg-primary-100 text-primary-800',
+  completed: 'bg-primary-100 text-primary-800',
+  cancelled: 'bg-neutral-100 text-neutral-700',
   expired: 'bg-red-600/15 text-red-600/95'
 }
 
@@ -308,10 +308,10 @@ const statusLabels = {
 
 const paymentStatusClasses = {
   pending: 'bg-orange-500/15 text-orange-500/95',
-  success: 'bg-blue-100 text-blue-800',
+  success: 'bg-primary-100 text-primary-800',
   failed: 'bg-red-600/15 text-red-600/95',
-  on_site: 'bg-blue-500/10 text-blue-500/95',
-  refunded: 'bg-gray-100 text-gray-800'
+  on_site: 'bg-primary-500/10 text-primary-500/95',
+  refunded: 'bg-neutral-100 text-neutral-800'
 } as const
 
 const paymentStatusLabels = {

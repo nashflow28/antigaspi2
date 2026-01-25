@@ -32,10 +32,10 @@
       </DashboardHeader>
 
       <!-- Info Banner -->
-      <Card variant="bordered" class="border-l-4 border-l-blue-500">
+      <Card variant="bordered" class="border-l-4 border-l-primary-500">
         <div class="flex items-start gap-4">
-          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
-            <Info class="h-5 w-5 text-blue-600" />
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10">
+            <Info class="h-5 w-5 text-primary-600" />
           </div>
           <div class="flex-1">
             <h3 class="text-base font-semibold text-neutral-900 dark:text-neutral-50">

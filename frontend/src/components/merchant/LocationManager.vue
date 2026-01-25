@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-white rounded shadow-lg p-6 border border-gray-100">
+  <div class="bg-white rounded shadow-lg p-6 border border-neutral-100">
     <div class="flex items-center justify-start sm:justify-between mt-4">
       <div class="flex items-center space-y-2 sm:space-x-3">
-        <div class="w-12 h-10 bg-blue-100 rounded flex items-center justify-center">
+        <div class="w-12 h-10 bg-primary-100 rounded flex items-center justify-center">
           <MapPin class="h-6 w-6 text-info" />
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Géolocalisation</h3>
-          <p class="text-gray-700 text-sm">Position de votre commerce</p>
+          <h3 class="text-lg font-semibold text-neutral-900">Géolocalisation</h3>
+          <p class="text-neutral-700 text-sm">Position de votre commerce</p>
         </div>
       </div>
       <button
@@ -20,14 +20,14 @@
       </button>
     </div>
 
-    <div v-if="!hasLocation" class="text-left sm:text-center py-6 sm:py-8 border-2 border-dashed border-gray-300 rounded">
-      <MapPin class="w-12 h-10 text-gray-400 mx-auto mt-3" />
-      <h4 class="text-lg font-medium text-gray-900 mt-2">Aucune position définie</h4>
-      <p class="text-gray-700 mt-3">
+    <div v-if="!hasLocation" class="text-left sm:text-center py-6 sm:py-8 border-2 border-dashed border-neutral-300 rounded">
+      <MapPin class="w-12 h-10 text-neutral-400 mx-auto mt-3" />
+      <h4 class="text-lg font-medium text-neutral-900 mt-2">Aucune position définie</h4>
+      <p class="text-neutral-700 mt-3">
         Ajoutez la position de votre commerce pour que les clients puissent vous trouver facilement
       </p>
       <button
-        class="bg-blue-600 text-white px-3 py-3 rounded hover:transition-colors"
+        class="bg-primary-600 text-white px-3 py-3 rounded hover:transition-colors"
         @click="showLocationModal = true"
       >
         Définir ma position
@@ -36,26 +36,26 @@
 
     <div v-else class="space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div class="bg-gray-50 rounded p-4">
-          <label class="text-sm font-medium text-gray-800">Latitude</label>
-          <p class="text-lg text-gray-900">{{ location.latitude?.toFixed(6) }}</p>
+        <div class="bg-neutral-50 rounded p-4">
+          <label class="text-sm font-medium text-neutral-800">Latitude</label>
+          <p class="text-lg text-neutral-900">{{ location.latitude?.toFixed(6) }}</p>
         </div>
-        <div class="bg-gray-50 rounded p-4">
-          <label class="text-sm font-medium text-gray-800">Longitude</label>
-          <p class="text-lg text-gray-900">{{ location.longitude?.toFixed(6) }}</p>
+        <div class="bg-neutral-50 rounded p-4">
+          <label class="text-sm font-medium text-neutral-800">Longitude</label>
+          <p class="text-lg text-neutral-900">{{ location.longitude?.toFixed(6) }}</p>
         </div>
       </div>
 
       <div class="flex space-y-2 sm:space-x-3">
         <button
-          class="flex-1 bg-gray-100 text-gray-800 py-3 px-3 rounded hover:transition-colors"
+          class="flex-1 bg-neutral-100 text-neutral-800 py-3 px-3 rounded hover:transition-colors"
           @click="showLocationModal = true"
         >
           Modifier
         </button>
         <button
           :disabled="loading"
-          class="flex-1 bg-blue-600 text-white py-3 px-3 rounded hover:transition-colors disabled:opacity-50"
+          class="flex-1 bg-primary-600 text-white py-3 px-3 rounded hover:transition-colors disabled:opacity-50"
           @click="getCurrentLocation"
         >
           {{ loading ? 'Localisation...' : 'Relocaliser' }}
@@ -78,14 +78,14 @@
           @click.stop
         >
           <!-- Header -->
-          <div class="px-4 py-4 border-b border-gray-200">
+          <div class="px-4 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-start sm:justify-between">
-              <h3 class="text-lg font-semibold text-gray-900">Définir votre position</h3>
+              <h3 class="text-lg font-semibold text-neutral-900">Définir votre position</h3>
               <button
                 class="p-2 hover:transition-colors"
                 @click="closeModal"
               >
-                <X class="h-4 w-4 text-gray-400" />
+                <X class="h-4 w-4 text-neutral-400" />
               </button>
             </div>
           </div>
@@ -96,7 +96,7 @@
             <div class="flex items-center justify-center space-y-4 sm:space-x-4 mt-3">
               <button
                 type="button"
-                :class="!mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'"
+                :class="!mapSelectionMode ? 'bg-primary-600 text-white' : 'bg-neutral-200 text-neutral-800'"
                 class="px-3 py-3 rounded font-medium transition-colors"
                 @click="mapSelectionMode = false"
               >
@@ -104,7 +104,7 @@
               </button>
               <button
                 type="button"
-                :class="mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'"
+                :class="mapSelectionMode ? 'bg-primary-600 text-white' : 'bg-neutral-200 text-neutral-800'"
                 class="px-3 py-3 rounded font-medium transition-colors"
                 @click="toggleMapSelection"
               >
@@ -115,7 +115,7 @@
             <!-- Map Selection -->
             <div v-if="mapSelectionMode" class="mt-3">
               <div class="mt-2 flex items-center justify-start sm:justify-between">
-                <label class="block text-sm font-medium text-gray-800">
+                <label class="block text-sm font-medium text-neutral-800">
                   Cliquez sur la carte pour choisir votre position
                 </label>
                 <button
@@ -129,7 +129,7 @@
               </div>
               <div
                 ref="mapContainer"
-                class="w-full h-9xl rounded border border-gray-300 bg-gray-100"
+                class="w-full h-9xl rounded border border-neutral-300 bg-neutral-100"
                 style="min-height: 300px;"
               >
                 <!-- Map will be loaded here -->
@@ -139,7 +139,7 @@
             <!-- Manual Coordinates (only show when not in map mode) -->
             <div v-else class="space-y-4">
               <div>
-                <label for="latitude" class="block text-sm font-medium text-gray-800 mt-2">
+                <label for="latitude" class="block text-sm font-medium text-neutral-800 mt-2">
                   Latitude *
                 </label>
                 <input
@@ -150,13 +150,13 @@
                   min="-90"
                   max="90"
                   required
-                  class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Ex: 5.3474"
                 >
               </div>
 
               <div>
-                <label for="longitude" class="block text-sm font-medium text-gray-800 mt-2">
+                <label for="longitude" class="block text-sm font-medium text-neutral-800 mt-2">
                   Longitude *
                 </label>
                 <input
@@ -167,14 +167,14 @@
                   min="-180"
                   max="180"
                   required
-                  class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Ex: -3.9857"
                 >
               </div>
             </div>
 
             <!-- Current Selection Display -->
-            <div v-if="form.latitude && form.longitude" class="bg-green-50 rounded p-3 border border-blue-200">
+            <div v-if="form.latitude && form.longitude" class="bg-green-50 rounded p-3 border border-primary-200">
               <div class="flex items-center space-y-4 sm:space-x-2 mt-2">
                 <CheckCircle class="h-4 w-4 text-green-600" />
                 <span class="font-medium text-green-800">Position sélectionnée</span>
@@ -189,7 +189,7 @@
               </div>
             </div>
 
-            <div class="bg-blue-50 rounded p-3">
+            <div class="bg-primary-50 rounded p-3">
               <p class="text-sm text-secondary-700">
                 <strong>Deux options :</strong><br>
                 • <strong>Coordonnées manuelles :</strong> Saisissez directement lat/long<br>
@@ -200,7 +200,7 @@
             <div class="flex justify-center sm:justify-end space-y-2 sm:space-x-3 padding-t-lg">
               <button
                 type="button"
-                class="px-3 py-3 text-gray-700 hover:transition-colors"
+                class="px-3 py-3 text-neutral-700 hover:transition-colors"
                 @click="closeModal"
               >
                 Annuler
@@ -208,7 +208,7 @@
               <button
                 type="submit"
                 :disabled="saving"
-                class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors disabled:opacity-50"
+                class="px-4 py-3 bg-primary-600 text-white rounded hover:transition-colors disabled:opacity-50"
               >
                 {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
               </button>
@@ -225,7 +225,7 @@
         :class="{
           'border-emerald-500': notification.type === 'success',
           'border-red-500': notification.type === 'error',
-          'border-blue-500': notification.type === 'info'
+          'border-primary-500': notification.type === 'info'
         }"
       >
         <div class="flex items-stretch sm:items-start">
@@ -240,16 +240,16 @@
             />
             <Info
               v-if="notification.type === 'info'"
-              class="h-4 w-4 text-blue-500"
+              class="h-4 w-4 text-primary-500"
             />
           </div>
           <div class="ml-4 w-none flex-1">
-            <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-            <p class="mt-1 text-sm text-gray-500">{{ notification.message }}</p>
+            <p class="text-sm font-medium text-neutral-900">{{ notification.title }}</p>
+            <p class="mt-1 text-sm text-neutral-500">{{ notification.message }}</p>
           </div>
           <div class="ml-6 flex-shrink-0 flex">
             <button
-              class="text-gray-400 hover:transition-colors"
+              class="text-neutral-400 hover:transition-colors"
               @click="notification.show = false"
             >
               <X class="h-4 w-4" />

@@ -1,4 +1,4 @@
-# 🤖 CLAUDE.md - Contexte Projet Antigaspi
+# 🤖 CLAUDE.md - Contexte Projet GÊLADAL
 
 # Guide pour Claude Code
 
@@ -172,7 +172,7 @@ L'agent **reality-checker** doit SYSTÉMATIQUEMENT être invoqué avant toute co
 ## 📋 **Informations Générales**
 
 ### **Nom du Projet**
-**Antigaspi** - Application Anti-Gaspillage Alimentaire
+**GÊLADAL** - Ton Panier N'attend Que Toi !
 
 ### **Objectif Principal**
 Développer une plateforme web complète permettant aux commerçants de vendre leurs invendus à prix réduit et aux consommateurs de faire des économies tout en luttant contre le gaspillage alimentaire.

@@ -119,7 +119,7 @@ export const checkoutCart = createAsyncThunk(
       }
 
       // Transformer les items du cart en format pour l'API orders
-      // Inclure payment_method et wallet_pin pour le paiement
+      // Inclure payment_method, wallet_pin, customer_phone, customer_email, pickup_date, pickup_time pour le paiement
       const orderPayload = {
         items: cart.items.map((item: any) => ({
           product_id: item.product_id,
@@ -127,6 +127,10 @@ export const checkoutCart = createAsyncThunk(
         })),
         payment_method: payload.paymentMethod,
         wallet_pin: payload.walletPin,
+        customer_phone: payload.customerPhone,
+        customer_email: payload.customerEmail,
+        pickup_date: payload.pickupDate ?? undefined,
+        pickup_time: payload.pickupTime ?? undefined,
         notes: payload.notes ?? undefined
       }
 

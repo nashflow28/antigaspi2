@@ -2,11 +2,11 @@
   <div class="space-y-8">
     <!-- Header moderne -->
     <div class="text-left sm:text-center animate-fade-in-up">
-      <h3 class="text-xl font-semibold text-gray-900 mt-2">
+      <h3 class="text-xl font-semibold text-neutral-900 mt-2">
         Content de vous revoir !
       </h3>
-      <p class="text-gray-700">
-        Connectez-vous pour accéder à votre compte Antigaspi
+      <p class="text-neutral-700">
+        Connectez-vous pour accéder à votre compte GÊLADAL
       </p>
     </div>
 
@@ -51,14 +51,14 @@
           <input
             v-model="form.remember"
             type="checkbox"
-            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            class="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
           >
-          <span class="text-sm text-gray-700">Se souvenir de moi</span>
+          <span class="text-sm text-neutral-700">Se souvenir de moi</span>
         </label>
 
         <router-link
           to="/forgot-password"
-          class="text-sm text-blue-600 hover:text-blue-900 font-medium"
+          class="text-sm text-primary-600 hover:text-primary-900 font-medium"
         >
           Mot de passe oublié ?
         </router-link>
@@ -78,7 +78,7 @@
           <Loader2 v-if="loading" class="h-4 w-4 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
-        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500/90 opacity-0 group-hover:transition-opacity duration-300" />
+        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500/90 opacity-0 group-hover:transition-opacity duration-300" />
       </Button>
 
       <!-- Error Message Global -->
@@ -97,10 +97,10 @@
     <div class="space-y-4 animate-fade-in-up" style="animation-delay: 0.4s;">
       <div class="relative">
         <div class="relative sm:absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300" />
+          <div class="w-full border-t border-neutral-300" />
         </div>
         <div class="relative flex justify-center text-sm">
-          <span class="px-3 bg-white text-gray-500">Ou continuez avec</span>
+          <span class="px-3 bg-white text-neutral-500">Ou continuez avec</span>
         </div>
       </div>
 
@@ -133,11 +133,11 @@
     </div>
 
     <!-- Sign Up Link -->
-    <div class="text-left sm:text-center text-sm text-gray-700 animate-fade-in-up" style="animation-delay: 0.6s;">
+    <div class="text-left sm:text-center text-sm text-neutral-700 animate-fade-in-up" style="animation-delay: 0.6s;">
       Vous n'avez pas encore de compte ?
       <router-link
         to="/register"
-        class="font-semibold text-blue-600 hover:text-blue-900 ml-1"
+        class="font-semibold text-primary-600 hover:text-primary-900 ml-1"
       >
         Créez votre compte
       </router-link>

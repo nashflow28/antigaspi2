@@ -2,15 +2,15 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-gray-50 to-gray-100"
+    class="bg-gradient-to-br from-neutral-50 to-neutral-100"
   >
     <!-- Header -->
-    <div class="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+    <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
       <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 py-6">
         <div class="flex flex-col lg:flex-row lg:items-center justify-start sm:justify-between gap-3">
           <div>
-            <h1 class="text-xl font-semibold text-gray-900">Mes Avis</h1>
-            <p class="text-gray-700 mt-1">
+            <h1 class="text-xl font-semibold text-neutral-900">Mes Avis</h1>
+            <p class="text-neutral-700 mt-1">
               Consultez et répondez aux avis de vos clients
             </p>
           </div>
@@ -18,7 +18,7 @@
           <div class="flex items-center space-y-2 sm:space-x-3">
             <router-link
               to="/merchant/reviews/dashboard"
-              class="inline-flex items-center px-3 py-3 border border-blue-600 text-blue-600 rounded hover:transition-colors"
+              class="inline-flex items-center px-3 py-3 border border-primary-600 text-primary-600 rounded hover:transition-colors"
             >
               <ChartBarIcon class="h-4 w-4 mr-2" />
               Dashboard
@@ -30,15 +30,15 @@
 
     <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 py-6 sm:py-8">
       <!-- Filters -->
-      <div class="bg-white rounded shadow-lg border border-gray-100 p-6 mt-4 sm:mb-3xl">
-        <h3 class="text-lg font-semibold text-gray-900 mt-3">Filtres</h3>
+      <div class="bg-white rounded shadow-lg border border-neutral-100 p-6 mt-4 sm:mb-3xl">
+        <h3 class="text-lg font-semibold text-neutral-900 mt-3">Filtres</h3>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
           <!-- Rating Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-800 mt-2">Note</label>
+            <label class="block text-sm font-medium text-neutral-800 mt-2">Note</label>
             <select
               v-model="filters.rating"
-              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="">Toutes les notes</option>
@@ -52,10 +52,10 @@
 
           <!-- Product Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-800 mt-2">Produit</label>
+            <label class="block text-sm font-medium text-neutral-800 mt-2">Produit</label>
             <select
               v-model="filters.product_id"
-              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="">Tous les produits</option>
@@ -71,10 +71,10 @@
 
           <!-- Verified Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-800 mt-2">Type</label>
+            <label class="block text-sm font-medium text-neutral-800 mt-2">Type</label>
             <select
               v-model="filters.verified_only"
-              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="">Tous les avis</option>
@@ -84,10 +84,10 @@
 
           <!-- Sort Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-800 mt-2">Tri</label>
+            <label class="block text-sm font-medium text-neutral-800 mt-2">Tri</label>
             <select
               v-model="filters.sort"
-              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="recent">Plus récents</option>
@@ -100,17 +100,17 @@
       </div>
 
       <!-- Reviews List -->
-      <div class="bg-white rounded shadow-lg border border-gray-100">
-        <div class="px-4 py-4 border-b border-gray-200">
+      <div class="bg-white rounded shadow-lg border border-neutral-100">
+        <div class="px-4 py-4 border-b border-neutral-200">
           <div class="flex items-center justify-start sm:justify-between">
-            <h3 class="text-xl font-semibold text-gray-900">
+            <h3 class="text-xl font-semibold text-neutral-900">
               Avis clients
-              <span v-if="pagination" class="text-gray-500 font-normal">
+              <span v-if="pagination" class="text-neutral-500 font-normal">
                 ({{ pagination.total }} au total)
               </span>
             </h3>
             <button
-              class="inline-flex items-center px-3 py-3 text-sm text-blue-600 hover:transition-colors"
+              class="inline-flex items-center px-3 py-3 text-sm text-primary-600 hover:transition-colors"
               :disabled="loading"
               @click="() => loadReviews()"
             >
@@ -123,15 +123,15 @@
         <div class="divide-y divide-neutral-200">
           <!-- Loading State -->
           <div v-if="loading" class="px-4 py-6 sm:py-8 text-left sm:text-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" />
-            <p class="text-gray-500 mt-2">Chargement des avis...</p>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
+            <p class="text-neutral-500 mt-2">Chargement des avis...</p>
           </div>
 
           <!-- Empty State -->
           <div v-else-if="reviews.length === 0" class="px-4 py-6 sm:py-8 text-left sm:text-center">
-            <ChatBubbleLeftRightIcon class="w-12 h-10 text-gray-400 mx-auto mt-3" />
-            <h4 class="text-lg font-medium text-gray-900 mt-2">Aucun avis</h4>
-            <p class="text-gray-700">
+            <ChatBubbleLeftRightIcon class="w-12 h-10 text-neutral-400 mx-auto mt-3" />
+            <h4 class="text-lg font-medium text-neutral-900 mt-2">Aucun avis</h4>
+            <p class="text-neutral-700">
               {{ hasActiveFilters ? 'Aucun avis ne correspond à vos critères' : 'Vous n\'avez pas encore reçu d\'avis clients' }}
             </p>
           </div>
@@ -146,7 +146,7 @@
             <div class="flex space-y-4 sm:space-x-4">
               <!-- User Avatar -->
               <div class="flex-shrink-0">
-                <div class="w-12 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                <div class="w-12 h-10 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
                   <span class="text-white text-sm font-medium">
                     {{ getInitials(review.user.name) }}
                   </span>
@@ -156,13 +156,13 @@
               <div class="flex-1 min-w-none">
                 <div class="flex items-center justify-start sm:justify-between mb-4">
                   <div class="flex items-center space-y-2 sm:space-x-3">
-                    <span class="font-medium text-gray-900">{{ review.user.name }}</span>
+                    <span class="font-medium text-neutral-900">{{ review.user.name }}</span>
                     <div class="flex items-center">
                       <StarIcon
                         v-for="star in 5"
                         :key="star"
                         class="h-4 w-4"
-                        :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500'"
+                        :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-500'"
                       />
                     </div>
                     <span v-if="review.is_verified_purchase" class="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -170,18 +170,18 @@
                       Achat vérifié
                     </span>
                   </div>
-                  <span class="text-sm text-gray-500">{{ review.time_ago }}</span>
+                  <span class="text-sm text-neutral-500">{{ review.time_ago }}</span>
                 </div>
 
                 <div v-if="review.title" class="mb-4">
-                  <h4 class="font-medium text-gray-900">{{ review.title }}</h4>
+                  <h4 class="font-medium text-neutral-900">{{ review.title }}</h4>
                 </div>
 
-                <div v-if="review.comment" class="text-gray-800 text-sm leading-relaxed mb-4">
+                <div v-if="review.comment" class="text-neutral-800 text-sm leading-relaxed mb-4">
                   {{ review.comment }}
                 </div>
 
-                <div v-if="review.product" class="inline-flex items-center text-xs text-info bg-blue-50 rounded-full px-3 py-3 mt-3">
+                <div v-if="review.product" class="inline-flex items-center text-xs text-info bg-primary-50 rounded-full px-3 py-3 mt-3">
                   <ArchiveBoxIcon class="w-xs h-3 mr-1" />
                   {{ review.product.name }}
                 </div>
@@ -199,23 +199,23 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="pagination && pagination.last_page > 1" class="px-4 py-4 border-t border-gray-200">
+        <div v-if="pagination && pagination.last_page > 1" class="px-4 py-4 border-t border-neutral-200">
           <div class="flex items-center justify-start sm:justify-between">
-            <div class="text-sm text-gray-500">
+            <div class="text-sm text-neutral-500">
               Page {{ pagination.current_page }} sur {{ pagination.last_page }}
               ({{ pagination.total }} avis au total)
             </div>
             <div class="flex space-y-4 sm:space-x-2">
               <button
                 :disabled="pagination.current_page <= 1"
-                class="px-3 py-3 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                class="px-3 py-3 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
                 @click="loadPage(pagination.current_page - 1)"
               >
                 Précédent
               </button>
               <button
                 :disabled="pagination.current_page >= pagination.last_page"
-                class="px-3 py-3 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                class="px-3 py-3 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
                 @click="loadPage(pagination.current_page + 1)"
               >
                 Suivant

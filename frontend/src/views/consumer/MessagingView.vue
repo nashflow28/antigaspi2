@@ -1,20 +1,20 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+    <header class="border-b border-neutral-200 bg-white/80 backdrop-blur-sm">
       <div class="container mx-auto px-4 py-6 lg:px-8 lg:py-8">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <nav class="text-sm text-gray-500" aria-label="Fil d'Ariane">
+            <nav class="text-sm text-neutral-500" aria-label="Fil d'Ariane">
               <ol class="flex items-center gap-2">
                 <li>
-                  <RouterLink to="/" class="hover:text-gray-800">Accueil</RouterLink>
+                  <RouterLink to="/" class="hover:text-neutral-800">Accueil</RouterLink>
                 </li>
-                <li class="text-gray-400">/</li>
-                <li class="font-medium text-gray-800">Messagerie commerçant</li>
+                <li class="text-neutral-400">/</li>
+                <li class="font-medium text-neutral-800">Messagerie commerçant</li>
               </ol>
             </nav>
-            <h1 class="mt-3 text-2xl font-semibold text-gray-900">Messagerie commerçant</h1>
-            <p class="mt-2 text-gray-600">
+            <h1 class="mt-3 text-2xl font-semibold text-neutral-900">Messagerie commerçant</h1>
+            <p class="mt-2 text-neutral-600">
               Discutez directement avec vos commerçants pour poser vos questions et organiser vos commandes.
             </p>
           </div>
@@ -40,16 +40,16 @@
 
     <main class="container mx-auto grid gap-6 px-4 py-10 lg:grid-cols-[320px_1fr] lg:px-8">
       <section class="space-y-4">
-        <Card class="overflow-hidden border border-gray-200 bg-white">
-          <header class="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-3">
-            <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-600">Conversations</h2>
-            <span class="rounded-full bg-gray-200 px-3 py-1 text-xs font-medium text-gray-700">
+        <Card class="overflow-hidden border border-neutral-200 bg-white">
+          <header class="flex items-center justify-between border-b border-neutral-200 bg-neutral-50 px-4 py-3">
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-neutral-600">Conversations</h2>
+            <span class="rounded-full bg-neutral-200 px-3 py-1 text-xs font-medium text-neutral-700">
               {{ conversations.length }}
             </span>
           </header>
 
           <div class="max-h-[600px] overflow-y-auto">
-            <ul v-if="!messagingLoading && conversations.length" class="divide-y divide-gray-200">
+            <ul v-if="!messagingLoading && conversations.length" class="divide-y divide-neutral-200">
               <li
                 v-for="conversation in conversations"
                 :key="conversation.id"
@@ -59,13 +59,13 @@
                 ]"
                 @click="handleSelectConversation(conversation.id)"
               >
-                <p class="text-sm font-semibold text-gray-900">
+                <p class="text-sm font-semibold text-neutral-900">
                   {{ getConversationTitle(conversation) }}
                 </p>
-                <p class="mt-1 text-xs text-gray-500">
+                <p class="mt-1 text-xs text-neutral-500">
                   {{ formatPreview(conversation.last_message_preview) }}
                 </p>
-                <p class="mt-2 text-xs text-gray-400">
+                <p class="mt-2 text-xs text-neutral-400">
                   {{ formatTimestamp(conversation.last_message_at) }}
                 </p>
               </li>
@@ -87,13 +87,13 @@
       </section>
 
       <section>
-        <Card class="flex h-full flex-col border border-gray-200 bg-white">
-          <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-5 py-4">
+        <Card class="flex h-full flex-col border border-neutral-200 bg-white">
+          <div class="flex items-center justify-between border-b border-neutral-200 bg-neutral-50 px-5 py-4">
             <div>
-              <h2 class="text-lg font-semibold text-gray-900">
+              <h2 class="text-lg font-semibold text-neutral-900">
                 {{ activeConversation ? getConversationTitle(activeConversation) : 'Sélectionnez une conversation' }}
               </h2>
-              <p v-if="activeConversation?.merchant?.phone" class="text-sm text-gray-500">
+              <p v-if="activeConversation?.merchant?.phone" class="text-sm text-neutral-500">
                 {{ activeConversation.merchant.phone }}
               </p>
             </div>
@@ -131,7 +131,7 @@
                     'max-w-[80%] rounded-2xl px-4 py-3 shadow-sm',
                     message.sender_id === activeConversation?.consumer_id
                       ? 'bg-primary-500 text-white'
-                      : 'bg-gray-100 text-gray-900'
+                      : 'bg-neutral-100 text-neutral-900'
                   ]"
                 >
                   <p class="text-sm leading-relaxed">{{ message.content }}</p>
@@ -140,7 +140,7 @@
                       'mt-2 text-xs',
                       message.sender_id === activeConversation?.consumer_id
                         ? 'text-primary-100'
-                        : 'text-gray-500'
+                        : 'text-neutral-500'
                     ]"
                   >
                     {{ formatTimestamp(message.created_at) }}
@@ -166,7 +166,7 @@
             />
           </div>
 
-          <footer class="border-t border-gray-200 bg-white px-5 py-4">
+          <footer class="border-t border-neutral-200 bg-white px-5 py-4">
             <form class="space-y-3" @submit.prevent="handleSendMessage">
               <Textarea
                 v-model="messageDraft"

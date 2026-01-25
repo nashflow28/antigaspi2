@@ -24,6 +24,7 @@ import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { useAlert } from '../../contexts/AlertContext'
+import { reset as navigationReset } from '../../navigation/NavigationRef'
 
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN = 60 // seconds
@@ -179,7 +180,10 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
         } else {
           // All good - close auth modal
           showSuccess('Succes', 'Connexion reussie!')
-          navigation.getParent()?.getParent()?.goBack()
+          navigationReset({
+            index: 0,
+            routes: [{ name: 'Main' }],
+          })
         }
       } else {
         showError('Erreur', 'Réponse inattendue du serveur')

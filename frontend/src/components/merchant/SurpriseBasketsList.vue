@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="flex items-center justify-start sm:justify-between mt-4">
       <div>
-        <h2 class="text-xl font-semibold text-gray-900">Mes Paniers Surprise</h2>
-        <p class="text-gray-700 mt-1">Gérez vos paniers surprise et maximisez vos ventes</p>
+        <h2 class="text-xl font-semibold text-neutral-900">Mes Paniers Surprise</h2>
+        <p class="text-neutral-700 mt-1">Gérez vos paniers surprise et maximisez vos ventes</p>
       </div>
       <button
-        class="px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
+        class="px-3 py-3 bg-primary-600 text-white rounded hover:transition-colors"
         @click="$emit('create')"
       >
         <Plus class="h-4 w-4 inline mr-2" />
@@ -17,70 +17,70 @@
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
-      <div class="bg-white rounded border border-gray-200 p-6">
+      <div class="bg-white rounded border border-neutral-200 p-6">
         <div class="flex items-center">
-          <div class="p-3 bg-blue-100 rounded">
-            <Package class="h-6 w-6 text-blue-600" />
+          <div class="p-3 bg-primary-100 rounded">
+            <Package class="h-6 w-6 text-primary-600" />
           </div>
           <div class="ml-6">
-            <p class="text-sm font-medium text-gray-700">Total</p>
-            <p class="text-xl font-semibold text-gray-900">{{ basketStats.total }}</p>
+            <p class="text-sm font-medium text-neutral-700">Total</p>
+            <p class="text-xl font-semibold text-neutral-900">{{ basketStats.total }}</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded border border-gray-200 p-6">
+      <div class="bg-white rounded border border-neutral-200 p-6">
         <div class="flex items-center">
           <div class="p-3 bg-green-100 rounded">
             <CheckCircle class="h-6 w-6 text-green-600" />
           </div>
           <div class="ml-6">
-            <p class="text-sm font-medium text-gray-700">Actifs</p>
-            <p class="text-xl font-semibold text-gray-900">{{ basketStats.active }}</p>
+            <p class="text-sm font-medium text-neutral-700">Actifs</p>
+            <p class="text-xl font-semibold text-neutral-900">{{ basketStats.active }}</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded border border-gray-200 p-6">
+      <div class="bg-white rounded border border-neutral-200 p-6">
         <div class="flex items-center">
-          <div class="p-3 bg-blue-100 rounded">
+          <div class="p-3 bg-primary-100 rounded">
             <DollarSign class="h-6 w-6 text-info" />
           </div>
           <div class="ml-6">
-            <p class="text-sm font-medium text-gray-700">Revenus potentiels</p>
-            <p class="text-xl font-semibold text-gray-900">{{ formatCurrency(basketStats.totalRevenue) }}</p>
+            <p class="text-sm font-medium text-neutral-700">Revenus potentiels</p>
+            <p class="text-xl font-semibold text-neutral-900">{{ formatCurrency(basketStats.totalRevenue) }}</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded border border-gray-200 p-6">
+      <div class="bg-white rounded border border-neutral-200 p-6">
         <div class="flex items-center">
           <div class="p-3 bg-yellow-100 rounded">
-            <TrendingUp class="h-6 w-6 text-blue-600" />
+            <TrendingUp class="h-6 w-6 text-primary-600" />
           </div>
           <div class="ml-6">
-            <p class="text-sm font-medium text-gray-700">Économies clients</p>
-            <p class="text-xl font-semibold text-gray-900">{{ formatCurrency(basketStats.totalSavings) }}</p>
+            <p class="text-sm font-medium text-neutral-700">Économies clients</p>
+            <p class="text-xl font-semibold text-neutral-900">{{ formatCurrency(basketStats.totalSavings) }}</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="bg-white rounded border border-gray-200 p-4 sm:p-6 lg:p-12 text-left sm:text-center">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mt-3" />
-      <p class="text-gray-700">Chargement de vos paniers surprise...</p>
+    <div v-if="loading" class="bg-white rounded border border-neutral-200 p-4 sm:p-6 lg:p-12 text-left sm:text-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mt-3" />
+      <p class="text-neutral-700">Chargement de vos paniers surprise...</p>
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="!hasMerchantBaskets" class="bg-white rounded border border-gray-200 p-6 sm:p-12 lg:p-12 text-left sm:text-center">
-      <Package class="w-12 h-10 mx-auto mt-3 text-gray-500" />
-      <h3 class="text-lg font-medium text-gray-900 mt-2">Aucun panier surprise</h3>
-      <p class="text-gray-700 mt-4">
+    <div v-else-if="!hasMerchantBaskets" class="bg-white rounded border border-neutral-200 p-6 sm:p-12 lg:p-12 text-left sm:text-center">
+      <Package class="w-12 h-10 mx-auto mt-3 text-neutral-500" />
+      <h3 class="text-lg font-medium text-neutral-900 mt-2">Aucun panier surprise</h3>
+      <p class="text-neutral-700 mt-4">
         Créez votre premier panier surprise pour valoriser vos invendus et attirer de nouveaux clients
       </p>
       <button
-        class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors"
+        class="px-4 py-3 bg-primary-600 text-white rounded hover:transition-colors"
         @click="$emit('create')"
       >
         <Plus class="h-4 w-4 inline mr-2" />
@@ -93,10 +93,10 @@
       <div
         v-for="basket in merchantBaskets"
         :key="basket.id"
-        class="bg-white rounded border border-gray-200 hover:transition-all duration-200 overflow-hidden sm:block"
+        class="bg-white rounded border border-neutral-200 hover:transition-all duration-200 overflow-hidden sm:block"
       >
         <!-- Image -->
-        <div class="relative h-8xl bg-gray-100">
+        <div class="relative h-8xl bg-neutral-100">
           <img
             v-if="basket.image_url"
             :src="basket.image_url"
@@ -104,7 +104,7 @@
             class="w-full h-full object-cover"
           >
           <div v-else class="w-full h-full flex items-center justify-center">
-            <Package class="w-12 h-10 text-gray-400" />
+            <Package class="w-12 h-10 text-neutral-400" />
           </div>
 
           <!-- Status Badge -->
@@ -121,7 +121,7 @@
 
           <!-- Quantity Badge -->
           <div class="relative sm:absolute top-3 right-3">
-            <span class="px-3 py-3 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+            <span class="px-3 py-3 text-xs font-medium bg-primary-100 text-primary-800 rounded-full">
               {{ basket.quantity_available }} disponible(s)
             </span>
           </div>
@@ -130,36 +130,36 @@
         <!-- Content -->
         <div class="p-6">
           <div class="flex items-stretch sm:items-start justify-start sm:justify-between mt-2">
-            <h3 class="text-lg font-semibold text-gray-900 line-clamp-1">{{ basket.name }}</h3>
+            <h3 class="text-lg font-semibold text-neutral-900 line-clamp-1">{{ basket.name }}</h3>
             <div class="relative">
               <button
                 class="p-1 hover:transition-colors"
                 @click="toggleDropdown(basket.id)"
               >
-                <MoreVertical class="h-4 w-4 text-gray-500" />
+                <MoreVertical class="h-4 w-4 text-neutral-500" />
               </button>
 
               <!-- Dropdown Menu -->
               <div
                 v-if="openDropdown === basket.id"
-                class="relative sm:absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded shadow-lg z-10 py-3 w-8xl"
+                class="relative sm:absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded shadow-lg z-10 py-3 w-8xl"
               >
                 <button
-                  class="w-full px-3 py-3 text-left text-sm text-gray-800 hover:bg-gray-50 flex items-center"
+                  class="w-full px-3 py-3 text-left text-sm text-neutral-800 hover:bg-neutral-50 flex items-center"
                   @click="editBasket(basket)"
                 >
                   <Edit class="h-4 w-4 mr-2" />
                   Modifier
                 </button>
                 <button
-                  class="w-full px-3 py-3 text-left text-sm text-gray-800 hover:bg-gray-50 flex items-center"
+                  class="w-full px-3 py-3 text-left text-sm text-neutral-800 hover:bg-neutral-50 flex items-center"
                   @click="toggleBasketStatus(basket)"
                 >
                   <component :is="basket.is_active ? EyeOff : Eye" class="h-4 w-4 mr-2" />
                   {{ basket.is_active ? 'Désactiver' : 'Activer' }}
                 </button>
                 <button
-                  class="w-full px-3 py-3 text-left text-sm text-gray-800 hover:bg-gray-50 flex items-center"
+                  class="w-full px-3 py-3 text-left text-sm text-neutral-800 hover:bg-neutral-50 flex items-center"
                   @click="viewBasket(basket)"
                 >
                   <Eye class="h-4 w-4 mr-2" />
@@ -177,15 +177,15 @@
             </div>
           </div>
 
-          <p v-if="basket.surprise_description" class="text-sm text-gray-700 mb-4 line-clamp-2">
+          <p v-if="basket.surprise_description" class="text-sm text-neutral-700 mb-4 line-clamp-2">
             {{ basket.surprise_description }}
           </p>
 
           <!-- Price and Savings -->
           <div class="flex items-center justify-start sm:justify-between mb-4">
             <div>
-              <span class="text-lg font-semibold text-blue-600">{{ formatCurrency(basket.discounted_price) }}</span>
-              <span v-if="basket.total_original_value" class="text-sm text-gray-400 ml-2 line-through">
+              <span class="text-lg font-semibold text-primary-600">{{ formatCurrency(basket.discounted_price) }}</span>
+              <span v-if="basket.total_original_value" class="text-sm text-neutral-400 ml-2 line-through">
                 {{ formatCurrency(basket.total_original_value) }}
               </span>
             </div>
@@ -195,7 +195,7 @@
           </div>
 
           <!-- Items Info -->
-          <div class="flex items-center justify-start sm:justify-between text-sm text-gray-500 mt-3">
+          <div class="flex items-center justify-start sm:justify-between text-sm text-neutral-500 mt-3">
             <span>{{ basket.basket_items_count }} article(s)</span>
             <span v-if="basket.expiration_date">
               Expire le {{ formatDate(basket.expiration_date) }}
@@ -204,7 +204,7 @@
 
           <!-- Category -->
           <div v-if="basket.category" class="mt-3">
-            <span class="inline-flex items-center px-3 py-3 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">
+            <span class="inline-flex items-center px-3 py-3 text-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
               {{ basket.category.name }}
             </span>
           </div>
@@ -212,13 +212,13 @@
           <!-- Actions -->
           <div class="flex items-center space-y-4 sm:space-x-2">
             <button
-              class="flex-1 px-3 py-3 text-sm font-medium text-gray-800 bg-gray-100 hover:transition-colors"
+              class="flex-1 px-3 py-3 text-sm font-medium text-neutral-800 bg-neutral-100 hover:transition-colors"
               @click="editBasket(basket)"
             >
               Modifier
             </button>
             <button
-              class="flex-1 px-3 py-3 text-sm font-medium text-white bg-blue-600 hover:transition-colors"
+              class="flex-1 px-3 py-3 text-sm font-medium text-white bg-primary-600 hover:transition-colors"
               @click="viewBasket(basket)"
             >
               Détails

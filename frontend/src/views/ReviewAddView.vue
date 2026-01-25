@@ -2,10 +2,10 @@
   <div class="container mx-auto py-8 px-4 max-w-2xl">
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <h1 class="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
         Donner votre avis
       </h1>
-      <p v-if="productName" class="text-gray-600 dark:text-gray-300">
+      <p v-if="productName" class="text-neutral-600 dark:text-neutral-300">
         sur <strong>{{ productName }}</strong>
       </p>
       <router-link :to="`/products/${productId}`" class="text-green-600 hover:text-green-700 text-sm mt-4 inline-block">
@@ -14,7 +14,7 @@
     </div>
 
     <!-- Form -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-md p-6">
       <ReviewForm
         :loading="reviewsStore.loading"
         @submit="handleSubmit"

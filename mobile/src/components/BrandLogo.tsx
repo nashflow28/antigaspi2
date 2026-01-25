@@ -28,7 +28,7 @@ export interface BrandLogoProps extends Omit<TypographyProps, 'children' | 'vari
    */
   style?: TextStyle
   /**
-   * Contenu du logo (par défaut : "🌱 Antigaspi")
+   * Contenu du logo (par défaut : "🌱 GÊLADAL")
    */
   text?: string
 }
@@ -38,7 +38,7 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
   align = 'center',
   style,
   weight = 'bold',
-  text = '🌱 Antigaspi',
+  text = '🌱 GÊLADAL',
   ...rest
 }) => {
   const { width } = useWindowDimensions()

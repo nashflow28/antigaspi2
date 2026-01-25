@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 px-4 py-8 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50 px-4 py-8 sm:px-6 lg:px-8">
     <div class="mx-auto flex max-w-6xl flex-col gap-6">
       <div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <!-- Profile form -->
         <Card variant="elevated" class="overflow-hidden">
-          <div class="bg-gradient-to-r from-blue-600/90 to-indigo-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
-            <p class="text-sm font-semibold uppercase tracking-wide text-blue-100">Espace personnel</p>
+          <div class="bg-gradient-to-r from-primary-600/90 to-indigo-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
+            <p class="text-sm font-semibold uppercase tracking-wide text-primary-100">Espace personnel</p>
             <h1 class="mt-2 text-2xl font-semibold">Mon profil</h1>
-            <p class="mt-2 max-w-2xl text-sm text-blue-100/90">
+            <p class="mt-2 max-w-2xl text-sm text-primary-100/90">
               Mettez à jour vos informations pour recevoir des recommandations personnalisées et faciliter vos prochaines réservations.
             </p>
           </div>
@@ -17,7 +17,7 @@
               <div class="flex flex-col items-center gap-4 lg:w-48">
                 <div class="relative">
                   <div
-                    class="flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 shadow-lg shadow-blue-500/10"
+                    class="flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary-100 via-white to-primary-200 shadow-lg shadow-primary-500/10"
                   >
                     <img
                       v-if="hasAvatarImage"
@@ -27,7 +27,7 @@
                     >
                     <span
                       v-else
-                      class="text-3xl font-semibold text-blue-600"
+                      class="text-3xl font-semibold text-primary-600"
                     >
                       {{ userInitials }}
                     </span>
@@ -103,9 +103,9 @@
                   />
                 </div>
 
-                <div class="flex flex-col gap-3 rounded-2xl bg-blue-50/60 p-4 text-sm text-blue-900 md:flex-row md:items-center md:justify-between">
+                <div class="flex flex-col gap-3 rounded-2xl bg-primary-50/60 p-4 text-sm text-primary-900 md:flex-row md:items-center md:justify-between">
                   <div class="flex items-center gap-3">
-                    <CheckCircle2 class="h-5 w-5 text-blue-500" aria-hidden="true" />
+                    <CheckCircle2 class="h-5 w-5 text-primary-500" aria-hidden="true" />
                     <p class="font-medium">Ces informations nous aident à personnaliser vos alertes et vos paniers recommandés.</p>
                   </div>
                   <Button
@@ -113,7 +113,7 @@
                     variant="ghost"
                     size="sm"
                     :right-icon="ArrowRight"
-                    class="text-blue-700"
+                    class="text-primary-700"
                     tag="router-link"
                     to="/notifications/inbox"
                   >
@@ -160,7 +160,7 @@
 
             <ul class="mt-6 space-y-4 text-sm text-neutral-600">
               <li class="flex items-start gap-3">
-                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
                   <User class="h-4 w-4" aria-hidden="true" />
                 </span>
                 <div>
@@ -209,11 +209,11 @@
 
           <Card class="p-6">
             <div class="flex items-start gap-3">
-              <ShieldCheck class="h-6 w-6 text-blue-600" aria-hidden="true" />
+              <ShieldCheck class="h-6 w-6 text-primary-600" aria-hidden="true" />
               <div>
                 <h3 class="text-base font-semibold text-neutral-900">Sécurité et confidentialité</h3>
                 <p class="mt-1 text-sm text-neutral-500">
-                  Vos données personnelles sont chiffrées et ne sont utilisées que pour améliorer votre expérience Antigaspi.
+                  Vos données personnelles sont chiffrées et ne sont utilisées que pour améliorer votre expérience GÊLADAL.
                 </p>
               </div>
             </div>

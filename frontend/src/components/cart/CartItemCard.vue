@@ -8,7 +8,7 @@
           :src="item.imageUrl"
           :alt="item.name"
           class="w-24 h-24 object-cover rounded-lg"
-        />
+        >
         <div
           v-else
           class="w-24 h-24 bg-neutral-100 rounded-lg flex items-center justify-center"

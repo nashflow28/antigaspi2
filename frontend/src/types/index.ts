@@ -3,16 +3,18 @@ export interface User {
   first_name: string
   last_name: string
   email: string
-  role: 'consumer' | 'merchant' | 'admin'
+  role: 'consumer' | 'merchant' | 'admin' | 'driver'
   city: string
   address?: string | null
   phone?: string
   photo_url?: string | null
+  has_pin?: boolean
   created_at: string
   updated_at: string
   prefers_email_notifications?: boolean
   prefers_sms_notifications?: boolean
   prefers_push_notifications?: boolean
+  wallet_balance?: number
 }
 
 export interface Merchant {
@@ -350,6 +352,139 @@ export interface Reservation {
   }
   consumer?: User
   latest_payment?: Payment | null
+}
+
+export type DeliveryStatus =
+  | 'pending'
+  | 'searching'
+  | 'assigned'
+  | 'picking_up'
+  | 'picked_up'
+  | 'delivering'
+  | 'delivered'
+  | 'cancelled'
+  | 'failed'
+
+export interface DeliveryZone {
+  id: number
+  name: string
+  description?: string | null
+  base_fee?: number
+  per_km_fee?: number
+  min_fee?: number
+  max_fee?: number
+  is_active?: boolean
+}
+
+export interface DeliveryDriverProfile {
+  id: number
+  user_id: number
+  vehicle_type: 'moto' | 'velo' | 'voiture' | 'pied'
+  vehicle_plate?: string | null
+  license_number?: string | null
+  delivery_zone_id?: number | null
+  is_verified?: boolean
+  is_active?: boolean
+  is_available?: boolean
+  rating?: number | null
+  current_latitude?: number | null
+  current_longitude?: number | null
+  last_location_update?: string | null
+  zone?: DeliveryZone | null
+  user?: User | null
+  photo_url?: string | null
+}
+
+export interface DeliveryTrackingPoint {
+  id?: number
+  latitude: number
+  longitude: number
+  created_at?: string
+}
+
+export interface DeliveryLocation {
+  latitude: number
+  longitude: number
+  address?: string | null
+  updated_at?: string
+}
+
+export interface Delivery {
+  id: number
+  reservation_id: number
+  delivery_code?: string
+  status: DeliveryStatus
+  pickup_address?: string | null
+  pickup_latitude?: number | null
+  pickup_longitude?: number | null
+  delivery_address?: string | null
+  delivery_latitude?: number | null
+  delivery_longitude?: number | null
+  delivery_instructions?: string | null
+  delivery_notes?: string | null
+  delivery_fee?: number
+  driver_commission?: number
+  estimated_delivery_at?: string | null
+  cancelled_at?: string | null
+  completed_at?: string | null
+  can_cancel?: boolean
+  consumer_rating?: number | null
+  consumer_feedback?: string | null
+  driver?: DeliveryDriverProfile | null
+  zone?: DeliveryZone | null
+  reservation?: Reservation | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface DeliveryTrackingResponse {
+  delivery: Delivery
+  driver_position?: DeliveryLocation | null
+  tracking_history?: DeliveryTrackingPoint[]
+  pickup_location?: DeliveryLocation
+  delivery_location?: DeliveryLocation
+}
+
+export interface DriverStatsPeriod {
+  deliveries: number
+  earnings: number
+}
+
+export interface DriverStats {
+  today: DriverStatsPeriod
+  week: DriverStatsPeriod
+  month: DriverStatsPeriod
+  total: DriverStatsPeriod
+}
+
+export interface DriverEarning {
+  id: number
+  driver_id: number
+  delivery_id?: number | null
+  amount: number
+  type: 'delivery' | 'bonus' | 'tip' | 'withdrawal'
+  description?: string | null
+  created_at?: string
+}
+
+export interface Reward {
+  id: number
+  name: string
+  description?: string | null
+  points_required: number
+  image_url?: string | null
+  is_active?: boolean
+  is_featured?: boolean
+  created_at?: string
+}
+
+export interface RewardRedemption {
+  id: number
+  reward_id: number
+  points_used: number
+  status?: string | null
+  created_at?: string
+  reward?: Reward | null
 }
 
 export interface ConversationMessage {

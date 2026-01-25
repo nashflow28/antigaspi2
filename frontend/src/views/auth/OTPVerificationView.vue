@@ -1,14 +1,14 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-4 py-12">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-emerald-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 px-4 py-12">
     <Card class="w-full max-w-md">
       <div class="text-center mb-8">
         <div class="mx-auto w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
           <ShieldCheck class="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
         </div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
           Vérification du code
         </h1>
-        <p class="text-slate-600 dark:text-slate-400 mt-2">
+        <p class="text-neutral-600 dark:text-neutral-400 mt-2">
           Entrez le code envoyé au <span class="font-medium">{{ maskedPhone }}</span>
         </p>
       </div>
@@ -26,10 +26,10 @@
               inputmode="numeric"
               maxlength="1"
               class="w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 transition-colors
-                     bg-white dark:bg-slate-800
-                     border-slate-200 dark:border-slate-700
+                     bg-white dark:bg-neutral-800
+                     border-neutral-200 dark:border-neutral-700
                      focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20
-                     text-slate-900 dark:text-white"
+                     text-neutral-900 dark:text-white"
               :class="{ 'border-red-500': error }"
               :value="otp[index] || ''"
               @input="handleOtpInput($event, index)"
@@ -44,7 +44,7 @@
 
         <!-- Timer & Resend -->
         <div class="text-center">
-          <p v-if="canResend" class="text-sm text-slate-600 dark:text-slate-400">
+          <p v-if="canResend" class="text-sm text-neutral-600 dark:text-neutral-400">
             Vous n'avez pas reçu le code ?
             <button
               type="button"
@@ -55,7 +55,7 @@
               {{ resending ? 'Envoi...' : 'Renvoyer' }}
             </button>
           </p>
-          <p v-else class="text-sm text-slate-500 dark:text-slate-400">
+          <p v-else class="text-sm text-neutral-500 dark:text-neutral-400">
             Renvoyer le code dans <span class="font-medium text-primary-600">{{ formatTime(countdown) }}</span>
           </p>
         </div>
@@ -76,7 +76,7 @@
         <div class="text-center">
           <button
             type="button"
-            class="text-sm text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 inline-flex items-center gap-1"
+            class="text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 inline-flex items-center gap-1"
             @click="goBack"
           >
             <ArrowLeft class="h-4 w-4" />
@@ -249,7 +249,7 @@ const handleVerify = async () => {
       // Clean up sensitive pendingRegistration data
       localStorage.removeItem('pendingRegistration')
 
-      notify.success('Connexion réussie', 'Bienvenue sur Antigaspi !')
+      notify.success('Connexion réussie', 'Bienvenue sur GÊLADAL !')
 
       // Navigate to home (profile completion is optional on web)
       router.push({ name: 'home' })
@@ -326,7 +326,7 @@ onMounted(async () => {
 
         if (result.success && result.token) {
           authStore.setAuth(result.token, result.user as any)
-          notify.success('Compte créé', 'Bienvenue sur Antigaspi !')
+          notify.success('Compte créé', 'Bienvenue sur GÊLADAL !')
           localStorage.removeItem('pendingRegistration')
           router.push({ name: 'home' })
           return // Only return on success

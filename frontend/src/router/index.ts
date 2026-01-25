@@ -60,6 +60,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/auth/pin-setup',
+      name: 'pin-setup',
+      component: () => import('@/views/auth/PinSetupView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/products',
       name: 'products',
       component: () => import('@/views/ProductsView2025.vue'),
@@ -110,6 +116,17 @@ const router = createRouter({
         roles: ['consumer'],
         title: 'Finaliser la commande',
         breadcrumb: ['Panier', 'Commande']
+      }
+    },
+    {
+      path: '/payments/status/:paymentId',
+      name: 'payment-status',
+      component: () => import('@/views/payments/PaymentStatusView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['consumer'],
+        title: 'Statut du paiement',
+        breadcrumb: ['Paiement', 'Statut']
       }
     },
     {
@@ -207,6 +224,30 @@ const router = createRouter({
       path: '/reservations',
       name: 'reservations',
       component: () => import('@/views/ReservationsView.vue'),
+      meta: { requiresAuth: true, roles: ['consumer'] }
+    },
+    {
+      path: '/deliveries/request/:reservationId',
+      name: 'delivery-request',
+      component: () => import('@/views/delivery/DeliveryRequestView.vue'),
+      meta: { requiresAuth: true, roles: ['consumer'] }
+    },
+    {
+      path: '/deliveries/:deliveryId/track',
+      name: 'delivery-tracking',
+      component: () => import('@/views/delivery/DeliveryTrackingView.vue'),
+      meta: { requiresAuth: true, roles: ['consumer'] }
+    },
+    {
+      path: '/deliveries/:deliveryId/rate',
+      name: 'delivery-rating',
+      component: () => import('@/views/delivery/DeliveryRatingView.vue'),
+      meta: { requiresAuth: true, roles: ['consumer'] }
+    },
+    {
+      path: '/deliveries/history',
+      name: 'delivery-history',
+      component: () => import('@/views/delivery/DeliveryHistoryView.vue'),
       meta: { requiresAuth: true, roles: ['consumer'] }
     },
     {
@@ -346,6 +387,53 @@ const router = createRouter({
       name: 'merchant-loyalty',
       component: () => import('@/views/merchant/LoyaltyManagement.vue'),
       meta: { requiresAuth: true, roles: ['merchant'] }
+    },
+    {
+      path: '/driver',
+      name: 'driver',
+      redirect: '/driver/dashboard'
+    },
+    {
+      path: '/driver/dashboard',
+      name: 'driver-dashboard',
+      component: () => import('@/views/driver/DriverDashboardView.vue'),
+      meta: { requiresAuth: true, roles: ['driver'] }
+    },
+    {
+      path: '/driver/deliveries/available',
+      name: 'driver-deliveries-available',
+      component: () => import('@/views/driver/AvailableDeliveriesView.vue'),
+      meta: { requiresAuth: true, roles: ['driver'] }
+    },
+    {
+      path: '/driver/deliveries/active',
+      name: 'driver-deliveries-active',
+      component: () => import('@/views/driver/ActiveDeliveryView.vue'),
+      meta: { requiresAuth: true, roles: ['driver'] }
+    },
+    {
+      path: '/driver/history',
+      name: 'driver-history',
+      component: () => import('@/views/driver/DriverHistoryView.vue'),
+      meta: { requiresAuth: true, roles: ['driver'] }
+    },
+    {
+      path: '/driver/earnings',
+      name: 'driver-earnings',
+      component: () => import('@/views/driver/DriverEarningsView.vue'),
+      meta: { requiresAuth: true, roles: ['driver'] }
+    },
+    {
+      path: '/driver/profile',
+      name: 'driver-profile',
+      component: () => import('@/views/driver/DriverProfileView.vue'),
+      meta: { requiresAuth: true, roles: ['driver'] }
+    },
+    {
+      path: '/driver/profile/edit',
+      name: 'driver-profile-edit',
+      component: () => import('@/views/driver/DriverProfileEditView.vue'),
+      meta: { requiresAuth: true, roles: ['driver'] }
     },
     {
       path: '/admin',
@@ -495,6 +583,10 @@ router.beforeEach(async (to, _from, next) => {
         default:
           console.log('[Router Guard] Redirecting consumer to /dashboard')
           next('/dashboard')
+          break
+        case 'driver':
+          console.log('[Router Guard] Redirecting driver to /driver/dashboard')
+          next('/driver/dashboard')
       }
     } else {
       next('/dashboard')
@@ -518,6 +610,9 @@ router.beforeEach(async (to, _from, next) => {
           break
         case 'merchant':
           next('/merchant/dashboard')
+          break
+        case 'driver':
+          next('/driver/dashboard')
           break
         case 'consumer':
           next('/dashboard')

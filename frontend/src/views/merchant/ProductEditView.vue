@@ -2,7 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-green-50 to-blue-50"
+    class="bg-gradient-to-br from-green-50 to-primary-50"
   >
     <div class="p-6">
       <!-- Header -->
@@ -10,7 +10,7 @@
         <div class="flex items-center gap-3 mt-3">
           <router-link
             to="/merchant/products"
-            class="flex items-center text-gray-700 hover:transition-colors"
+            class="flex items-center text-neutral-700 hover:transition-colors"
           >
             <ArrowLeftIcon class="h-4 w-4 mr-2" />
             Retour aux produits
@@ -19,10 +19,10 @@
 
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-6">
           <div>
-            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-neutral-900 mt-2">
               {{ product ? 'Modifier le produit' : 'Chargement...' }}
             </h1>
-            <p class="text-gray-700 text-lg">
+            <p class="text-neutral-700 text-lg">
               {{ product ? product.name : 'Veuillez patienter...' }}
             </p>
           </div>
@@ -43,8 +43,8 @@
       <!-- Loading State -->
       <Card v-if="!product && !error">
         <div class="flex items-center justify-center py-8 sm:py-12 lg:py-16">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <span class="ml-4 text-gray-700">Chargement du produit...</span>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+          <span class="ml-4 text-neutral-700">Chargement du produit...</span>
         </div>
       </Card>
 
@@ -67,12 +67,12 @@
             <!-- Informations générales -->
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-gray-900">Informations générales</h3>
+                <h3 class="text-xl font-semibold text-neutral-900">Informations générales</h3>
               </template>
               <div class="space-y-6">
                 <!-- Nom du produit -->
                 <div>
-                  <label for="name" class="block text-sm font-medium text-gray-800 mt-2">
+                  <label for="name" class="block text-sm font-medium text-neutral-800 mt-2">
                     Nom du produit <span class="text-red-500">*</span>
                   </label>
                   <Input
@@ -86,14 +86,14 @@
 
                 <!-- Description -->
                 <div>
-                  <label for="description" class="block text-sm font-medium text-gray-800 mt-2">
+                  <label for="description" class="block text-sm font-medium text-neutral-800 mt-2">
                     Description <span class="text-red-500">*</span>
                   </label>
                   <textarea
                     id="description"
                     v-model="form.description"
                     rows="4"
-                    class="w-full px-3 py-3 text-gray-900 bg-white border border-gray-200 rounded shadow-sm placeholder:text-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-3 text-neutral-900 bg-white border border-neutral-200 rounded shadow-sm placeholder:text-neutral-400 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.description }"
                     placeholder="Décrivez votre produit..."
                     required
@@ -103,13 +103,13 @@
 
                 <!-- Catégorie -->
                 <div>
-                  <label for="category" class="block text-sm font-medium text-gray-800 mt-2">
+                  <label for="category" class="block text-sm font-medium text-neutral-800 mt-2">
                     Catégorie <span class="text-red-500">*</span>
                   </label>
                   <select
                     id="category"
                     v-model="form.category_id"
-                    class="w-full px-3 py-3 text-gray-900 bg-white border border-gray-200 rounded shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-3 text-neutral-900 bg-white border border-neutral-200 rounded shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.category_id }"
                     required
                   >
@@ -130,12 +130,12 @@
             <!-- Prix et stock -->
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-gray-900">Prix et stock</h3>
+                <h3 class="text-xl font-semibold text-neutral-900">Prix et stock</h3>
               </template>
               <div class="grid md:grid-cols-2 gap-3 sm:gap-6">
                 <!-- Prix original -->
                 <div>
-                  <label for="original_price" class="block text-sm font-medium text-gray-800 mt-2">
+                  <label for="original_price" class="block text-sm font-medium text-neutral-800 mt-2">
                     Prix original (XOF) <span class="text-red-500">*</span>
                   </label>
                   <Input
@@ -152,7 +152,7 @@
 
                 <!-- Prix réduit -->
                 <div>
-                  <label for="discounted_price" class="block text-sm font-medium text-gray-800 mt-2">
+                  <label for="discounted_price" class="block text-sm font-medium text-neutral-800 mt-2">
                     Prix réduit (XOF) <span class="text-red-500">*</span>
                   </label>
                   <Input
@@ -169,7 +169,7 @@
 
                 <!-- Quantité -->
                 <div>
-                  <label for="quantity" class="block text-sm font-medium text-gray-800 mt-2">
+                  <label for="quantity" class="block text-sm font-medium text-neutral-800 mt-2">
                     Quantité disponible <span class="text-red-500">*</span>
                   </label>
                   <Input
@@ -185,7 +185,7 @@
 
                 <!-- Date d'expiration -->
                 <div>
-                  <label for="expiration_date" class="block text-sm font-medium text-gray-800 mt-2">
+                  <label for="expiration_date" class="block text-sm font-medium text-neutral-800 mt-2">
                     Date d'expiration <span class="text-red-500">*</span>
                   </label>
                   <Input
@@ -200,10 +200,10 @@
               </div>
 
               <!-- Réduction calculée -->
-              <div v-if="discountPercentage > 0" class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+              <div v-if="discountPercentage > 0" class="mt-4 p-4 bg-primary-50 border border-primary-200 rounded">
                 <div class="flex items-center">
-                  <TagIcon class="h-4 w-4 text-blue-500 mr-2" />
-                  <span class="font-medium text-blue-900">
+                  <TagIcon class="h-4 w-4 text-primary-500 mr-2" />
+                  <span class="font-medium text-primary-900">
                     Réduction de {{ discountPercentage }}% ({{ savings }} XOF d'économie)
                   </span>
                 </div>
@@ -213,24 +213,24 @@
             <!-- Image du produit -->
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-gray-900">Image du produit</h3>
+                <h3 class="text-xl font-semibold text-neutral-900">Image du produit</h3>
               </template>
               <div class="space-y-4">
                 <!-- Image actuelle -->
                 <div v-if="product.image_url">
-                  <p class="block text-sm font-medium text-gray-800 mt-2">Image actuelle</p>
+                  <p class="block text-sm font-medium text-neutral-800 mt-2">Image actuelle</p>
                   <div class="relative inline-block">
                     <img
                       :src="product.image_url"
                       :alt="product.name"
-                      class="w-7xl h-7xl object-cover rounded border border-gray-200"
+                      class="w-7xl h-7xl object-cover rounded border border-neutral-200"
                     >
                   </div>
                 </div>
 
                 <!-- Upload nouvelle image -->
                 <div>
-                  <label for="image" class="block text-sm font-medium text-gray-800 mt-2">Nouvelle image (optionnel)</label>
+                  <label for="image" class="block text-sm font-medium text-neutral-800 mt-2">Nouvelle image (optionnel)</label>
                   <div class="flex items-center gap-3">
                     <input
                       id="image"
@@ -248,20 +248,20 @@
                       <PhotoIcon class="h-4 w-4 mr-2" />
                       Choisir une image
                     </Button>
-                    <span v-if="form.image" class="text-sm text-gray-700">
+                    <span v-if="form.image" class="text-sm text-neutral-700">
                       {{ form.image.name }}
                     </span>
                   </div>
-                  <p class="text-sm text-gray-500 mt-1">Format JPG, PNG ou WebP. Taille max: 5 MB</p>
+                  <p class="text-sm text-neutral-500 mt-1">Format JPG, PNG ou WebP. Taille max: 5 MB</p>
                 </div>
 
                 <!-- Prévisualisation nouvelle image -->
                 <div v-if="imagePreview">
-                  <p class="block text-sm font-medium text-gray-800 mt-2">Aperçu</p>
+                  <p class="block text-sm font-medium text-neutral-800 mt-2">Aperçu</p>
                   <img
                     :src="imagePreview"
                     alt="Aperçu"
-                    class="w-7xl h-7xl object-cover rounded border border-gray-200"
+                    class="w-7xl h-7xl object-cover rounded border border-neutral-200"
                   >
                 </div>
               </div>
@@ -270,16 +270,16 @@
             <!-- Statut -->
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-gray-900">Statut</h3>
+                <h3 class="text-xl font-semibold text-neutral-900">Statut</h3>
               </template>
               <div class="flex items-center gap-3">
                 <input
                   id="is_active"
                   v-model="form.is_active"
                   type="checkbox"
-                  class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  class="h-4 w-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
                 >
-                <label for="is_active" class="text-gray-800">
+                <label for="is_active" class="text-neutral-800">
                   Produit actif (visible par les clients)
                 </label>
               </div>
@@ -308,21 +308,21 @@
           <!-- Statistiques du produit -->
           <Card>
             <template #header>
-              <h3 class="text-lg font-semibold text-gray-900">Statistiques</h3>
+              <h3 class="text-lg font-semibold text-neutral-900">Statistiques</h3>
             </template>
             <div class="space-y-4">
               <div class="flex justify-between">
-                <span class="text-gray-700">Créé le:</span>
+                <span class="text-neutral-700">Créé le:</span>
                 <span class="font-medium">{{ formatDate(product.created_at) }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-700">Statut:</span>
+                <span class="text-neutral-700">Statut:</span>
                 <Badge :variant="product.is_active ? 'success' : 'error'">
                   {{ product.is_active ? 'Actif' : 'Inactif' }}
                 </Badge>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-700">Stock restant:</span>
+                <span class="text-neutral-700">Stock restant:</span>
                 <span class="font-medium">{{ product.quantity_available }}</span>
               </div>
             </div>
@@ -331,7 +331,7 @@
           <!-- Actions rapides -->
           <Card>
             <template #header>
-              <h3 class="text-lg font-semibold text-gray-900">Actions rapides</h3>
+              <h3 class="text-lg font-semibold text-neutral-900">Actions rapides</h3>
             </template>
             <div class="space-y-2">
               <Button

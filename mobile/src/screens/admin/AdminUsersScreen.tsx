@@ -42,6 +42,9 @@ const AdminUsersScreen: React.FC = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [confirmAction, setConfirmAction] = useState<'block' | 'unblock'>('block')
   const [actionLoading, setActionLoading] = useState(false)
+  // Suspension reason modal
+  const [showSuspensionModal, setShowSuspensionModal] = useState(false)
+  const [suspensionReason, setSuspensionReason] = useState('')
 
   useEffect(() => {
     loadUsers()
@@ -59,9 +62,25 @@ const AdminUsersScreen: React.FC = () => {
       adminLogger.log('Loading users...')
       const response = await apiService.get('/admin/users')
       // apiService retourne déjà response.data, donc response.data = tableau d'users
-      const users = Array.isArray(response.data) ? response.data : (response.data?.data || [])
-      adminLogger.log('Users loaded:', users.length)
-      setUsers(users)
+      const rawUsers = Array.isArray(response.data) ? response.data : (response.data?.data || [])
+      adminLogger.log('Users loaded:', rawUsers.length)
+
+      // Transform backend response to match UI expected format
+      // Backend returns: { name, status, email, phone, role, avatar, created_at, last_activity }
+      // UI expects: { first_name, last_name, is_suspended, email, role, ... }
+      const transformedUsers = rawUsers.map((user: any) => {
+        const nameParts = (user.name || '').split(' ')
+        const firstName = nameParts[0] || ''
+        const lastName = nameParts.slice(1).join(' ') || ''
+        return {
+          ...user,
+          first_name: user.first_name || firstName,
+          last_name: user.last_name || lastName,
+          is_suspended: user.is_suspended ?? (user.status === 'suspended'),
+          is_active: user.is_active ?? (user.status === 'active'),
+        }
+      })
+      setUsers(transformedUsers)
     } catch (error: any) {
       adminLogger.error('Load users error')
 
@@ -109,14 +128,25 @@ const AdminUsersScreen: React.FC = () => {
 
   const handleOpenBlockModal = (user: User) => {
     setSelectedUser(user)
-    setConfirmAction(user.is_suspended ? 'unblock' : 'block')
-    setShowConfirmModal(true)
+    if (user.is_suspended) {
+      // For unblocking, show confirm modal directly
+      setConfirmAction('unblock')
+      setShowConfirmModal(true)
+    } else {
+      // For blocking, show suspension reason modal
+      setSuspensionReason('')
+      setShowSuspensionModal(true)
+    }
   }
 
-  const handleConfirmToggleStatus = async () => {
+  const handleConfirmSuspension = async () => {
     if (!selectedUser) return
 
-    const isSuspended = selectedUser.is_suspended || false
+    if (!suspensionReason || suspensionReason.trim().length < 10) {
+      showError('Erreur', 'La raison doit contenir au moins 10 caractères')
+      return
+    }
+
     const previousUsers = [...users]
 
     try {
@@ -125,22 +155,51 @@ const AdminUsersScreen: React.FC = () => {
       // Mise à jour optimiste
       setUsers(prev =>
         prev.map(u =>
-          u.id === selectedUser.id ? { ...u, is_suspended: !isSuspended } : u
+          u.id === selectedUser.id ? { ...u, is_suspended: true } : u
         )
       )
 
-      const endpoint = isSuspended
-        ? `/admin/users/${selectedUser.id}/unsuspend`
-        : `/admin/users/${selectedUser.id}/suspend`
+      // Backend requires PATCH with reason
+      await apiService.patch(`/admin/users/${selectedUser.id}/suspend`, {
+        reason: suspensionReason.trim(),
+      })
 
-      await apiService.patch(endpoint)
+      setShowSuspensionModal(false)
+      setShowDetailModal(false)
+      setSuspensionReason('')
+      showSuccess('Succès', 'Utilisateur bloqué')
+    } catch (error: any) {
+      setUsers(previousUsers)
+      showError('Erreur', error?.response?.data?.message || 'Impossible de bloquer l\'utilisateur')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleConfirmUnsuspend = async () => {
+    if (!selectedUser) return
+
+    const previousUsers = [...users]
+
+    try {
+      setActionLoading(true)
+
+      // Mise à jour optimiste
+      setUsers(prev =>
+        prev.map(u =>
+          u.id === selectedUser.id ? { ...u, is_suspended: false } : u
+        )
+      )
+
+      // Backend uses PATCH for unsuspend
+      await apiService.patch(`/admin/users/${selectedUser.id}/unsuspend`)
 
       setShowConfirmModal(false)
       setShowDetailModal(false)
-      showSuccess('Succès', isSuspended ? 'Utilisateur débloqué' : 'Utilisateur bloqué')
+      showSuccess('Succès', 'Utilisateur débloqué')
     } catch (error: any) {
       setUsers(previousUsers)
-      showError('Erreur', 'Impossible de mettre à jour le statut')
+      showError('Erreur', error?.response?.data?.message || 'Impossible de débloquer l\'utilisateur')
     } finally {
       setActionLoading(false)
     }
@@ -517,22 +576,102 @@ const AdminUsersScreen: React.FC = () => {
       {/* Modal détails utilisateur */}
       {renderDetailModal()}
 
-      {/* Modal confirmation blocage */}
+      {/* Modal confirmation déblocage */}
       <ConfirmModal
         visible={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}
-        onConfirm={handleConfirmToggleStatus}
-        title={confirmAction === 'block' ? 'Bloquer l\'utilisateur' : 'Débloquer l\'utilisateur'}
-        message={
-          confirmAction === 'block'
-            ? `Êtes-vous sûr de vouloir bloquer ${selectedUser?.first_name} ${selectedUser?.last_name} ?\n\nL'utilisateur ne pourra plus accéder à son compte.`
-            : `Êtes-vous sûr de vouloir débloquer ${selectedUser?.first_name} ${selectedUser?.last_name} ?\n\nL'utilisateur pourra à nouveau accéder à son compte.`
-        }
-        confirmText={confirmAction === 'block' ? 'Bloquer' : 'Débloquer'}
-        variant={confirmAction === 'block' ? 'danger' : 'success'}
+        onConfirm={handleConfirmUnsuspend}
+        title="Débloquer l'utilisateur"
+        message={`Êtes-vous sûr de vouloir débloquer ${selectedUser?.first_name} ${selectedUser?.last_name} ?\n\nL'utilisateur pourra à nouveau accéder à son compte.`}
+        confirmText="Débloquer"
+        variant="success"
         loading={actionLoading}
-        icon={confirmAction === 'block' ? 'ban' : 'checkmark-circle'}
+        icon="checkmark-circle"
       />
+
+      {/* Modal suspension avec raison */}
+      <Modal
+        visible={showSuspensionModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowSuspensionModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: theme.colors.border }]}>
+              <Typography variant="h3" weight="bold">
+                Bloquer l'utilisateur
+              </Typography>
+              <TouchableOpacity onPress={() => setShowSuspensionModal(false)}>
+                <Ionicons name="close" size={28} color={theme.colors.neutral[600]} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <Typography variant="body" color="secondary" style={{ marginBottom: 16 }}>
+                Utilisateur : {selectedUser?.first_name} {selectedUser?.last_name}
+              </Typography>
+
+              <Typography variant="body" weight="medium" style={{ marginBottom: 8 }}>
+                Raison du blocage (minimum 10 caractères) :
+              </Typography>
+
+              <TextInput
+                style={[
+                  styles.suspensionInput,
+                  {
+                    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
+                    color: theme.colors.text,
+                    borderColor: theme.isDark ? theme.colors.neutral[600] : theme.colors.neutral[300],
+                  },
+                ]}
+                placeholder="Indiquez la raison du blocage..."
+                placeholderTextColor={theme.colors.neutral[400]}
+                value={suspensionReason}
+                onChangeText={setSuspensionReason}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+                maxLength={1000}
+              />
+
+              <Typography variant="caption" color="secondary" style={{ marginTop: 4, marginBottom: 24 }}>
+                {suspensionReason.length}/1000 caractères
+              </Typography>
+
+              <View style={styles.suspensionActions}>
+                <Button
+                  variant="secondary"
+                  onPress={() => {
+                    setShowSuspensionModal(false)
+                    setSuspensionReason('')
+                  }}
+                  disabled={actionLoading}
+                  style={{ flex: 1 }}
+                >
+                  Annuler
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  onPress={handleConfirmSuspension}
+                  disabled={actionLoading || suspensionReason.trim().length < 10}
+                  style={{ flex: 1 }}
+                  leftIcon={
+                    actionLoading ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Ionicons name="ban" size={20} color="#FFFFFF" />
+                    )
+                  }
+                >
+                  {actionLoading ? 'Blocage...' : 'Bloquer'}
+                </Button>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <AlertModal {...alertProps} />
     </View>
@@ -667,6 +806,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+  },
+  // Suspension modal styles
+  suspensionInput: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 15,
+    minHeight: 100,
+  },
+  suspensionActions: {
+    flexDirection: 'row',
+    gap: 12,
   },
 })
 

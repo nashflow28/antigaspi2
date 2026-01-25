@@ -2,15 +2,15 @@
   <form class="space-y-6" @submit.prevent="handleSubmit">
     <!-- Role Selection -->
     <div>
-      <label class="block text-sm font-medium text-gray-800 mb-2">
+      <label class="block text-sm font-medium text-neutral-800 mb-2">
         Je souhaite m'inscrire en tant que :
       </label>
       <div class="grid grid-cols-2 gap-3">
         <label
           class="relative flex cursor-pointer rounded border p-4 focus:outline-none"
           :class="form.role === 'consumer'
-            ? 'border-blue-600 bg-blue-50 text-blue-900'
-            : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'"
+            ? 'border-primary-600 bg-primary-50 text-primary-900'
+            : 'border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50'"
         >
           <input
             v-model="form.role"
@@ -23,7 +23,7 @@
               <span class="text-xl mr-2">🛒</span>
               <span class="block text-sm font-medium">Consommateur</span>
             </div>
-            <span class="mt-1 block text-xs text-gray-500">
+            <span class="mt-1 block text-xs text-neutral-500">
               Découvrir et réserver des produits
             </span>
           </div>
@@ -32,8 +32,8 @@
         <label
           class="relative flex cursor-pointer rounded border p-4 focus:outline-none"
           :class="form.role === 'merchant'
-            ? 'border-blue-600 bg-blue-50 text-blue-900'
-            : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'"
+            ? 'border-primary-600 bg-primary-50 text-primary-900'
+            : 'border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50'"
         >
           <input
             v-model="form.role"
@@ -46,7 +46,7 @@
               <span class="text-xl mr-2">🏪</span>
               <span class="block text-sm font-medium">Commerçant</span>
             </div>
-            <span class="mt-1 block text-xs text-gray-500">
+            <span class="mt-1 block text-xs text-neutral-500">
               Vendre mes invendus
             </span>
           </div>
@@ -58,7 +58,7 @@
     <!-- Personal Information -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div>
-        <label for="first_name" class="block text-sm font-medium text-gray-800 mt-2">
+        <label for="first_name" class="block text-sm font-medium text-neutral-800 mt-2">
           Prénom
         </label>
         <input
@@ -76,7 +76,7 @@
       </div>
 
       <div>
-        <label for="last_name" class="block text-sm font-medium text-gray-800 mt-2">
+        <label for="last_name" class="block text-sm font-medium text-neutral-800 mt-2">
           Nom
         </label>
         <input
@@ -96,7 +96,7 @@
 
     <!-- Contact Information -->
     <div>
-      <label for="email" class="block text-sm font-medium text-gray-800 mt-2">
+      <label for="email" class="block text-sm font-medium text-neutral-800 mt-2">
         Adresse e-mail
       </label>
       <input
@@ -114,7 +114,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div>
-        <label for="phone" class="block text-sm font-medium text-gray-800 mt-2">
+        <label for="phone" class="block text-sm font-medium text-neutral-800 mt-2">
           Téléphone
         </label>
         <input
@@ -131,7 +131,7 @@
       </div>
 
       <div>
-        <label for="city" class="block text-sm font-medium text-gray-800 mt-2">
+        <label for="city" class="block text-sm font-medium text-neutral-800 mt-2">
           Ville
         </label>
         <input
@@ -150,11 +150,11 @@
 
     <!-- Business Information (for merchants) -->
     <template v-if="form.role === 'merchant'">
-      <div class="border-t border-gray-200 pt-8">
-        <h3 class="text-lg font-medium text-gray-900 mt-3">Informations commerciales</h3>
+      <div class="border-t border-neutral-200 pt-8">
+        <h3 class="text-lg font-medium text-neutral-900 mt-3">Informations commerciales</h3>
 
         <div>
-          <label for="business_name" class="block text-sm font-medium text-gray-800 mt-2">
+          <label for="business_name" class="block text-sm font-medium text-neutral-800 mt-2">
             Nom de l'entreprise
           </label>
           <input
@@ -170,7 +170,7 @@
         </div>
 
         <div class="mt-4">
-          <label for="business_type" class="block text-sm font-medium text-gray-800 mt-2">
+          <label for="business_type" class="block text-sm font-medium text-neutral-800 mt-2">
             Type de commerce
           </label>
           <select
@@ -199,7 +199,7 @@
 
     <!-- Password -->
     <div>
-      <label for="password" class="block text-sm font-medium text-gray-800 mt-2">
+      <label for="password" class="block text-sm font-medium text-neutral-800 mt-2">
         Mot de passe
       </label>
       <div class="relative">
@@ -215,7 +215,7 @@
         >
         <button
           type="button"
-          class="relative sm:absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-700"
+          class="relative sm:absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:text-neutral-700"
           @click="togglePasswordVisibility"
         >
           <svg
@@ -258,7 +258,7 @@
     </div>
 
     <div>
-      <label for="password_confirmation" class="block text-sm font-medium text-gray-800 mt-2">
+      <label for="password_confirmation" class="block text-sm font-medium text-neutral-800 mt-2">
         Confirmer le mot de passe
       </label>
       <input
@@ -281,13 +281,13 @@
         v-model="form.acceptTerms"
         type="checkbox"
         required
-        class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+        class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded mt-1"
       >
-      <label for="terms" class="ml-2 block text-sm text-gray-900">
+      <label for="terms" class="ml-2 block text-sm text-neutral-900">
         J'accepte les
-        <a href="#" class="text-blue-600 hover:text-blue-700">conditions d'utilisation</a>
+        <a href="#" class="text-primary-600 hover:text-primary-700">conditions d'utilisation</a>
         et la
-        <a href="#" class="text-blue-600 hover:text-blue-700">politique de confidentialité</a>
+        <a href="#" class="text-primary-600 hover:text-primary-700">politique de confidentialité</a>
       </label>
     </div>
     <p v-if="errors.acceptTerms" class="mt-1 text-sm text-red-600">{{ errors.acceptTerms }}</p>
@@ -324,9 +324,9 @@
     </div>
 
     <div class="text-left sm:text-center">
-      <p class="text-sm text-gray-700">
+      <p class="text-sm text-neutral-700">
         Déjà un compte ?
-        <router-link to="/login" class="font-medium text-blue-600 hover:text-blue-700">
+        <router-link to="/login" class="font-medium text-primary-600 hover:text-primary-700">
           Se connecter
         </router-link>
       </p>
@@ -437,7 +437,7 @@ const normalizePhone = (phone: string): string => {
   if (!phone) return ''
 
   // Clean the phone number (remove spaces, dashes, parentheses)
-  let cleaned = phone.replace(/[\s\-()]/g, '')
+  const cleaned = phone.replace(/[\s\-()]/g, '')
 
   // If already has + prefix, return as-is (already international)
   if (cleaned.startsWith('+')) {

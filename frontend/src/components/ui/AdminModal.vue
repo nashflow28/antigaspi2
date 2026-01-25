@@ -13,7 +13,7 @@
         @click.stop
       >
         <!-- Header -->
-        <div class="px-4 py-4 border-b border-gray-200">
+        <div class="px-4 py-4 border-b border-neutral-200">
           <div class="flex items-center justify-start sm:justify-between">
             <div class="flex items-center gap-3">
               <div
@@ -26,13 +26,13 @@
                   :class="iconClass"
                 />
               </div>
-              <h3 class="text-xl font-semibold text-gray-900">{{ title }}</h3>
+              <h3 class="text-xl font-semibold text-neutral-900">{{ title }}</h3>
             </div>
             <button
               class="p-2 hover:transition-colors"
               @click="closeModal"
             >
-              <XMarkIcon class="h-4 w-4 text-gray-400" />
+              <XMarkIcon class="h-4 w-4 text-neutral-400" />
             </button>
           </div>
         </div>
@@ -47,7 +47,7 @@
             >
               <h4
                 v-if="section.title"
-                class="font-semibold text-gray-900 text-lg"
+                class="font-semibold text-neutral-900 text-lg"
               >
                 {{ section.title }}
               </h4>
@@ -56,10 +56,10 @@
                 <div
                   v-for="(item, itemIndex) in section.items"
                   :key="itemIndex"
-                  class="text-gray-700 flex items-stretch sm:items-start gap-2"
+                  class="text-neutral-700 flex items-stretch sm:items-start gap-2"
                 >
                   <!-- Safe rendering of sanitized content -->
-                  <span v-if="item.type === 'bullet'" class="inline-block h-4 w-4 bg-blue-600 rounded-full mr-2 mt-1.5 flex-shrink-0" />
+                  <span v-if="item.type === 'bullet'" class="inline-block h-4 w-4 bg-primary-600 rounded-full mr-2 mt-1.5 flex-shrink-0" />
                   <span v-else-if="item.type === 'success'" class="text-green-600 mr-2">✅</span>
                   <span v-else-if="item.type === 'warning'" class="text-yellow-500 mr-2">⚠️</span>
                   <span v-else-if="item.type === 'info'" class="text-info mr-2">ℹ️</span>
@@ -72,17 +72,17 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-4 py-4 bg-gray-50 rounded-b-2xl">
+        <div class="px-4 py-4 bg-neutral-50 rounded-b-2xl">
           <div class="flex justify-center sm:justify-end gap-3">
             <button
-              class="px-3 py-3 text-gray-700 hover:transition-colors"
+              class="px-3 py-3 text-neutral-700 hover:transition-colors"
               @click="closeModal"
             >
               Fermer
             </button>
             <button
               v-if="actionButton"
-              class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors"
+              class="px-4 py-3 bg-primary-600 text-white rounded hover:transition-colors"
               @click="handleAction"
             >
               {{ actionButton }}
@@ -129,7 +129,7 @@ const emit = defineEmits<{
 
 const iconBgClass = computed(() => {
   const classes = {
-    info: 'bg-blue-100',
+    info: 'bg-primary-100',
     success: 'bg-green-100',
     warning: 'bg-yellow-100',
     error: 'bg-red-100'

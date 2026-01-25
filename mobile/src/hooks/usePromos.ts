@@ -23,7 +23,7 @@ export const usePromos = () => {
     // Bannière de bienvenue / promo générale
     banners.push({
       id: 'welcome-promo',
-      title: 'Bienvenue sur Antigaspi !',
+      title: 'Bienvenue sur GÊLADAL !',
       subtitle: 'Économisez jusqu\'à 70% sur vos courses tout en luttant contre le gaspillage',
       backgroundColor: '#10B981',
       icon: 'leaf',
@@ -34,7 +34,7 @@ export const usePromos = () => {
     banners.push({
       id: 'special-offer',
       title: 'Offre de lancement',
-      subtitle: 'Première réservation ? Profitez de -10% avec le code ANTIGASPI10',
+      subtitle: 'Première réservation ? Profitez de -10% avec le code GELADAL10',
       backgroundColor: '#F59E0B',
       icon: 'gift',
       textColor: '#FFFFFF',
@@ -79,9 +79,9 @@ export const usePromos = () => {
     ads.push({
       id: 'wallet-promo',
       headline: 'Rechargez votre portefeuille',
-      body: 'Payez plus rapidement avec votre solde Antigaspi',
+      body: 'Payez plus rapidement avec votre solde GÊLADAL',
       ctaText: 'Recharger',
-      advertiser: 'Antigaspi',
+      advertiser: 'GÊLADAL',
       adType: 'custom',
       iconUrl: undefined,
     })
@@ -92,7 +92,7 @@ export const usePromos = () => {
       headline: 'Parrainez vos amis',
       body: 'Gagnez 500 XOF pour chaque ami qui s\'inscrit',
       ctaText: 'Inviter',
-      advertiser: 'Antigaspi',
+      advertiser: 'GÊLADAL',
       adType: 'custom',
     })
 
@@ -115,9 +115,9 @@ export const usePromos = () => {
     ads.push({
       id: 'become-merchant',
       headline: 'Vous êtes commerçant ?',
-      body: 'Rejoignez Antigaspi et vendez vos invendus',
+      body: 'Rejoignez GÊLADAL et vendez vos invendus',
       ctaText: 'En savoir plus',
-      advertiser: 'Antigaspi Pro',
+      advertiser: 'GÊLADAL Pro',
       adType: 'custom',
     })
 

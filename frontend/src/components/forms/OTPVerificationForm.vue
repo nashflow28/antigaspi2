@@ -2,15 +2,15 @@
   <div class="space-y-6">
     <!-- Header -->
     <div class="text-left sm:text-center animate-fade-in-up">
-      <h3 class="text-xl font-semibold text-gray-900 mt-2">
+      <h3 class="text-xl font-semibold text-neutral-900 mt-2">
         Vérification du code
       </h3>
-      <p class="text-gray-700">
+      <p class="text-neutral-700">
         Nous avons envoyé un code à {{ formattedPhone }}
       </p>
       <button
         type="button"
-        class="text-sm text-blue-600 hover:text-blue-900 mt-2"
+        class="text-sm text-primary-600 hover:text-primary-900 mt-2"
         @click="$emit('go-back')"
       >
         Modifier le numéro
@@ -21,7 +21,7 @@
     <form class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;" @submit.prevent="handleSubmit">
       <!-- OTP Code Input -->
       <div class="space-y-4">
-        <label for="otp" class="block text-sm font-medium text-gray-900">
+        <label for="otp" class="block text-sm font-medium text-neutral-900">
           Code de vérification
         </label>
         <Input
@@ -39,7 +39,7 @@
           class="text-center text-2xl tracking-widest"
           @input="handleOtpInput"
         />
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-neutral-600">
           Code à 6 chiffres envoyé par SMS
         </p>
       </div>
@@ -58,7 +58,7 @@
           <Loader2 v-if="verifying" class="h-4 w-4 animate-spin" />
           <span>{{ verifying ? 'Vérification...' : 'Vérifier' }}</span>
         </span>
-        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500/90 opacity-0 group-hover:transition-opacity duration-300" />
+        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500/90 opacity-0 group-hover:transition-opacity duration-300" />
       </Button>
 
       <!-- Error Message -->
@@ -86,13 +86,13 @@
 
     <!-- Resend Code -->
     <div class="text-left sm:text-center animate-fade-in-up" style="animation-delay: 0.4s;">
-      <p class="text-sm text-gray-700">
+      <p class="text-sm text-neutral-700">
         Vous n'avez pas reçu le code ?
       </p>
       <button
         type="button"
         :disabled="resendCooldown > 0 || resending"
-        class="font-semibold text-blue-600 hover:text-blue-900 disabled:text-gray-400 disabled:cursor-not-allowed mt-2"
+        class="font-semibold text-primary-600 hover:text-primary-900 disabled:text-neutral-400 disabled:cursor-not-allowed mt-2"
         @click="handleResend"
       >
         <span v-if="resending">Envoi en cours...</span>
@@ -102,10 +102,10 @@
     </div>
 
     <!-- Loading message for initial OTP send -->
-    <div v-if="sendingInitial" class="p-4 rounded bg-blue-50 border border-blue-200">
+    <div v-if="sendingInitial" class="p-4 rounded bg-primary-50 border border-primary-200">
       <div class="flex items-center gap-3">
-        <Loader2 class="h-4 w-4 text-blue-600 animate-spin" />
-        <p class="text-sm text-blue-700">Envoi du code en cours...</p>
+        <Loader2 class="h-4 w-4 text-primary-600 animate-spin" />
+        <p class="text-sm text-primary-700">Envoi du code en cours...</p>
       </div>
     </div>
   </div>
@@ -144,7 +144,7 @@ const { logMigration } = useDesignSystem2025()
 
 // Log migration usage
 logMigration('OTPVerificationForm', 'Using 2025 components', {
-  components: ['Button', 'Input'],
+  components: ['Button', 'Input']
 })
 
 // Reactive state
@@ -158,7 +158,7 @@ const resendCooldown = ref(0)
 let cooldownInterval: number | null = null
 
 const errors = ref({
-  otp: '',
+  otp: ''
 })
 
 // Computed

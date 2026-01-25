@@ -162,7 +162,7 @@ describe('ProductDetailsScreen', () => {
   it('shows payment options and switches selection', () => {
     const { getByText, getAllByText, queryByText } = renderScreen()
 
-    expect(getByText('Portefeuille Antigaspi')).toBeTruthy()
+    expect(getByText('Portefeuille GÊLADAL')).toBeTruthy()
     expect(getByText(/Total à payer/i)).toBeTruthy()
 
     fireEvent.press(getByText('Mobile Money'))

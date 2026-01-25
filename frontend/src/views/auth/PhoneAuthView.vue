@@ -1,14 +1,14 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-4 py-12">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-emerald-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 px-4 py-12">
     <Card class="w-full max-w-md">
       <div class="text-center mb-8">
         <div class="mx-auto w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mb-4">
           <Phone class="h-8 w-8 text-primary-600 dark:text-primary-400" />
         </div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
           {{ isLogin ? 'Connexion par téléphone' : 'Inscription par téléphone' }}
         </h1>
-        <p class="text-slate-600 dark:text-slate-400 mt-2">
+        <p class="text-neutral-600 dark:text-neutral-400 mt-2">
           {{ isLogin ? 'Entrez votre numéro pour recevoir un code' : 'Créez votre compte avec votre numéro' }}
         </p>
       </div>
@@ -32,7 +32,7 @@
           <Label for="phone">Numéro de téléphone</Label>
           <div class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <span class="text-slate-500 dark:text-slate-400 text-sm">+228</span>
+              <span class="text-neutral-500 dark:text-neutral-400 text-sm">+228</span>
             </div>
             <Input
               id="phone"
@@ -44,14 +44,14 @@
               required
             />
           </div>
-          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
             Nous vous enverrons un code de vérification par SMS
           </p>
         </div>
 
         <!-- Role Selection (register only) - Consumer only for phone registration -->
         <!-- Merchants must use email registration to provide business details -->
-        <input type="hidden" v-model="form.role" />
+        <input v-model="form.role" type="hidden">
 
         <!-- Email (optional, register only) -->
         <div v-if="!isLogin">
@@ -87,7 +87,7 @@
 
         <!-- Toggle Login/Register -->
         <div class="text-center text-sm">
-          <span class="text-slate-600 dark:text-slate-400">
+          <span class="text-neutral-600 dark:text-neutral-400">
             {{ isLogin ? 'Pas encore de compte ?' : 'Déjà un compte ?' }}
           </span>
           <button
@@ -102,10 +102,10 @@
         <!-- Or Divider -->
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-slate-200 dark:border-slate-700" />
+            <div class="w-full border-t border-neutral-200 dark:border-neutral-700" />
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">ou</span>
+            <span class="px-2 bg-white dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400">ou</span>
           </div>
         </div>
 
@@ -113,7 +113,7 @@
         <div class="text-center">
           <router-link
             :to="isLogin ? '/login' : '/register'"
-            class="text-sm text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400"
+            class="text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
           >
             {{ isLogin ? 'Connexion par email' : 'Inscription par email' }}
           </router-link>
@@ -200,7 +200,7 @@ const validateForm = (): boolean => {
 
 const formatPhoneNumber = (phone: string): string => {
   // Remove spaces and non-digit chars except +
-  let cleaned = phone.replace(/[^\d+]/g, '')
+  const cleaned = phone.replace(/[^\d+]/g, '')
 
   // Handle various input formats
   if (cleaned.startsWith('+228')) {

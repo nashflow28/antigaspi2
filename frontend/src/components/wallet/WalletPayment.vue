@@ -2,9 +2,9 @@
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded p-6 w-full max-w-xl">
       <div class="flex items-center justify-start sm:justify-between mt-4">
-        <h3 class="text-xl font-semibold text-gray-900">Paiement Portefeuille</h3>
+        <h3 class="text-xl font-semibold text-neutral-900">Paiement Portefeuille</h3>
         <button
-          class="text-gray-400 hover:text-gray-700"
+          class="text-neutral-400 hover:text-neutral-700"
           @click="$emit('close')"
         >
           <svg
@@ -24,17 +24,17 @@
       </div>
 
       <!-- Résumé du paiement -->
-      <div class="bg-gray-50 rounded p-4 mt-4">
+      <div class="bg-neutral-50 rounded p-4 mt-4">
         <div class="flex items-center justify-start sm:justify-between mt-2">
-          <span class="text-sm text-gray-700">Montant à payer</span>
-          <span class="text-lg font-semibold text-gray-900">{{ formatAmount(amount) }} XOF</span>
+          <span class="text-sm text-neutral-700">Montant à payer</span>
+          <span class="text-lg font-semibold text-neutral-900">{{ formatAmount(amount) }} XOF</span>
         </div>
         <div class="flex items-center justify-start sm:justify-between mt-2">
-          <span class="text-sm text-gray-700">Solde actuel</span>
+          <span class="text-sm text-neutral-700">Solde actuel</span>
           <span class="text-sm font-medium text-green-600">{{ formatAmount(walletBalance) }} XOF</span>
         </div>
         <div class="flex items-center justify-start sm:justify-between">
-          <span class="text-sm text-gray-700">Solde après paiement</span>
+          <span class="text-sm text-neutral-700">Solde après paiement</span>
           <span class="text-sm font-medium" :class="remainingBalance >= 0 ? 'text-green-600' : 'text-red-600'">
             {{ formatAmount(remainingBalance) }} XOF
           </span>
@@ -64,7 +64,7 @@
       <form v-else @submit.prevent="handlePayment">
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-800 mt-2">
+            <label class="block text-sm font-medium text-neutral-800 mt-2">
               Code PIN du portefeuille
             </label>
             <input
@@ -72,7 +72,7 @@
               type="password"
               maxlength="6"
               placeholder="••••••"
-              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-transparent text-left sm:text-center text-lg tracking-widest"
+              class="w-full px-3 py-3 border border-neutral-300 rounded focus:ring-2 focus:ring-green-500 focus:border-transparent text-left sm:text-center text-lg tracking-widest"
               :class="{'border-red-300': error}"
               required
               autocomplete="off"
@@ -81,9 +81,9 @@
             <p v-if="error" class="mt-1 text-sm text-red-600">{{ error }}</p>
           </div>
 
-          <div class="bg-blue-50 border border-blue-200 rounded p-4">
+          <div class="bg-primary-50 border border-primary-200 rounded p-4">
             <div class="flex items-stretch sm:items-start space-y-4 sm:space-x-2">
-              <svg class="h-4 w-4 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="h-4 w-4 text-primary-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
               </svg>
               <div class="text-sm text-secondary-700">
@@ -97,7 +97,7 @@
         <div class="flex space-y-2 sm:space-x-3 mt-6">
           <button
             type="button"
-            class="flex-1 px-3 py-3 border border-gray-300 rounded text-gray-800 hover:transition-colors"
+            class="flex-1 px-3 py-3 border border-neutral-300 rounded text-neutral-800 hover:transition-colors"
             @click="$emit('close')"
           >
             Annuler
@@ -105,7 +105,7 @@
           <button
             type="submit"
             :disabled="loading || !pin || pin.length < 4"
-            class="flex-1 px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
+            class="flex-1 px-3 py-3 bg-primary-600 text-white rounded hover:transition-colors"
           >
             <span v-if="loading" class="flex items-center justify-center">
               <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -132,7 +132,7 @@
       <div v-if="!canPay" class="mt-6 space-y-2">
         <button
           v-if="walletBalance < amount"
-          class="w-full px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
+          class="w-full px-3 py-3 bg-primary-600 text-white rounded hover:transition-colors"
           @click="$emit('recharge')"
         >
           Recharger le portefeuille

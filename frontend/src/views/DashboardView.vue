@@ -2,17 +2,17 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-gray-50 to-blue-50"
+    class="bg-gradient-to-br from-neutral-50 to-primary-50"
   >
     <!-- Page Header -->
-    <div class="sticky top-20 z-40 border-b border-gray-200/70 bg-gray-100/80 backdrop-blur-lg">
+    <div class="sticky top-20 z-40 border-b border-neutral-200/70 bg-neutral-100/80 backdrop-blur-lg">
       <div class="container px-3 sm:px-4 lg:px-6 py-6">
         <div class="flex items-center justify-start sm:justify-between animate-fade-in-up">
           <div>
-            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-neutral-900 mt-2">
               Bonjour {{ authStore.user?.first_name }} ! 👋
             </h1>
-            <p class="text-lg text-gray-700">
+            <p class="text-lg text-neutral-700">
               Découvrez vos économies et votre impact environnemental
             </p>
           </div>
@@ -37,17 +37,17 @@
         >
           <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <div class="text-xl lg:text-xl font-semibold text-blue-600 mt-2">
+              <div class="text-xl lg:text-xl font-semibold text-primary-600 mt-2">
                 {{ formatPrice(userStats.totalSavings) }}
               </div>
-              <p class="text-sm text-gray-700 font-medium">Économies totales</p>
-              <div class="flex items-center mt-2 text-xs text-blue-600">
+              <p class="text-sm text-neutral-700 font-medium">Économies totales</p>
+              <div class="flex items-center mt-2 text-xs text-primary-600">
                 <TrendingUp class="h-4 w-4 mr-1" />
                 <span>+{{ formatPrice(userStats.monthSavings) }} ce mois</span>
               </div>
             </div>
-            <div class="w-12 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded flex items-center justify-center">
-              <DollarSign class="h-6 w-6 text-blue-600" />
+            <div class="w-12 h-10 bg-gradient-to-br from-primary-100 to-primary-200 rounded flex items-center justify-center">
+              <DollarSign class="h-6 w-6 text-primary-600" />
             </div>
           </div>
         </Card>
@@ -61,17 +61,17 @@
         >
           <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <div class="text-xl lg:text-xl font-semibold text-blue-600 mt-2">
+              <div class="text-xl lg:text-xl font-semibold text-primary-600 mt-2">
                 {{ userStats.productsSaved }}
               </div>
-              <p class="text-sm text-gray-700 font-medium">Produits sauvés</p>
-              <div class="flex items-center mt-2 text-xs text-blue-600">
+              <p class="text-sm text-neutral-700 font-medium">Produits sauvés</p>
+              <div class="flex items-center mt-2 text-xs text-primary-600">
                 <Package class="h-4 w-4 mr-1" />
                 <span>{{ userStats.monthProducts }} ce mois</span>
               </div>
             </div>
-            <div class="w-12 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded flex items-center justify-center">
-              <ShoppingBag class="h-6 w-6 text-blue-600" />
+            <div class="w-12 h-10 bg-gradient-to-br from-primary-100 to-primary-200 rounded flex items-center justify-center">
+              <ShoppingBag class="h-6 w-6 text-primary-600" />
             </div>
           </div>
         </Card>
@@ -85,17 +85,17 @@
         >
           <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <div class="text-xl lg:text-xl font-semibold text-blue-500 mt-2">
+              <div class="text-xl lg:text-xl font-semibold text-primary-500 mt-2">
                 {{ userStats.co2Saved }}kg
               </div>
-              <p class="text-sm text-gray-700 font-medium">CO₂ évité</p>
-              <div class="flex items-center mt-2 text-xs text-blue-500">
+              <p class="text-sm text-neutral-700 font-medium">CO₂ évité</p>
+              <div class="flex items-center mt-2 text-xs text-primary-500">
                 <Leaf class="h-4 w-4 mr-1" />
                 <span>≈ {{ Math.round(userStats.co2Saved / 2.3) }} km en voiture</span>
               </div>
             </div>
-            <div class="w-12 h-10 bg-gradient-to-br from-blue-500/10 to-blue-500/20 rounded flex items-center justify-center">
-              <TreePine class="h-6 w-6 text-blue-500" />
+            <div class="w-12 h-10 bg-gradient-to-br from-primary-500/10 to-primary-500/20 rounded flex items-center justify-center">
+              <TreePine class="h-6 w-6 text-primary-500" />
             </div>
           </div>
         </Card>
@@ -112,7 +112,7 @@
               <div class="text-xl lg:text-xl font-semibold text-orange-500 mt-2">
                 {{ userStats.activeReservations }}
               </div>
-              <p class="text-sm text-gray-700 font-medium">Réservations actives</p>
+              <p class="text-sm text-neutral-700 font-medium">Réservations actives</p>
               <div class="flex items-center mt-2 text-xs text-orange-500">
                 <Clock class="h-4 w-4 mr-1" />
                 <span>À récupérer aujourd'hui</span>
@@ -137,7 +137,7 @@
               <div class="text-xl lg:text-xl font-semibold text-indigo-600 mt-2">
                 {{ walletStore.formattedBalance || '0 XOF' }}
               </div>
-              <p class="text-sm text-gray-700 font-medium">Mon portefeuille</p>
+              <p class="text-sm text-neutral-700 font-medium">Mon portefeuille</p>
               <div class="flex items-center mt-2 text-xs text-indigo-600">
                 <Wallet class="h-4 w-4 mr-1" />
                 <span v-if="walletStore.isActive">Actif</span>
@@ -158,14 +158,14 @@
           <Card class="animate-fade-in-up" style="animation-delay: 0.5s;">
             <div class="flex items-center justify-start sm:justify-between mt-4">
               <div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-1">Mes réservations récentes</h3>
-                <p class="text-sm text-gray-700">Vos dernières réservations de produits</p>
+                <h3 class="text-xl font-semibold text-neutral-900 mb-1">Mes réservations récentes</h3>
+                <p class="text-sm text-neutral-700">Vos dernières réservations de produits</p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 :right-icon="ArrowRight"
-                class="text-blue-600 hover:text-blue-900"
+                class="text-primary-600 hover:text-primary-900"
                 @click="router.push('/reservations')"
               >
                 Voir tout
@@ -175,20 +175,20 @@
             <div class="space-y-4">
               <!-- Loading state -->
               <div v-if="loading" class="space-y-4">
-                <div v-for="i in 3" :key="i" class="flex items-center gap-3 p-4 rounded border border-gray-200 animate-pulse">
-                  <div class="w-12 h-10 bg-gray-200 rounded" />
+                <div v-for="i in 3" :key="i" class="flex items-center gap-3 p-4 rounded border border-neutral-200 animate-pulse">
+                  <div class="w-12 h-10 bg-neutral-200 rounded" />
                   <div class="flex-1 space-y-4">
-                    <div class="h-4 bg-gray-200 rounded w-3/4" />
-                    <div class="h-3 bg-gray-200 rounded w-1/2" />
+                    <div class="h-4 bg-neutral-200 rounded w-3/4" />
+                    <div class="h-3 bg-neutral-200 rounded w-1/2" />
                   </div>
                 </div>
               </div>
 
               <div v-else-if="recentReservations.length === 0" class="text-left sm:text-center py-8 sm:py-12 lg:py-16">
-                <div class="w-12 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mt-3">
-                  <ShoppingBag class="h-6 w-6 text-gray-400" />
+                <div class="w-12 h-10 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mt-3">
+                  <ShoppingBag class="h-6 w-6 text-neutral-400" />
                 </div>
-                <p class="text-gray-700 mt-3">Aucune réservation récente</p>
+                <p class="text-neutral-700 mt-3">Aucune réservation récente</p>
                 <Button variant="primary" size="sm" @click="router.push('/products')">
                   Découvrir les produits
                 </Button>
@@ -198,17 +198,17 @@
                 v-for="reservation in recentReservations"
                 v-else
                 :key="reservation.id"
-                class="flex items-center gap-3 p-4 rounded border border-gray-200 hover:border-blue-300 hover:transition-all duration-200"
+                class="flex items-center gap-3 p-4 rounded border border-neutral-200 hover:border-primary-300 hover:transition-all duration-200"
               >
-                <div class="w-12 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded flex items-center justify-center">
+                <div class="w-12 h-10 bg-gradient-to-r from-primary-600 to-primary-700 rounded flex items-center justify-center">
                   <span class="text-white font-semibold">{{ reservation.merchant.name[0] }}</span>
                 </div>
                 <div class="flex-1 min-w-none">
-                  <h4 class="font-semibold text-gray-900 mb-1">{{ reservation.product.name }}</h4>
-                  <p class="text-sm text-gray-700 mb-1">{{ reservation.merchant.name }}</p>
+                  <h4 class="font-semibold text-neutral-900 mb-1">{{ reservation.product.name }}</h4>
+                  <p class="text-sm text-neutral-700 mb-1">{{ reservation.merchant.name }}</p>
                   <div class="flex items-center gap-3 text-xs">
                     <Badge variant="primary">{{ formatPrice(reservation.price) }}</Badge>
-                    <span class="text-gray-500">{{ formatDate(reservation.pickup_date) }}</span>
+                    <span class="text-neutral-500">{{ formatDate(reservation.pickup_date) }}</span>
                   </div>
                 </div>
                 <div class="text-right">
@@ -224,14 +224,14 @@
           <Card class="animate-fade-in-up" style="animation-delay: 0.6s;">
             <div class="flex items-center justify-start sm:justify-between mt-4">
               <div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-1">Recommandés pour vous</h3>
-                <p class="text-sm text-gray-700">Basé sur vos préférences et votre localisation</p>
+                <h3 class="text-xl font-semibold text-neutral-900 mb-1">Recommandés pour vous</h3>
+                <p class="text-sm text-neutral-700">Basé sur vos préférences et votre localisation</p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 :right-icon="ArrowRight"
-                class="text-blue-600 hover:text-blue-900"
+                class="text-primary-600 hover:text-primary-900"
                 @click="router.push('/products')"
               >
                 Voir le catalogue
@@ -242,24 +242,24 @@
               <div
                 v-for="product in recommendedProducts"
                 :key="product.id"
-                class="p-4 rounded border border-gray-200 hover:border-blue-300 hover:transition-all duration-200 cursor-pointer active:scale-95 touch-manipulation group"
+                class="p-4 rounded border border-neutral-200 hover:border-primary-300 hover:transition-all duration-200 cursor-pointer active:scale-95 touch-manipulation group"
                 @click="viewProduct(product)"
               >
                 <div class="flex items-center gap-4 mb-4">
-                  <div class="w-12 h-10 bg-gradient-to-r from-blue-500 to-blue-500/90 rounded flex items-center justify-center">
+                  <div class="w-12 h-10 bg-gradient-to-r from-primary-500 to-primary-500/90 rounded flex items-center justify-center">
                     <Package class="h-6 w-6 text-white" />
                   </div>
                   <div class="flex-1 min-w-none">
-                    <h4 class="font-semibold text-gray-900 mb-1 group-hover:transition-colors">
+                    <h4 class="font-semibold text-neutral-900 mb-1 group-hover:transition-colors">
                       {{ product.name }}
                     </h4>
-                    <p class="text-sm text-gray-700">{{ product.merchant.name }}</p>
+                    <p class="text-sm text-neutral-700">{{ product.merchant.name }}</p>
                   </div>
                 </div>
                 <div class="flex items-center justify-start sm:justify-between">
                   <div class="flex items-center gap-2">
-                    <span class="text-lg font-semibold text-blue-600">{{ formatPrice(product.discounted_price) }}</span>
-                    <span class="text-sm text-gray-400 line-through">{{ formatPrice(product.original_price) }}</span>
+                    <span class="text-lg font-semibold text-primary-600">{{ formatPrice(product.discounted_price) }}</span>
+                    <span class="text-sm text-neutral-400 line-through">{{ formatPrice(product.original_price) }}</span>
                   </div>
                   <Badge variant="success">-{{ product.discount }}%</Badge>
                 </div>
@@ -273,42 +273,42 @@
           <!-- Badge d'impact -->
           <Card variant="gradient" class="text-left sm:text-center animate-fade-in-up" style="animation-delay: 0.7s;">
             <div class="text-4xl mt-3">🌍</div>
-            <h3 class="text-xl font-semibold text-gray-900 mt-2">Éco-Héros</h3>
-            <p class="text-sm text-gray-700 mt-3">
+            <h3 class="text-xl font-semibold text-neutral-900 mt-2">Éco-Héros</h3>
+            <p class="text-sm text-neutral-700 mt-3">
               Vous avez évité le gaspillage de {{ userStats.productsSaved }} produits !
             </p>
-            <div class="w-full bg-gray-200 rounded-full h-4 mt-3">
+            <div class="w-full bg-neutral-200 rounded-full h-4 mt-3">
               <div
-                class="bg-gradient-to-r from-blue-600 to-blue-700 h-4 rounded-full transition-all duration-500"
+                class="bg-gradient-to-r from-primary-600 to-primary-700 h-4 rounded-full transition-all duration-500"
                 :style="{ width: Math.min(100, (userStats.productsSaved / 100) * 100) + '%' }"
               />
             </div>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-neutral-500">
               Plus que {{ Math.max(0, 100 - userStats.productsSaved) }} produits pour le niveau suivant
             </p>
           </Card>
 
           <!-- Actions rapides -->
           <Card class="animate-fade-in-up" style="animation-delay: 0.8s;">
-            <h3 class="text-lg font-semibold text-gray-900 mt-3">Actions rapides</h3>
+            <h3 class="text-lg font-semibold text-neutral-900 mt-3">Actions rapides</h3>
             <div class="space-y-2">
               <router-link to="/products" class="flex items-center gap-4 p-3 rounded hover:transition-colors group">
-                <div class="h-6 w-6 bg-blue-100 rounded flex items-center justify-center group-hover:transition-colors">
-                  <Search class="h-4 w-4 text-blue-600" />
+                <div class="h-6 w-6 bg-primary-100 rounded flex items-center justify-center group-hover:transition-colors">
+                  <Search class="h-4 w-4 text-primary-600" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900">Chercher des produits</p>
-                  <p class="text-xs text-gray-700">Découvrez les offres près de chez vous</p>
+                  <p class="font-medium text-neutral-900">Chercher des produits</p>
+                  <p class="text-xs text-neutral-700">Découvrez les offres près de chez vous</p>
                 </div>
               </router-link>
 
               <router-link to="/reservations" class="flex items-center gap-4 p-3 rounded hover:transition-colors group">
-                <div class="h-6 w-6 bg-blue-500/10 rounded flex items-center justify-center group-hover:transition-colors">
-                  <Calendar class="h-4 w-4 text-blue-500" />
+                <div class="h-6 w-6 bg-primary-500/10 rounded flex items-center justify-center group-hover:transition-colors">
+                  <Calendar class="h-4 w-4 text-primary-500" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900">Mes réservations</p>
-                  <p class="text-xs text-gray-700">Gérer mes commandes en cours</p>
+                  <p class="font-medium text-neutral-900">Mes réservations</p>
+                  <p class="text-xs text-neutral-700">Gérer mes commandes en cours</p>
                 </div>
               </router-link>
 
@@ -317,22 +317,22 @@
                   <User class="h-4 w-4 text-orange-500" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900">Mon profil</p>
-                  <p class="text-xs text-gray-700">Paramètres et préférences</p>
+                  <p class="font-medium text-neutral-900">Mon profil</p>
+                  <p class="text-xs text-neutral-700">Paramètres et préférences</p>
                 </div>
               </router-link>
             </div>
           </Card>
 
           <!-- Tips écologiques -->
-          <Card class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 animate-fade-in-up" style="animation-delay: 0.9s;">
+          <Card class="bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-200 animate-fade-in-up" style="animation-delay: 0.9s;">
             <div class="flex items-center gap-4 mt-3">
-              <div class="h-6 w-6 bg-blue-500 rounded-full flex items-center justify-center">
+              <div class="h-6 w-6 bg-primary-500 rounded-full flex items-center justify-center">
                 <Lightbulb class="h-4 w-4 text-white" />
               </div>
-              <h3 class="text-lg font-semibold text-blue-800">Astuce du jour</h3>
+              <h3 class="text-lg font-semibold text-primary-800">Astuce du jour</h3>
             </div>
-            <p class="text-sm text-blue-900 mt-3">
+            <p class="text-sm text-primary-900 mt-3">
               {{ currentTip.text }}
             </p>
             <Button

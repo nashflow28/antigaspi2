@@ -2,7 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-slate-50 via-sky-50/40 to-blue-50"
+    class="bg-gradient-to-br from-neutral-50 via-sky-50/40 to-primary-50"
   >
     <header class="sticky top-20 z-40 border-b border-white/60 bg-white/80 backdrop-blur-xl">
       <div class="container px-3 py-4">
@@ -16,10 +16,10 @@
             <ArrowLeft class="h-6 w-6" />
           </Button>
           <div class="space-y-1">
-            <h1 class="text-xl font-semibold text-slate-900 lg:text-3xl">
+            <h1 class="text-xl font-semibold text-neutral-900 lg:text-3xl">
               {{ pageTitle }}
             </h1>
-            <p class="text-base text-slate-600 lg:text-lg">
+            <p class="text-base text-neutral-600 lg:text-lg">
               {{ pageSubtitle }}
             </p>
           </div>
@@ -39,17 +39,17 @@
         <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <Button
             variant="outline"
-            class="h-auto items-start gap-3 rounded-2xl border-blue-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-white"
+            class="h-auto items-start gap-3 rounded-2xl border-primary-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-primary-300 hover:bg-white"
             @click="showRechargeModal = true"
           >
             <span class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
               <Plus class="h-6 w-6 text-emerald-600" />
             </span>
             <span class="flex-1 space-y-1">
-              <span class="block text-base font-semibold text-slate-900">
+              <span class="block text-base font-semibold text-neutral-900">
                 {{ isMerchant ? 'Encaisser un paiement' : 'Recharger' }}
               </span>
-              <span class="block text-sm text-slate-500">
+              <span class="block text-sm text-neutral-500">
                 {{ isMerchant ? 'Initier un encaissement Mobile Money ou Paystack' : 'Ajouter des fonds instantanément' }}
               </span>
             </span>
@@ -57,43 +57,43 @@
 
           <Button
             variant="outline"
-            class="h-auto items-start gap-3 rounded-2xl border-blue-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-white"
+            class="h-auto items-start gap-3 rounded-2xl border-primary-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-primary-300 hover:bg-white"
             @click="showTransferModal = true"
           >
-            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <ArrowUpRight class="h-6 w-6 text-blue-600" />
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
+              <ArrowUpRight class="h-6 w-6 text-primary-600" />
             </span>
             <span class="flex-1 space-y-1">
-              <span class="block text-base font-semibold text-slate-900">Transférer</span>
-              <span class="block text-sm text-slate-500">Envoyer des fonds à un autre utilisateur</span>
+              <span class="block text-base font-semibold text-neutral-900">Transférer</span>
+              <span class="block text-sm text-neutral-500">Envoyer des fonds à un autre utilisateur</span>
             </span>
           </Button>
 
           <Button
             variant="outline"
-            class="h-auto items-start gap-3 rounded-2xl border-blue-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-white"
+            class="h-auto items-start gap-3 rounded-2xl border-primary-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-primary-300 hover:bg-white"
             @click="showSettingsModal = true"
           >
             <span class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
               <Settings class="h-6 w-6 text-indigo-600" />
             </span>
             <span class="flex-1 space-y-1">
-              <span class="block text-base font-semibold text-slate-900">Paramètres</span>
-              <span class="block text-sm text-slate-500">Gestion du PIN et des limites</span>
+              <span class="block text-base font-semibold text-neutral-900">Paramètres</span>
+              <span class="block text-sm text-neutral-500">Gestion du PIN et des limites</span>
             </span>
           </Button>
 
           <Button
             variant="outline"
-            class="h-auto items-start gap-3 rounded-2xl border-blue-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-white"
+            class="h-auto items-start gap-3 rounded-2xl border-primary-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-primary-300 hover:bg-white"
             @click="showStatsModal = true"
           >
             <span class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
               <BarChart3 class="h-6 w-6 text-amber-600" />
             </span>
             <span class="flex-1 space-y-1">
-              <span class="block text-base font-semibold text-slate-900">Statistiques</span>
-              <span class="block text-sm text-slate-500">Analyse détaillée des mouvements</span>
+              <span class="block text-base font-semibold text-neutral-900">Statistiques</span>
+              <span class="block text-sm text-neutral-500">Analyse détaillée des mouvements</span>
             </span>
           </Button>
         </section>
@@ -109,7 +109,7 @@
           <aside class="space-y-4">
             <Card class="space-y-4">
               <header class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-slate-900">Aperçu du mois</h3>
+                <h3 class="text-lg font-semibold text-neutral-900">Aperçu du mois</h3>
               </header>
               <div v-if="stats" class="space-y-3">
                 <div class="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2">
@@ -130,76 +130,76 @@
                     {{ formatAmount(stats.period_stats.total_debits) }} XOF
                   </span>
                 </div>
-                <div class="flex items-center justify-between rounded-xl bg-slate-100 px-3 py-2">
-                  <div class="flex items-center gap-2 text-slate-700">
+                <div class="flex items-center justify-between rounded-xl bg-neutral-100 px-3 py-2">
+                  <div class="flex items-center gap-2 text-neutral-700">
                     <Activity class="h-4 w-4" />
                     <span class="text-sm font-medium">Transactions</span>
                   </div>
-                  <span class="text-sm font-semibold text-slate-700">
+                  <span class="text-sm font-semibold text-neutral-700">
                     {{ stats.period_stats.transaction_count }}
                   </span>
                 </div>
               </div>
               <div v-else class="space-y-2">
-                <div class="h-3 w-1/2 animate-pulse rounded-full bg-slate-200" />
-                <div class="h-3 w-2/3 animate-pulse rounded-full bg-slate-200" />
-                <div class="h-3 w-1/3 animate-pulse rounded-full bg-slate-200" />
+                <div class="h-3 w-1/2 animate-pulse rounded-full bg-neutral-200" />
+                <div class="h-3 w-2/3 animate-pulse rounded-full bg-neutral-200" />
+                <div class="h-3 w-1/3 animate-pulse rounded-full bg-neutral-200" />
               </div>
             </Card>
 
             <Card class="space-y-4">
               <header class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-slate-900">Limite quotidienne</h3>
+                <h3 class="text-lg font-semibold text-neutral-900">Limite quotidienne</h3>
                 <span
                   v-if="wallet"
-                  class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
+                  class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600"
                 >
                   {{ formatAmount(wallet.daily_limit) }} XOF
                 </span>
               </header>
 
               <div v-if="wallet" class="space-y-3">
-                <div class="flex items-center justify-between text-sm text-slate-600">
+                <div class="flex items-center justify-between text-sm text-neutral-600">
                   <span>Utilisé aujourd'hui</span>
-                  <span class="font-semibold text-slate-900">
+                  <span class="font-semibold text-neutral-900">
                     {{ formatAmount(dailySpent) }} XOF
                   </span>
                 </div>
-                <div class="h-3 w-full overflow-hidden rounded-full bg-slate-200">
+                <div class="h-3 w-full overflow-hidden rounded-full bg-neutral-200">
                   <div
-                    class="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300"
+                    class="h-full rounded-full bg-gradient-to-r from-primary-500 to-indigo-500 transition-all duration-300"
                     :style="{ width: Math.min(Math.round(dailyLimitUsagePercentage), 100) + '%' }"
                   />
                 </div>
-                <div class="flex items-start justify-between text-sm text-slate-500">
+                <div class="flex items-start justify-between text-sm text-neutral-500">
                   <span>Restant</span>
-                  <span class="font-semibold text-slate-900">
+                  <span class="font-semibold text-neutral-900">
                     {{ formatAmount(remainingDailyLimit) }} XOF
                   </span>
                 </div>
               </div>
-              <p v-else class="text-sm text-slate-500">
+              <p v-else class="text-sm text-neutral-500">
                 Les limites apparaîtront dès que le portefeuille sera initialisé.
               </p>
             </Card>
 
-            <Card class="space-y-4 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            <Card class="space-y-4 bg-gradient-to-br from-neutral-50 via-primary-50 to-indigo-50">
               <header class="flex items-center gap-3">
-                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white">
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-white">
                   <Shield class="h-4 w-4" />
                 </span>
-                <h3 class="text-lg font-semibold text-slate-900">Sécurité</h3>
+                <h3 class="text-lg font-semibold text-neutral-900">Sécurité</h3>
               </header>
               <div class="space-y-3 text-sm">
                 <div class="flex items-center justify-between">
-                  <span class="text-slate-600">Code PIN</span>
-                  <span class="font-medium text-slate-900">
+                  <span class="text-neutral-600">Code PIN</span>
+                  <span class="font-medium text-neutral-900">
                     {{ hasPin ? '✓ Configuré' : '⚠ À configurer' }}
                   </span>
                 </div>
                 <div class="flex items-center justify-between">
-                  <span class="text-slate-600">Statut</span>
-                  <span class="font-medium text-slate-900">
+                  <span class="text-neutral-600">Statut</span>
+                  <span class="font-medium text-neutral-900">
                     {{ isActive ? '✓ Actif' : '⚠ Inactif' }}
                   </span>
                 </div>
@@ -235,16 +235,16 @@
 
     <div
       v-if="showTransferModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/60 p-4"
     >
       <div class="w-full max-w-xl space-y-4 rounded-2xl bg-white p-6 shadow-2xl">
         <header class="flex items-center justify-between">
-          <h3 class="text-xl font-semibold text-slate-900">Transfert (bientôt disponible)</h3>
+          <h3 class="text-xl font-semibold text-neutral-900">Transfert (bientôt disponible)</h3>
           <Button variant="ghost" size="sm" @click="showTransferModal = false">
             <X class="h-5 w-5" />
           </Button>
         </header>
-        <p class="text-sm text-slate-600">
+        <p class="text-sm text-neutral-600">
           L'envoi de fonds vers un autre portefeuille sera activé très prochainement.
           Restez connecté pour découvrir la version bêta.
         </p>
@@ -256,11 +256,11 @@
 
     <div
       v-if="showSettingsModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/60 p-4"
     >
       <div class="w-full max-w-xl space-y-5 rounded-2xl bg-white p-6 shadow-2xl">
         <header class="flex items-center justify-between">
-          <h3 class="text-xl font-semibold text-slate-900">Paramètres du portefeuille</h3>
+          <h3 class="text-xl font-semibold text-neutral-900">Paramètres du portefeuille</h3>
           <Button variant="ghost" size="sm" @click="showSettingsModal = false">
             <X class="h-5 w-5" />
           </Button>
@@ -268,36 +268,36 @@
 
         <Button
           variant="outline"
-          class="h-auto items-center justify-between gap-3 rounded-xl border-slate-200 p-4 text-left"
+          class="h-auto items-center justify-between gap-3 rounded-xl border-neutral-200 p-4 text-left"
           @click="() => { showSettingsModal = false; showPinSetupModal = true }"
         >
-          <span class="flex items-center gap-3 text-slate-800">
-            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
+          <span class="flex items-center gap-3 text-neutral-800">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100">
               <Key class="h-4 w-4" />
             </span>
             <span class="text-base font-medium">
               {{ hasPin ? 'Modifier mon code PIN' : 'Configurer un code PIN' }}
             </span>
           </span>
-          <ChevronRight class="h-4 w-4 text-slate-400" />
+          <ChevronRight class="h-4 w-4 text-neutral-400" />
         </Button>
 
-        <div class="space-y-2 rounded-xl border border-slate-200 p-4">
+        <div class="space-y-2 rounded-xl border border-neutral-200 p-4">
           <div class="flex items-center justify-between text-sm">
-            <span class="font-medium text-slate-700">Activer le portefeuille</span>
+            <span class="font-medium text-neutral-700">Activer le portefeuille</span>
             <button
               :disabled="loading"
               class="relative inline-flex h-6 w-12 items-center rounded-full transition-colors"
-              :class="isActive ? 'bg-blue-600' : 'bg-slate-300'"
+              :class="isActive ? 'bg-primary-600' : 'bg-neutral-300'"
               @click="toggleWalletStatus"
             >
               <span
                 class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform"
-                :class="isActive ? 'translate-x-6' : 'translate-x-1'"
+                :class="isActive ? 'tranneutral-x-6' : 'tranneutral-x-1'"
               />
             </button>
           </div>
-          <p class="text-sm text-slate-500">
+          <p class="text-sm text-neutral-500">
             {{ isActive ? 'Votre portefeuille est actif et prêt à recevoir des paiements.' : 'Activez le portefeuille pour encaisser et payer avec votre solde.' }}
           </p>
         </div>
@@ -306,16 +306,16 @@
 
     <div
       v-if="showStatsModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/60 p-4"
     >
       <div class="w-full max-w-xl space-y-4 rounded-2xl bg-white p-6 shadow-2xl">
         <header class="flex items-center justify-between">
-          <h3 class="text-xl font-semibold text-slate-900">Statistiques détaillées</h3>
+          <h3 class="text-xl font-semibold text-neutral-900">Statistiques détaillées</h3>
           <Button variant="ghost" size="sm" @click="showStatsModal = false">
             <X class="h-5 w-5" />
           </Button>
         </header>
-        <p class="text-sm text-slate-600">
+        <p class="text-sm text-neutral-600">
           Les graphiques d'analyse arriveront dans une prochaine itération. Vous pourrez suivre vos catégories de dépenses, vos habitudes de recharge et vos encaissements marchands.
         </p>
         <Button class="w-full justify-center" @click="showStatsModal = false">

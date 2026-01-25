@@ -9,9 +9,9 @@
       >
       <div
         v-else
-        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-50 to-blue-500/5"
+        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-primary-500/5"
       >
-        <Package class="h-6 w-6 text-blue-400" />
+        <Package class="h-6 w-6 text-primary-400" />
       </div>
 
       <div class="relative sm:absolute left-4 top-4 flex gap-2">
@@ -23,29 +23,29 @@
 
       <span
         v-if="timeLeft"
-        class="relative sm:absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-3 text-xs font-medium text-gray-800 shadow-xl"
+        class="relative sm:absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-3 text-xs font-medium text-neutral-800 shadow-xl"
       >
-        <Clock class="h-4 w-4 text-blue-500" />
+        <Clock class="h-4 w-4 text-primary-500" />
         {{ timeLeft }}
       </span>
     </div>
 
     <div class="space-y-4 p-6">
       <div class="space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900 group-hover:transition-colors">
+        <h3 class="text-lg font-semibold text-neutral-900 group-hover:transition-colors">
           {{ basket.name }}
         </h3>
-        <p v-if="basket.surprise_description" class="line-clamp-2 text-sm text-gray-700">
+        <p v-if="basket.surprise_description" class="line-clamp-2 text-sm text-neutral-700">
           {{ basket.surprise_description }}
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-        <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-3 text-blue-900">
+      <div class="flex flex-wrap items-center gap-3 text-sm text-neutral-500">
+        <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-3 text-primary-900">
           <Store class="h-4 w-4" />
           {{ basket.merchant.business_name }}
         </span>
-        <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-blue-500/5 px-3 py-3 text-blue-500/90">
+        <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-primary-500/5 px-3 py-3 text-primary-500/90">
           <Tag class="h-4 w-4" />
           {{ basket.category.name }}
         </span>
@@ -53,11 +53,11 @@
 
       <div class="flex items-end justify-start sm:justify-between">
         <div>
-          <div class="text-xl font-semibold text-blue-600">{{ formattedDiscountedPrice }}</div>
-          <div v-if="formattedOriginalPrice" class="text-sm text-gray-400 line-through">
+          <div class="text-xl font-semibold text-primary-600">{{ formattedDiscountedPrice }}</div>
+          <div v-if="formattedOriginalPrice" class="text-sm text-neutral-400 line-through">
             {{ formattedOriginalPrice }}
           </div>
-          <div v-if="formattedSavings" class="text-xs text-blue-600 font-medium">
+          <div v-if="formattedSavings" class="text-xs text-primary-600 font-medium">
             Économisez {{ formattedSavings }}
           </div>
         </div>

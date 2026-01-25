@@ -6,22 +6,22 @@
         v-if="showInstallPrompt"
         class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50"
       >
-        <div class="bg-white dark:bg-dark-800 rounded shadow-80 border border-gray-200 dark:border-dark-700 p-6">
+        <div class="bg-white dark:bg-dark-800 rounded shadow-80 border border-neutral-200 dark:border-dark-700 p-6">
           <div class="flex items-stretch sm:items-start gap-3">
             <!-- Icon -->
             <div class="shrink-0">
-              <div class="w-12 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded flex items-center justify-center">
+              <div class="w-12 h-10 bg-gradient-to-r from-primary-600 to-primary-700 rounded flex items-center justify-center">
                 <span class="text-white text-xl">🌱</span>
               </div>
             </div>
 
             <!-- Content -->
             <div class="flex-1">
-              <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-1">
-                Installer Antigaspi
+              <h3 class="font-semibold text-neutral-900 dark:text-white text-sm mb-1">
+                Installer GÊLADAL
               </h3>
-              <p class="text-gray-700 dark:text-gray-500 text-xs leading-relaxed mt-3">
-                Ajoutez Antigaspi à votre écran d'accueil pour un accès rapide et une expérience native.
+              <p class="text-neutral-700 dark:text-neutral-500 text-xs leading-relaxed mt-3">
+                Ajoutez GÊLADAL à votre écran d'accueil pour un accès rapide et une expérience native.
               </p>
 
               <!-- Buttons -->
@@ -31,7 +31,7 @@
                   variant="primary"
                   :left-icon="Download"
                   :loading="installing"
-                  aria-label="Installer l'application Antigaspi"
+                  aria-label="Installer l'application GÊLADAL"
                   @click="handleInstall"
                 >
                   Installer
@@ -53,7 +53,7 @@
               variant="ghost"
               size="icon"
               :left-icon="X"
-              class="shrink-0 text-gray-400 hover:text-gray-700 dark:hover:transition-colors"
+              class="shrink-0 text-neutral-400 hover:text-neutral-700 dark:hover:transition-colors"
               aria-label="Fermer"
               @click="dismissInstallPrompt"
             >
@@ -72,11 +72,11 @@
         v-if="showUpdatePrompt"
         class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50"
       >
-        <div class="bg-blue-50 dark:bg-secondary-900/20 border border-blue-200 dark:border-blue-800 rounded shadow-xl p-6">
+        <div class="bg-primary-50 dark:bg-secondary-900/20 border border-primary-200 dark:border-primary-800 rounded shadow-xl p-6">
           <div class="flex items-stretch sm:items-start gap-3">
             <!-- Icon -->
             <div class="shrink-0">
-              <div class="h-6 w-6 bg-blue-500 rounded flex items-center justify-center">
+              <div class="h-6 w-6 bg-primary-500 rounded flex items-center justify-center">
                 <RefreshCw class="h-4 w-4 text-white" />
               </div>
             </div>
@@ -87,7 +87,7 @@
                 Mise à jour disponible
               </h3>
               <p class="text-secondary-700 dark:text-secondary-200 text-xs leading-relaxed mt-3">
-                Une nouvelle version d'Antigaspi est disponible avec des améliorations et corrections.
+                Une nouvelle version d'GÊLADAL est disponible avec des améliorations et corrections.
               </p>
 
               <!-- Buttons -->
@@ -142,7 +142,7 @@
           :class="[
             'px-3 py-3 rounded-full shadow-lg text-sm font-medium flex items-center gap-2',
             isOnline
-              ? 'bg-blue-500 text-white'
+              ? 'bg-primary-500 text-white'
               : 'bg-red-500 text-white'
           ]"
         >

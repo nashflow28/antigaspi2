@@ -1,19 +1,19 @@
 <template>
   <div class="space-y-6">
     <!-- Amount Display -->
-    <div v-if="!hideAmount" class="text-center py-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-      <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Montant à payer</p>
-      <p class="text-3xl font-bold text-slate-900 dark:text-white">
+    <div v-if="!hideAmount" class="text-center py-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl">
+      <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Montant à payer</p>
+      <p class="text-3xl font-bold text-neutral-900 dark:text-white">
         {{ formatAmount(amount) }} <span class="text-lg">XOF</span>
       </p>
-      <p v-if="fees > 0" class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+      <p v-if="fees > 0" class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
         + {{ formatAmount(fees) }} XOF de frais
       </p>
     </div>
 
     <!-- Step 1: Select Provider -->
     <div v-if="step === 'provider'" class="space-y-4">
-      <h3 class="text-sm font-medium text-slate-700 dark:text-slate-300">
+      <h3 class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
         Choisissez votre opérateur
       </h3>
 
@@ -25,7 +25,7 @@
           class="relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all"
           :class="selectedProvider?.provider === provider.provider
             ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-            : 'border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600'"
+            : 'border-neutral-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-primary-600'"
           :disabled="!provider.enabled"
           @click="selectProvider(provider)"
         >
@@ -39,12 +39,12 @@
               :style="{ color: provider.color }"
             />
           </div>
-          <span class="text-sm font-medium text-slate-900 dark:text-white">
+          <span class="text-sm font-medium text-neutral-900 dark:text-white">
             {{ provider.name }}
           </span>
           <span
             v-if="!provider.enabled"
-            class="absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500"
+            class="absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-500"
           >
             Bientôt
           </span>
@@ -56,14 +56,14 @@
     <div v-if="step === 'phone'" class="space-y-4">
       <button
         type="button"
-        class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600"
+        class="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400 hover:text-primary-600"
         @click="step = 'provider'"
       >
         <ArrowLeft class="h-4 w-4" />
         Changer d'opérateur
       </button>
 
-      <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-800/50">
         <div
           class="w-10 h-10 rounded-full flex items-center justify-center"
           :style="{ backgroundColor: selectedProvider?.color + '20' }"
@@ -75,8 +75,8 @@
           />
         </div>
         <div>
-          <p class="font-medium text-slate-900 dark:text-white">{{ selectedProvider?.name }}</p>
-          <p class="text-xs text-slate-500">Paiement mobile</p>
+          <p class="font-medium text-neutral-900 dark:text-white">{{ selectedProvider?.name }}</p>
+          <p class="text-xs text-neutral-500">Paiement mobile</p>
         </div>
       </div>
 
@@ -84,7 +84,7 @@
         <Label for="phone">Numéro de téléphone</Label>
         <div class="relative mt-1">
           <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span class="text-slate-500 dark:text-slate-400 text-sm">+228</span>
+            <span class="text-neutral-500 dark:text-neutral-400 text-sm">+228</span>
           </div>
           <Input
             id="phone"
@@ -96,7 +96,7 @@
             @blur="validatePhoneInput"
           />
         </div>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
           Préfixes valides : {{ selectedProvider?.phonePrefix.join(', ') }}
         </p>
       </div>
@@ -128,10 +128,10 @@
         <div class="mx-auto w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mb-4">
           <Smartphone class="h-8 w-8 text-primary-600 dark:text-primary-400" />
         </div>
-        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
           Confirmez le paiement
         </h3>
-        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+        <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
           Entrez le code reçu par SMS sur le {{ maskedPhone }}
         </p>
       </div>
@@ -145,10 +145,10 @@
           inputmode="numeric"
           maxlength="1"
           class="w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 transition-colors
-                 bg-white dark:bg-slate-800
-                 border-slate-200 dark:border-slate-700
+                 bg-white dark:bg-neutral-800
+                 border-neutral-200 dark:border-neutral-700
                  focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20
-                 text-slate-900 dark:text-white"
+                 text-neutral-900 dark:text-white"
           :class="{ 'border-red-500': otpError }"
           :value="otp[index] || ''"
           @input="handleOtpInput($event, index)"
@@ -174,7 +174,7 @@
 
       <button
         type="button"
-        class="w-full text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600"
+        class="w-full text-sm text-neutral-500 dark:text-neutral-400 hover:text-primary-600"
         @click="cancelPayment"
       >
         Annuler le paiement
@@ -186,10 +186,10 @@
       <div class="mx-auto w-20 h-20 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mb-4">
         <Loader2 class="h-10 w-10 text-primary-600 dark:text-primary-400 animate-spin" />
       </div>
-      <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
         Traitement en cours...
       </h3>
-      <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+      <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
         Veuillez patienter, ne fermez pas cette fenêtre
       </p>
     </div>
@@ -199,13 +199,13 @@
       <div class="mx-auto w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
         <CheckCircle class="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
       </div>
-      <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
         Paiement réussi !
       </h3>
-      <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+      <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
         {{ successMessage }}
       </p>
-      <p v-if="transactionId" class="text-xs text-slate-500 mt-2">
+      <p v-if="transactionId" class="text-xs text-neutral-500 mt-2">
         Référence : {{ transactionId }}
       </p>
     </div>
@@ -215,7 +215,7 @@
       <div class="mx-auto w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
         <XCircle class="h-10 w-10 text-red-600 dark:text-red-400" />
       </div>
-      <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
         Paiement échoué
       </h3>
       <p class="text-sm text-red-600 dark:text-red-400 mt-2">

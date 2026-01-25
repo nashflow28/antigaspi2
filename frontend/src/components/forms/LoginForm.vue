@@ -4,18 +4,18 @@
   <div v-else class="space-y-8">
     <!-- Header moderne -->
     <div class="text-left sm:text-center animate-fade-in-up">
-      <h3 class="text-xl font-semibold text-gray-900 mt-2">
+      <h3 class="text-xl font-semibold text-neutral-900 mt-2">
         Content de vous revoir !
       </h3>
-      <p class="text-gray-700">
-        Connectez-vous pour accéder à votre compte Antigaspi
+      <p class="text-neutral-700">
+        Connectez-vous pour accéder à votre compte GÊLADAL
       </p>
     </div>
 
     <form class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;" @submit.prevent="handleSubmit">
       <!-- Email Input -->
       <div class="space-y-4">
-        <label for="email" class="block text-sm font-medium text-gray-800 mt-2 flex items-center gap-2">
+        <label for="email" class="block text-sm font-medium text-neutral-800 mt-2 flex items-center gap-2">
           <span>Adresse email</span>
           <span class="text-red-600">*</span>
         </label>
@@ -30,14 +30,14 @@
           class="pl-12"
         >
           <template #icon>
-            <Mail class="h-4 w-4 text-gray-400" />
+            <Mail class="h-4 w-4 text-neutral-400" />
           </template>
         </Input>
       </div>
 
       <!-- Password Input -->
       <div class="space-y-4">
-        <label for="password" class="block text-sm font-medium text-gray-800 mt-2 flex items-center gap-2">
+        <label for="password" class="block text-sm font-medium text-neutral-800 mt-2 flex items-center gap-2">
           <span>Mot de passe</span>
           <span class="text-red-600">*</span>
         </label>
@@ -53,12 +53,12 @@
             class="pl-12 pr-12"
           >
             <template #icon>
-              <Lock class="h-4 w-4 text-gray-400" />
+              <Lock class="h-4 w-4 text-neutral-400" />
             </template>
           </Input>
           <button
             type="button"
-            class="relative sm:absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:transition-colors duration-200"
+            class="relative sm:absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:transition-colors duration-200"
             @click="togglePasswordVisibility"
           >
             <Eye v-if="!showPassword" class="h-4 w-4" />
@@ -74,15 +74,15 @@
             id="remember-me"
             v-model="form.remember"
             type="checkbox"
-            class="h-4 w-4 text-blue-600 bg-white border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            class="h-4 w-4 text-primary-600 bg-white border-2 border-neutral-300 rounded focus:ring-primary-500 focus:ring-2"
           >
-          <label for="remember-me" class="text-sm text-gray-800 font-medium">
+          <label for="remember-me" class="text-sm text-neutral-800 font-medium">
             Se souvenir de moi
           </label>
         </div>
 
         <div class="text-sm">
-          <a href="#" class="font-medium text-blue-600 hover:transition-colors duration-200 hover:underline">
+          <a href="#" class="font-medium text-primary-600 hover:transition-colors duration-200 hover:underline">
             Mot de passe oublié ?
           </a>
         </div>
@@ -100,26 +100,26 @@
           <Loader2 v-if="loading" class="h-4 w-4 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
-        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500/90 opacity-0 group-hover:transition-opacity duration-300" />
+        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500/90 opacity-0 group-hover:transition-opacity duration-300" />
       </Button>
 
       <!-- Divider -->
       <div class="relative">
         <div class="relative sm:absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-200" />
+          <div class="w-full border-t border-neutral-200" />
         </div>
         <div class="relative flex justify-center text-sm">
-          <span class="px-3 bg-white text-gray-500 font-medium">ou</span>
+          <span class="px-3 bg-white text-neutral-500 font-medium">ou</span>
         </div>
       </div>
 
       <!-- Register Link -->
       <div class="text-left sm:text-center">
-        <p class="text-gray-700">
+        <p class="text-neutral-700">
           Pas encore de compte ?
           <router-link
             to="/register"
-            class="font-medium text-blue-600 hover:transition-colors duration-200 hover:underline ml-1"
+            class="font-medium text-primary-600 hover:transition-colors duration-200 hover:underline ml-1"
           >
             Créer un compte
           </router-link>
@@ -128,14 +128,14 @@
     </form>
 
     <!-- Footer Links -->
-    <div class="text-left sm:text-center text-sm text-gray-500 animate-fade-in-up" style="animation-delay: 0.4s;">
+    <div class="text-left sm:text-center text-sm text-neutral-500 animate-fade-in-up" style="animation-delay: 0.4s;">
       <p>
         En vous connectant, vous acceptez nos
-        <a href="#" class="text-blue-600 hover:text-blue-900 hover:transition-colors duration-200">
+        <a href="#" class="text-primary-600 hover:text-primary-900 hover:transition-colors duration-200">
           Conditions d'utilisation
         </a>
         et notre
-        <a href="#" class="text-blue-600 hover:text-blue-900 hover:transition-colors duration-200">
+        <a href="#" class="text-primary-600 hover:text-primary-900 hover:transition-colors duration-200">
           Politique de confidentialité
         </a>
       </p>

@@ -8,7 +8,7 @@
     :enter="{ y: 0, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } }"
     :class="navClasses"
   >
-    <div class="pointer-events-none relative sm:absolute inset-0 bg-gray-50-dark/10" aria-hidden="true" />
+    <div class="pointer-events-none relative sm:absolute inset-0 bg-neutral-50/10" aria-hidden="true" />
     <div class="relative z-10 mx-auto flex h-10 max-w-full sm:max-w-7xl items-center justify-start sm:justify-between px-3 sm:h-20 sm:px-4 lg:px-6">
       <a
         :href="brandHref"
@@ -101,7 +101,7 @@
       :id="menuId"
       tag="div"
       role="menu"
-      class="relative z-10 border-t border-white/10 bg-gray-900 text-gray-50 dark:border-gray-700/60 dark:bg-gray-900 lg:hidden"
+      class="relative z-10 border-t border-white/10 bg-neutral-900 text-neutral-50 dark:border-neutral-700/60 dark:bg-neutral-900 lg:hidden"
       :initial="{ opacity: 0, y: -12 }"
       :enter="{ opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeInOut' } }"
       :leave="{ opacity: 0, y: -12, transition: { duration: 0.2, ease: 'easeInOut' } }"
@@ -164,7 +164,7 @@ const props = withDefaults(
     class?: string
   }>(),
   {
-    brand: () => ({ name: 'Antigaspi', href: '#' }),
+    brand: () => ({ name: 'GÊLADAL', href: '#' }),
     items: () => [],
     actions: null,
     showThemeToggle: true,
@@ -185,8 +185,8 @@ const scrolled = computed(() => y.value > 12)
 
 const navClasses = computed(() => {
   const classes = [
-    'fixed inset-x-0 top-0 z-40 border-b border-blue-500/15 backdrop-blur-xl transition-all duration-300 ease-out',
-    'relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-700 text-white dark:bg-gray-50-dark',
+    'fixed inset-x-0 top-0 z-40 border-b border-primary-500/15 backdrop-blur-xl transition-all duration-300 ease-out',
+    'relative overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700 text-white dark:bg-neutral-900',
     scrolled.value ? 'shadow-xl' : '',
     props.class
   ]
@@ -205,8 +205,8 @@ const navigationItemClasses = (item: NavigationItem) =>
 
 const mobileItemClasses = (item: NavigationItem) =>
   [
-    'flex items-center gap-3 rounded px-3 py-3 text-gray-700 font-medium transition-colors',
-    item.active ? 'bg-blue-500/20 text-blue-50' : 'text-gray-100 hover:bg-blue-500/15'
+    'flex items-center gap-3 rounded px-3 py-3 text-neutral-700 font-medium transition-colors',
+    item.active ? 'bg-primary-500/20 text-primary-50' : 'text-neutral-100 hover:bg-primary-500/15'
   ]
     .filter(Boolean)
     .join(' ')

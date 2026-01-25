@@ -1,17 +1,17 @@
 <template>
-  <div class="bg-white rounded shadow-lg p-6 border border-gray-100">
+  <div class="bg-white rounded shadow-lg p-6 border border-neutral-100">
     <div class="flex items-center justify-start sm:justify-between mt-4">
       <div class="flex items-center space-y-2 sm:space-x-3">
-        <div class="w-12 h-10 bg-blue-100 rounded flex items-center justify-center">
+        <div class="w-12 h-10 bg-primary-100 rounded flex items-center justify-center">
           <Edit class="h-6 w-6 text-info" />
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Modifier votre avis</h3>
-          <p class="text-gray-700 text-sm">Mettez à jour votre expérience</p>
+          <h3 class="text-lg font-semibold text-neutral-900">Modifier votre avis</h3>
+          <p class="text-neutral-700 text-sm">Mettez à jour votre expérience</p>
         </div>
       </div>
       <button
-        class="text-gray-400 hover:transition-colors"
+        class="text-neutral-400 hover:transition-colors"
         @click="$emit('cancel')"
       >
         <X class="h-6 w-6" />
@@ -21,7 +21,7 @@
     <form class="space-y-6" @submit.prevent="submitUpdate">
       <!-- Rating -->
       <div>
-        <label class="block text-sm font-medium text-gray-800 mb-4">
+        <label class="block text-sm font-medium text-neutral-800 mb-4">
           Note générale *
         </label>
         <StarRating
@@ -34,7 +34,7 @@
 
       <!-- Title -->
       <div>
-        <label for="edit-title" class="block text-sm font-medium text-gray-800 mt-2">
+        <label for="edit-title" class="block text-sm font-medium text-neutral-800 mt-2">
           Titre de votre avis
         </label>
         <input
@@ -42,7 +42,7 @@
           v-model="form.title"
           type="text"
           maxlength="255"
-          class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
         >
         <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
@@ -50,7 +50,7 @@
 
       <!-- Comment -->
       <div>
-        <label for="edit-comment" class="block text-sm font-medium text-gray-800 mt-2">
+        <label for="edit-comment" class="block text-sm font-medium text-neutral-800 mt-2">
           Votre commentaire
         </label>
         <textarea
@@ -58,12 +58,12 @@
           v-model="form.comment"
           rows="4"
           maxlength="1000"
-          class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
           placeholder="Décrivez votre expérience mise à jour..."
         />
         <div class="flex justify-start sm:justify-between mt-1">
           <p v-if="errors.comment" class="text-sm text-red-600">{{ errors.comment }}</p>
-          <p class="text-xs text-gray-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
+          <p class="text-xs text-neutral-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@
       <div class="flex justify-center sm:justify-end space-y-2 sm:space-x-3 padding-t-lg">
         <button
           type="button"
-          class="px-4 py-3 text-gray-700 hover:transition-colors"
+          class="px-4 py-3 text-neutral-700 hover:transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
@@ -88,7 +88,7 @@
         <button
           type="submit"
           :disabled="!form.rating || submitting"
-          class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-y-4 sm:space-x-2"
+          class="px-4 py-3 bg-primary-600 text-white rounded hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-y-4 sm:space-x-2"
         >
           <span>{{ submitting ? 'Mise à jour...' : 'Mettre à jour' }}</span>
           <Save v-if="!submitting" class="h-4 w-4" />
@@ -102,7 +102,7 @@
       v-if="message.show"
       class="mt-4 p-4 rounded"
       :class="{
-        'bg-green-50 border border-blue-200': message.type === 'success',
+        'bg-green-50 border border-primary-200': message.type === 'success',
         'bg-red-50 border border-red-200': message.type === 'error'
       }"
     >
@@ -123,13 +123,13 @@
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
       <div class="bg-white rounded p-6 max-w-xl w-full max-w-lg mx-auto">
-        <h3 class="text-lg font-semibold text-gray-900 mt-3">Supprimer l'avis</h3>
-        <p class="text-gray-700 mt-4">
+        <h3 class="text-lg font-semibold text-neutral-900 mt-3">Supprimer l'avis</h3>
+        <p class="text-neutral-700 mt-4">
           Êtes-vous sûr de vouloir supprimer définitivement cet avis ? Cette action ne peut pas être annulée.
         </p>
         <div class="flex justify-center sm:justify-end space-y-2 sm:space-x-3">
           <button
-            class="px-3 py-3 text-gray-700 hover:transition-colors"
+            class="px-3 py-3 text-neutral-700 hover:transition-colors"
             @click="showDeleteConfirm = false"
           >
             Annuler

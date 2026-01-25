@@ -1,14 +1,14 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-4 py-12">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-emerald-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 px-4 py-12">
     <Card class="w-full max-w-md">
       <div class="text-center mb-8">
         <div class="mx-auto w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mb-4">
           <UserCircle class="h-8 w-8 text-primary-600 dark:text-primary-400" />
         </div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
           Complétez votre profil
         </h1>
-        <p class="text-slate-600 dark:text-slate-400 mt-2">
+        <p class="text-neutral-600 dark:text-neutral-400 mt-2">
           Quelques informations supplémentaires pour personnaliser votre expérience
         </p>
       </div>
@@ -37,7 +37,7 @@
             placeholder="jean@example.com"
             :error="errors.email"
           />
-          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
             Optionnel - Pour recevoir les notifications par email
           </p>
         </div>
@@ -47,7 +47,7 @@
           <Label for="location">Ville / Quartier</Label>
           <div class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <MapPin class="h-5 w-5 text-slate-400" />
+              <MapPin class="h-5 w-5 text-neutral-400" />
             </div>
             <Input
               id="location"
@@ -71,7 +71,7 @@
               class="flex items-center gap-2 p-3 rounded-xl border-2 transition-all"
               :class="form.preferences.includes(pref.value)
                 ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                : 'border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600'"
+                : 'border-neutral-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-primary-600'"
               @click="togglePreference(pref.value)"
             >
               <component :is="pref.icon" class="h-5 w-5" />
@@ -104,7 +104,7 @@
         <div class="text-center">
           <button
             type="button"
-            class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400"
+            class="text-sm text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
             @click="skipProfile"
           >
             Compléter plus tard
@@ -186,7 +186,7 @@ const handleSubmit = async () => {
       first_name: form.value.name.split(' ')[0] || form.value.name,
       last_name: form.value.name.split(' ').slice(1).join(' ') || '',
       email: form.value.email || undefined,
-      city: form.value.location || undefined,
+      city: form.value.location || undefined
     })
 
     if (response.success) {
@@ -195,7 +195,7 @@ const handleSubmit = async () => {
         authStore.setUser(response.data.user as any)
       }
 
-      notify.success('Profil complété', 'Bienvenue sur Antigaspi !')
+      notify.success('Profil complété', 'Bienvenue sur GÊLADAL !')
       router.push({ name: 'home' })
     } else {
       error.value = response.message || 'Erreur lors de la mise à jour'

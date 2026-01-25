@@ -1,10 +1,10 @@
 <template>
   <Card class="space-y-6">
     <div class="flex items-center justify-start sm:justify-between">
-      <h2 class="text-lg font-semibold text-gray-900">Filtres</h2>
+      <h2 class="text-lg font-semibold text-neutral-900">Filtres</h2>
       <button
         type="button"
-        class="text-sm text-blue-600 hover:text-blue-900"
+        class="text-sm text-primary-600 hover:text-primary-900"
         :disabled="!hasActiveFilters"
         @click="handleReset"
       >

@@ -22,6 +22,7 @@ import BrandLogo from '../../components/BrandLogo'
 import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 import { useTheme } from '../../theme'
 import { useAlert } from '../../contexts/AlertContext'
+import { reset as navigationReset } from '../../navigation/NavigationRef'
 
 type UserRole = 'consumer' | 'merchant'
 
@@ -117,8 +118,11 @@ const CompleteProfilePhoneScreen = ({ navigation, route }: any) => {
 
       if (result.success) {
         showSuccess('Bienvenue!', 'Votre compte a ete cree avec succes')
-        // Fermer le modal Auth et retourner à l'écran principal
-        navigation.getParent()?.getParent()?.goBack()
+        // Reset navigation to Main screen (closes auth modal)
+        navigationReset({
+          index: 0,
+          routes: [{ name: 'Main' }],
+        })
       }
     } catch (error: any) {
       console.error('Registration error:', error)

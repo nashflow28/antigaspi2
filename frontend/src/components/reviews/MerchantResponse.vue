@@ -1,5 +1,5 @@
 <template>
-  <div class="border-t border-gray-200 padding-t-lg mt-4">
+  <div class="border-t border-neutral-200 padding-t-lg mt-4">
     <!-- Existing Response -->
     <div v-if="review.merchant_response && !isEditing" class="mt-3">
       <div class="flex items-stretch sm:items-start space-y-2 sm:space-x-3">
@@ -10,15 +10,15 @@
         </div>
         <div class="flex-1 min-w-none">
           <div class="flex items-center space-y-4 sm:space-x-2 mt-2">
-            <span class="text-sm font-medium text-gray-900">Réponse du commerçant</span>
-            <span class="text-xs text-gray-500">{{ formatDate(review.merchant_response_at) }}</span>
+            <span class="text-sm font-medium text-neutral-900">Réponse du commerçant</span>
+            <span class="text-xs text-neutral-500">{{ formatDate(review.merchant_response_at) }}</span>
           </div>
-          <div class="text-sm text-gray-800 leading-relaxed bg-green-50 rounded p-3">
+          <div class="text-sm text-neutral-800 leading-relaxed bg-green-50 rounded p-3">
             {{ review.merchant_response }}
           </div>
           <div class="flex items-center space-y-4 sm:space-x-2 mt-2">
             <button
-              class="inline-flex items-center px-3 py-3 text-xs text-info bg-blue-50 hover:transition-colors"
+              class="inline-flex items-center px-3 py-3 text-xs text-info bg-primary-50 hover:transition-colors"
               @click="startEditing"
             >
               <PencilIcon class="w-xs h-3 mr-1" />
@@ -41,7 +41,7 @@
     <div v-else-if="!review.merchant_response || isEditing" class="space-y-2">
       <div class="flex items-center space-y-4 sm:space-x-2">
         <BuildingStorefrontIcon class="h-4 w-4 text-green-600" />
-        <span class="text-sm font-medium text-gray-900">
+        <span class="text-sm font-medium text-neutral-900">
           {{ isEditing ? 'Modifier votre réponse' : 'Répondre à cet avis' }}
         </span>
       </div>
@@ -51,18 +51,18 @@
           v-model="responseText"
           :placeholder="isEditing ? 'Modifiez votre réponse...' : 'Écrivez votre réponse à ce client...'"
           rows="3"
-          class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+          class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
           :disabled="submitting"
         />
 
         <div class="flex items-center justify-start sm:justify-between">
-          <span class="text-xs text-gray-500">
+          <span class="text-xs text-neutral-500">
             {{ responseText.length }}/1000 caractères
           </span>
           <div class="flex items-center space-y-4 sm:space-x-2">
             <button
               v-if="isEditing"
-              class="px-3 py-3 text-sm text-gray-700 hover:transition-colors"
+              class="px-3 py-3 text-sm text-neutral-700 hover:transition-colors"
               :disabled="submitting"
               @click="cancelEditing"
             >
@@ -70,7 +70,7 @@
             </button>
             <button
               :disabled="!responseText.trim() || submitting || responseText.length > 1000"
-              class="inline-flex items-center px-3 py-3 text-sm bg-blue-600 text-white rounded hover:transition-colors"
+              class="inline-flex items-center px-3 py-3 text-sm bg-primary-600 text-white rounded hover:transition-colors"
               @click="submitResponse"
             >
               <span v-if="submitting" class="inline-flex items-center">
@@ -102,7 +102,7 @@
     </div>
 
     <!-- Success Message -->
-    <div v-if="showSuccess" class="mt-3 p-3 bg-green-50 border border-blue-200 rounded">
+    <div v-if="showSuccess" class="mt-3 p-3 bg-green-50 border border-primary-200 rounded">
       <div class="flex items-center">
         <CheckCircleIcon class="h-4 w-4 text-green-600 mr-2" />
         <span class="text-sm text-green-800">{{ successMessage }}</span>

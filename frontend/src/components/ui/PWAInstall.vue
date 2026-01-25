@@ -5,7 +5,7 @@
         🌱
       </div>
       <div class="pwa-text">
-        <h3>Installer Antigaspi</h3>
+        <h3>Installer GÊLADAL</h3>
         <p>Accédez plus rapidement à l'application depuis votre écran d'accueil</p>
       </div>
       <div class="pwa-actions">

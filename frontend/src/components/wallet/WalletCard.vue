@@ -9,22 +9,22 @@
         </div>
         <div>
           <h3 class="text-lg font-semibold">Portefeuille</h3>
-          <p class="text-blue-100 text-sm">{{ wallet?.currency || 'XOF' }}</p>
+          <p class="text-primary-100 text-sm">{{ wallet?.currency || 'XOF' }}</p>
         </div>
       </div>
       <div class="text-right">
         <div class="text-xl font-semibold">{{ formattedBalance }}</div>
-        <div class="text-blue-100 text-sm">Solde disponible</div>
+        <div class="text-primary-100 text-sm">Solde disponible</div>
       </div>
     </div>
 
     <div class="flex items-center justify-start sm:justify-between text-sm">
       <div class="flex items-center space-y-4 sm:space-x-4">
         <div class="flex items-center space-y-4 sm:space-x-2">
-          <div class="h-4 w-4 rounded-full" :class="wallet?.is_active ? 'bg-blue-300' : 'bg-red-300'" />
-          <span class="text-blue-100">{{ wallet?.is_active ? 'Actif' : 'Inactif' }}</span>
+          <div class="h-4 w-4 rounded-full" :class="wallet?.is_active ? 'bg-primary-300' : 'bg-red-300'" />
+          <span class="text-primary-100">{{ wallet?.is_active ? 'Actif' : 'Inactif' }}</span>
         </div>
-        <div class="text-blue-100">
+        <div class="text-primary-100">
           Limite: {{ formatAmount(wallet?.daily_limit || 0) }}
         </div>
       </div>
@@ -45,7 +45,7 @@
     </div>
 
     <div v-if="wallet?.remaining_daily_limit !== undefined" class="mt-4">
-      <div class="flex justify-start sm:justify-between text-sm text-blue-100 mb-1">
+      <div class="flex justify-start sm:justify-between text-sm text-primary-100 mb-1">
         <span>Limite quotidienne restante</span>
         <span>{{ formatAmount(wallet.remaining_daily_limit) }}</span>
       </div>

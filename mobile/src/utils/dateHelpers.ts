@@ -2,7 +2,7 @@
  * Date Helpers
  *
  * Centralized date manipulation utilities using date-fns.
- * Handles timezone-safe date operations for the Antigaspi app.
+ * Handles timezone-safe date operations for the GÊLADAL app.
  *
  * BUG FIX #M-005: Proper date parsing with timezone awareness
  */

@@ -134,7 +134,7 @@
           <div class="space-y-2 text-sm text-neutral-700 dark:text-neutral-500" role="group" aria-labelledby="checkout-terms">
             <label class="flex items-stretch sm:items-start gap-3">
               <input v-model="termsAccepted" type="checkbox" class="mt-1 w-4 h-4 rounded border-neutral-300 text-primary-600 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-400 dark:focus-visible:ring-offset-neutral-950">
-              <span>J'accepte les conditions d'annulation AntiGaspi et m'engage à récupérer mon panier dans le créneau choisi.</span>
+              <span>J'accepte les conditions d'annulation GÊLADAL et m'engage à récupérer mon panier dans le créneau choisi.</span>
             </label>
             <label class="flex items-stretch sm:items-start gap-3">
               <input v-model="subscribeNotifications" type="checkbox" class="mt-1 w-4 h-4 rounded border-neutral-300 text-primary-600 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-400 dark:focus-visible:ring-offset-neutral-950">
@@ -249,7 +249,7 @@ const isMobileMoneyPayment = computed(() => ['flooz', 'tmoney', 'orange_money', 
 const paymentOptions = [
   {
     value: 'wallet' as const,
-    label: 'Portefeuille AntiGaspi',
+    label: 'Portefeuille GÊLADAL',
     description: 'Utilisez votre solde fidélité et vos remboursements cumulés.'
   },
   {
@@ -313,14 +313,16 @@ const confirmCheckout = async () => {
   try {
     // Convert pickup slot to actual date/time
     const now = new Date()
-    let pickupDate = now.toISOString().split('T')[0] // Today by default
+    const pickupDate = now.toISOString().split('T')[0] // Today by default
     let pickupTime = ''
 
     switch (pickupSlot.value) {
       case 'asap':
         // ASAP: 30 min from now
-        const asapTime = new Date(now.getTime() + 30 * 60 * 1000)
-        pickupTime = asapTime.toTimeString().slice(0, 5)
+        {
+          const asapTime = new Date(now.getTime() + 30 * 60 * 1000)
+          pickupTime = asapTime.toTimeString().slice(0, 5)
+        }
         break
       case 'lunch':
         pickupTime = '12:00'
@@ -370,14 +372,9 @@ const confirmCheckout = async () => {
     // Check if Mobile Money payment requires confirmation
     if (response.data?.requires_payment_confirmation && response.data?.payment) {
       notify.info('Validez le paiement sur votre téléphone', 'Paiement en attente')
-      // For Mobile Money, redirect to a payment status page (to be implemented)
-      // For now, go to reservations with info
       router.push({
-        name: 'reservations',
-        query: {
-          payment_pending: 'true',
-          order: response.data.order_number
-        }
+        name: 'payment-status',
+        params: { paymentId: response.data.payment.id }
       })
     } else {
       notify.success('Votre réservation est confirmée !', 'Paiement')

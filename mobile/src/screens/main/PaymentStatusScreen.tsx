@@ -9,6 +9,8 @@ import {
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useDispatch } from 'react-redux'
 
 import { useTheme } from '../../theme'
 import { Typography, Button, Card } from '../../components/2025'
@@ -17,6 +19,10 @@ import paymentService from '../../services/paymentService'
 import { Payment, MobileMoneyProvider } from '../../types'
 import { useToast } from '../../contexts/ToastContext'
 import { useHaptics } from '../../hooks/useHaptics'
+import { AppDispatch } from '../../store'
+import { addCartItem, fetchCart } from '../../store/slices/cartSlice'
+
+const CART_BACKUP_KEY = 'cart_backup_for_retry'
 
 type PaymentStatusParams = {
   paymentId: number
@@ -24,17 +30,19 @@ type PaymentStatusParams = {
   provider: MobileMoneyProvider
   amount: number
   reservationCode: string
+  hasCartBackup?: boolean // Indicates cart backup exists for retry
 }
 
 type PaymentState = 'pending' | 'success' | 'failed' | 'timeout'
 
 const PaymentStatusScreen = ({ navigation, route }: { navigation: any; route: any }) => {
   const params = route.params as PaymentStatusParams
-  const { paymentId, reservationId, provider, amount, reservationCode } = params
+  const { paymentId, reservationId, provider, amount, reservationCode, hasCartBackup } = params
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const { showSuccess, showError } = useToast()
   const haptics = useHaptics()
+  const dispatch = useDispatch<AppDispatch>()
 
   const [paymentState, setPaymentState] = useState<PaymentState>('pending')
   const [payment, setPayment] = useState<Payment | null>(null)
@@ -73,13 +81,19 @@ const PaymentStatusScreen = ({ navigation, route }: { navigation: any; route: an
   useEffect(() => {
     const stopPolling = paymentService.pollPaymentStatus(
       paymentId,
-      (updatedPayment, isComplete) => {
+      async (updatedPayment, isComplete) => {
         setPayment(updatedPayment)
 
         if (isComplete) {
           if (updatedPayment.status === 'success') {
             setPaymentState('success')
             haptics.success()
+            // Clear cart backup on successful payment
+            try {
+              await AsyncStorage.removeItem(CART_BACKUP_KEY)
+            } catch {
+              // Ignore
+            }
           } else {
             setPaymentState('failed')
             haptics.error()
@@ -91,7 +105,7 @@ const PaymentStatusScreen = ({ navigation, route }: { navigation: any; route: an
         setPaymentState('timeout')
         haptics.error()
       },
-      (error) => {
+      () => {
         // Error during polling - continue silently
       }
     )
@@ -103,9 +117,15 @@ const PaymentStatusScreen = ({ navigation, route }: { navigation: any; route: an
     }
   }, [paymentId, haptics])
 
-  const handleGoToReservation = useCallback(() => {
+  const handleGoToReservation = useCallback(async () => {
     // Stop polling if still active
     stopPollingRef.current?.()
+    // Clear cart backup on successful navigation to reservation
+    try {
+      await AsyncStorage.removeItem(CART_BACKUP_KEY)
+    } catch {
+      // Ignore
+    }
     navigation.replace('ReservationDetails', { reservationId })
   }, [navigation, reservationId])
 
@@ -114,11 +134,43 @@ const PaymentStatusScreen = ({ navigation, route }: { navigation: any; route: an
     navigation.goBack()
   }, [navigation])
 
-  const handleRetry = useCallback(() => {
-    // For retry, go back to cart to try again
+  const handleRetry = useCallback(async () => {
+    // For retry, restore cart from backup if available and go back to cart
     stopPollingRef.current?.()
+
+    if (hasCartBackup) {
+      try {
+        const backupJson = await AsyncStorage.getItem(CART_BACKUP_KEY)
+        if (backupJson) {
+          const backup = JSON.parse(backupJson)
+          // Check if backup is not too old (1 hour max)
+          const isRecent = Date.now() - backup.timestamp < 60 * 60 * 1000
+
+          if (isRecent && backup.items && backup.items.length > 0) {
+            // Re-add items to cart one by one
+            for (const item of backup.items) {
+              try {
+                await dispatch(addCartItem({
+                  productId: item.product_id,
+                  quantity: item.quantity,
+                })).unwrap()
+              } catch {
+                // Some items might fail if stock changed - continue with others
+              }
+            }
+            // Fetch updated cart
+            await dispatch(fetchCart())
+            showSuccess('Panier restauré. Vous pouvez réessayer le paiement.')
+          }
+        }
+      } catch {
+        // If restore fails, just navigate to cart anyway
+        showError('Impossible de restaurer le panier. Veuillez ajouter les produits à nouveau.')
+      }
+    }
+
     navigation.navigate('Cart')
-  }, [navigation])
+  }, [navigation, hasCartBackup, dispatch, showSuccess, showError])
 
   const instructions = paymentService.getPaymentInstructions(provider, amount)
   const providerInfo = paymentService.getProviderById(provider)

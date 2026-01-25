@@ -83,7 +83,34 @@ const AdminMerchantsScreen: React.FC = () => {
       // Backend retourne {success, merchants, pendingMerchants, ...}
 
       // Essayer plusieurs chemins possibles
-      const allMerchants = response.merchants || response.data?.merchants || response.data || []
+      const rawMerchants = response.merchants || response.data?.merchants || response.data || []
+
+      // Transform flat fields to nested user object (backend sends flat fields)
+      const allMerchants = rawMerchants.map((merchant: any) => {
+        // If merchant already has a user object, use it
+        if (merchant.user && typeof merchant.user === 'object') {
+          return merchant
+        }
+
+        // Otherwise, create user object from flat fields
+        const nameParts = (merchant.owner_name || '').split(' ')
+        const firstName = nameParts[0] || ''
+        const lastName = nameParts.slice(1).join(' ') || ''
+
+        return {
+          ...merchant,
+          user: {
+            id: merchant.user_id || 0,
+            email: merchant.email || '',
+            first_name: firstName,
+            last_name: lastName,
+            city: merchant.city || merchant.address?.split(',')[0] || 'Non renseigné',
+            address: merchant.address || null,
+            phone: merchant.phone || 'Non renseigné',
+          },
+        }
+      })
+
       setMerchants(allMerchants)
     } catch (error: any) {
       // Gestion des erreurs d'autorisation

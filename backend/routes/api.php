@@ -401,6 +401,10 @@ Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])-
     Route::post('/products/{id}/reject', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'rejectProduct']);
     Route::post('/reservations/{id}/resolve', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'resolveReservation']);
 
+    // Gestion des produits (admin - accès à tous les produits sans filtrage)
+    Route::get('/products', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'adminProducts']);
+    Route::put('/products/{id}', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'updateProduct']);
+
     // Historique des actions admin (audit trail)
     Route::prefix('audit')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\AdminAuditController::class, 'index']); // Historique des actions

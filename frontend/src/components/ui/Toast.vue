@@ -11,7 +11,7 @@
         <span aria-hidden="true" class="mt-1">
           <svg
             v-if="tone === 'success'"
-            class="h-4 w-4 text-blue-500"
+            class="h-4 w-4 text-primary-500"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -23,7 +23,7 @@
           </svg>
           <svg
             v-else-if="tone === 'info'"
-            class="h-4 w-4 text-blue-500"
+            class="h-4 w-4 text-primary-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -61,10 +61,10 @@
           </svg>
         </span>
         <div class="flex-1 space-y-4">
-          <p v-if="title" class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+          <p v-if="title" class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">
             {{ title }}
           </p>
-          <p v-if="description" class="text-xs text-gray-500 dark:text-gray-500">
+          <p v-if="description" class="text-xs text-neutral-500 dark:text-neutral-500">
             {{ description }}
           </p>
           <Button
@@ -72,7 +72,7 @@
             variant="ghost"
             size="sm"
             data-testid="notification-action-btn"
-            class="px-0 text-blue-600 dark:text-blue-200"
+            class="px-0 text-primary-600 dark:text-primary-200"
             @click="handleAction"
           >
             {{ actionLabel }}
@@ -80,7 +80,7 @@
         </div>
         <button
           type="button"
-          class="rounded p-2 text-gray-400 transition hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          class="rounded p-2 text-neutral-400 transition hover:text-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
           aria-label="Fermer la notification"
           @click="handleClose"
         >
@@ -133,8 +133,8 @@ const emit = defineEmits<{
 }>()
 
 const toneClasses: Record<ToastTone, string> = {
-  success: 'border-blue-500',
-  info: 'border-blue-500',
+  success: 'border-primary-500',
+  info: 'border-primary-500',
   warning: 'border-orange-500',
   error: 'border-red-600'
 }
@@ -142,7 +142,7 @@ const toneClasses: Record<ToastTone, string> = {
 const { isOpen, tone, title, description, actionLabel, position } = toRefs(props)
 
 const toastClasses = computed(() => [
-  'flex w-full items-start gap-3 rounded border-l-4 bg-white p-4 shadow-md dark:bg-gray-900',
+  'flex w-full items-start gap-3 rounded border-l-4 bg-white p-4 shadow-md dark:bg-neutral-900',
   toneClasses[tone.value]
 ])
 
@@ -153,7 +153,7 @@ const positionClasses: Record<ToastPosition, string> = {
 
 const rootClasses = computed(() => [
   positionClasses[position.value],
-  'bg-white dark:bg-gray-900 rounded shadow-md'
+  'bg-white dark:bg-neutral-900 rounded shadow-md'
 ])
 
 const handleClose = () => {

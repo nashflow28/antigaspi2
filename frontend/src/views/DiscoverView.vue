@@ -12,7 +12,7 @@
               Trouvez des paniers surprise près de chez vous
             </h1>
             <p class="mt-3 text-lg text-neutral-700 dark:text-neutral-300">
-              Filtrez par catégorie, distance ou ambiance pour découvrir de nouveaux partenaires AntiGaspi et suivre vos coups de cœur.
+              Filtrez par catégorie, distance ou ambiance pour découvrir de nouveaux partenaires GÊLADAL et suivre vos coups de cœur.
             </p>
           </div>
           <Card class="w-full max-w-xl bg-white/90">

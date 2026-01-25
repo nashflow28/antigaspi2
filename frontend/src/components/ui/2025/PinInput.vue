@@ -2,7 +2,7 @@
   <div class="space-y-2">
     <div class="flex gap-2 justify-center">
       <input
-        v-for="(digit, index) in length"
+        v-for="(_, index) in length"
         :key="index"
         :ref="(el) => setInputRef(el as HTMLInputElement, index)"
         type="text"
@@ -19,7 +19,7 @@
         @input="handleInput(index, $event)"
         @keydown="handleKeyDown(index, $event)"
         @paste="handlePaste"
-      />
+      >
     </div>
     <p v-if="error" class="text-sm text-red-600 text-center">
       {{ error }}

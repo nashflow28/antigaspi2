@@ -1,26 +1,26 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
     <!-- Header -->
-    <div class="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+    <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
       <div class="container px-3 py-4 mx-auto">
         <div class="flex flex-col lg:flex-row lg:items-center justify-start sm:justify-between gap-3">
           <div>
-            <h1 class="text-xl font-semibold text-gray-900">Centre d'avis</h1>
-            <p class="text-gray-700 mt-1">
+            <h1 class="text-xl font-semibold text-neutral-900">Centre d'avis</h1>
+            <p class="text-neutral-700 mt-1">
               Consultez et gérez les avis des commerçants
             </p>
           </div>
 
           <!-- Merchant Selector -->
           <div class="flex items-center space-y-2 sm:space-x-3">
-            <label for="merchant-select" class="text-sm font-medium text-gray-800">
+            <label for="merchant-select" class="text-sm font-medium text-neutral-800">
               Commerçant :
             </label>
             <select
               id="merchant-select"
               v-model="selectedMerchantId"
               :disabled="merchantsLoading"
-              class="border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              class="border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               @change="onMerchantChange"
             >
               <option value="">Sélectionner un commerçant</option>
@@ -32,7 +32,7 @@
                 {{ merchant.business_name }}
               </option>
             </select>
-            <p v-if="merchantsLoading" class="text-xs text-gray-500 mt-1">Chargement des commerçants...</p>
+            <p v-if="merchantsLoading" class="text-xs text-neutral-500 mt-1">Chargement des commerçants...</p>
           </div>
         </div>
       </div>
@@ -40,9 +40,9 @@
 
     <div class="container px-3 py-6 mx-auto">
       <div v-if="!selectedMerchantId" class="text-left sm:text-center py-16 sm:py-16 lg:py-16">
-        <Star class="w-12 h-10 text-gray-400 mx-auto mt-3" />
-        <h2 class="text-xl font-semibold text-gray-900 mt-2">Sélectionnez un commerçant</h2>
-        <p class="text-gray-700">Choisissez un commerçant pour voir ses avis et en laisser un.</p>
+        <Star class="w-12 h-10 text-neutral-400 mx-auto mt-3" />
+        <h2 class="text-xl font-semibold text-neutral-900 mt-2">Sélectionnez un commerçant</h2>
+        <p class="text-neutral-700">Choisissez un commerçant pour voir ses avis et en laisser un.</p>
       </div>
 
       <div v-else class="space-y-8">

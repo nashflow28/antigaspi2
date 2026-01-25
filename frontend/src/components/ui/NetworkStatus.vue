@@ -55,7 +55,7 @@ const statusClasses = computed(() => {
   if (pendingRequestsCount.value > 0) {
     return 'bg-yellow-50 border-yellow-200 text-yellow-700'
   }
-  return 'bg-green-50 border-blue-200 text-green-700'
+  return 'bg-green-50 border-primary-200 text-green-700'
 })
 
 const indicatorClasses = computed(() => {
@@ -65,7 +65,7 @@ const indicatorClasses = computed(() => {
   if (pendingRequestsCount.value > 0) {
     return 'bg-yellow-500 animate-pulse'
   }
-  return 'bg-blue-500'
+  return 'bg-primary-500'
 })
 
 const pendingCount = computed(() => pendingRequestsCount.value)

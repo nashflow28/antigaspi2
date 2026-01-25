@@ -2,7 +2,7 @@
   <form class="space-y-6" @submit.prevent="handleSubmit">
     <!-- Rating -->
     <div>
-      <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+      <label class="block text-sm font-semibold text-neutral-900 dark:text-white mb-2">
         Note <span class="text-red-500">*</span>
       </label>
       <div class="flex items-center gap-4">
@@ -12,13 +12,13 @@
             :key="star"
             type="button"
             class="text-3xl transition-colors cursor-pointer"
-            :class="star <= formData.rating ? 'text-yellow-400' : 'text-gray-300'"
+            :class="star <= formData.rating ? 'text-yellow-400' : 'text-neutral-300'"
             @click="formData.rating = star"
           >
             ★
           </button>
         </div>
-        <span v-if="formData.rating > 0" class="text-sm font-medium text-gray-600 dark:text-gray-300">
+        <span v-if="formData.rating > 0" class="text-sm font-medium text-neutral-600 dark:text-neutral-300">
           {{ getRatingLabel(formData.rating) }}
         </span>
       </div>
@@ -27,7 +27,7 @@
 
     <!-- Title -->
     <div>
-      <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+      <label class="block text-sm font-semibold text-neutral-900 dark:text-white mb-2">
         Titre (facultatif)
       </label>
       <input
@@ -35,13 +35,13 @@
         type="text"
         maxlength="255"
         placeholder="Résumez votre expérience..."
-        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+        class="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-neutral-700 dark:text-white"
       >
     </div>
 
     <!-- Comment -->
     <div>
-      <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+      <label class="block text-sm font-semibold text-neutral-900 dark:text-white mb-2">
         Commentaire (facultatif)
       </label>
       <textarea
@@ -49,9 +49,9 @@
         maxlength="1000"
         rows="6"
         placeholder="Partagez votre expérience..."
-        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+        class="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-neutral-700 dark:text-white"
       />
-      <div class="mt-1 text-xs text-gray-500 dark:text-gray-400 text-right">
+      <div class="mt-1 text-xs text-neutral-500 dark:text-neutral-400 text-right">
         {{ formData.comment.length }}/1000
       </div>
       <p v-if="errors.comment" class="mt-1 text-sm text-red-500">{{ errors.comment }}</p>
@@ -61,7 +61,7 @@
     <button
       type="submit"
       :disabled="loading || formData.rating === 0"
-      class="w-full py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors"
+      class="w-full py-2 bg-green-600 hover:bg-green-700 disabled:bg-neutral-400 text-white font-semibold rounded-lg transition-colors"
     >
       <span v-if="!loading">Publier l'avis</span>
       <span v-else>Publication...</span>

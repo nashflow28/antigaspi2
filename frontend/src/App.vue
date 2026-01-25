@@ -174,7 +174,7 @@ interface NavigationEntry {
 }
 
 const navigationBrand = computed(() => ({
-  name: 'Antigaspi',
+  name: 'GÊLADAL',
   href: '/'
 }))
 

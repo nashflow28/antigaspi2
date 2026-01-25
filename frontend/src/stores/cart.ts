@@ -225,6 +225,7 @@ export const useCartStore = defineStore('cart', () => {
     } else {
       items.value.push({
         id: payload.id,
+        type: 'product',
         name: normalizedName,
         price: resolvePrice(payload.price),
         originalPrice: payload.originalPrice ? resolvePrice(payload.originalPrice) : null,

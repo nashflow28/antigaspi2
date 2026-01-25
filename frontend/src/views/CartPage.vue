@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
-    <div class="border-b border-gray-200/70 bg-white/80 backdrop-blur">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50">
+    <div class="border-b border-neutral-200/70 bg-white/80 backdrop-blur">
       <div class="container px-3 sm:px-4 lg:px-6 mx-auto py-12">
         <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-blue-100/70 px-3 py-3 text-sm font-medium text-blue-900">
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-3 py-3 text-sm font-medium text-primary-900">
               <ShoppingCart class="h-4 w-4" />
-              Mon panier AntiGaspi
+              Mon panier GÊLADAL
             </p>
-            <h1 class="mt-3 text-3xl font-semibold tracking-tight text-gray-900">{{ headline }}</h1>
-            <p class="mt-2 max-w-full sm:max-w-80 text-gray-700">
+            <h1 class="mt-3 text-3xl font-semibold tracking-tight text-neutral-900">{{ headline }}</h1>
+            <p class="mt-2 max-w-full sm:max-w-80 text-neutral-700">
               Ajustez vos quantités et finalisez votre réservation en toute sécurité.
             </p>
           </div>
@@ -29,11 +29,11 @@
       <div v-if="!hasItems" class="max-w-2xl mx-auto">
         <Card class="bg-white/90">
           <div class="py-12 text-center">
-            <div class="mx-auto flex icon-xl items-center justify-center rounded-full bg-gray-100 text-gray-400">
+            <div class="mx-auto flex icon-xl items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
               <ShoppingCart class="h-12 w-12" />
             </div>
-            <h3 class="mt-4 text-xl font-semibold text-gray-800">Votre panier est vide</h3>
-            <p class="mt-2 text-gray-500">
+            <h3 class="mt-4 text-xl font-semibold text-neutral-800">Votre panier est vide</h3>
+            <p class="mt-2 text-neutral-500">
               Découvrez les produits anti-gaspi près de chez vous et ajoutez-les à votre panier.
             </p>
             <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
@@ -53,7 +53,7 @@
         <!-- Items List -->
         <section class="space-y-4">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-semibold text-gray-900">
+            <h2 class="text-xl font-semibold text-neutral-900">
               Articles ({{ itemsCount }})
             </h2>
             <Button
@@ -80,12 +80,12 @@
         <aside class="lg:sticky lg:top-4 h-fit">
           <Card class="bg-white/90">
             <template #header>
-              <h2 class="text-xl font-semibold text-gray-900">Récapitulatif</h2>
+              <h2 class="text-xl font-semibold text-neutral-900">Récapitulatif</h2>
             </template>
 
             <div class="space-y-4">
               <!-- Subtotal -->
-              <div class="flex justify-between text-gray-700">
+              <div class="flex justify-between text-neutral-700">
                 <span>Sous-total</span>
                 <span class="font-semibold">{{ formatPrice(totalAmount) }}</span>
               </div>
@@ -97,10 +97,10 @@
               </div>
 
               <!-- Divider -->
-              <div class="border-t border-gray-200" />
+              <div class="border-t border-neutral-200" />
 
               <!-- Total -->
-              <div class="flex justify-between text-xl font-bold text-gray-900">
+              <div class="flex justify-between text-xl font-bold text-neutral-900">
                 <span>Total</span>
                 <span>{{ formatPrice(totalAmount) }}</span>
               </div>
@@ -139,13 +139,13 @@
               </Button>
 
               <!-- Trust Indicators -->
-              <div class="pt-4 border-t border-gray-200 space-y-2 text-xs text-gray-600">
+              <div class="pt-4 border-t border-neutral-200 space-y-2 text-xs text-neutral-600">
                 <div class="flex items-center gap-2">
                   <ShieldCheck class="h-4 w-4 text-green-600" />
                   <span>Paiement 100% sécurisé</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <Clock class="h-4 w-4 text-blue-600" />
+                  <Clock class="h-4 w-4 text-primary-600" />
                   <span>Retrait rapide chez le commerçant</span>
                 </div>
                 <div class="flex items-center gap-2">

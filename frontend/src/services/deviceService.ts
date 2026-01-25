@@ -172,7 +172,7 @@ class DeviceService {
       device_brand: deviceBrand,
       device_type: 'web',
       os_version: osVersion,
-      app_version: import.meta.env.VITE_APP_VERSION || '1.0.0',
+      app_version: import.meta.env.VITE_APP_VERSION || '1.0.0'
     }
   }
 
@@ -186,7 +186,7 @@ class DeviceService {
       const response = await apiService.post<CheckPhoneResponse>('/auth/device/check-phone', {
         phone: this.normalizePhone(phone),
         device_id: deviceInfo.device_id,
-        device_info: deviceInfo,
+        device_info: deviceInfo
       })
 
       return response
@@ -194,7 +194,7 @@ class DeviceService {
       console.error('Check phone error:', error)
       return {
         success: false,
-        message: error.response?.data?.message || error.message || 'Erreur lors de la vérification du numéro',
+        message: error.response?.data?.message || error.message || 'Erreur lors de la vérification du numéro'
       }
     }
   }
@@ -205,7 +205,7 @@ class DeviceService {
   async sendOtp(phone: string): Promise<{ success: boolean; message: string }> {
     try {
       const response = await apiService.post<{ success: boolean; message: string }>('/auth/device/send-otp', {
-        phone: this.normalizePhone(phone),
+        phone: this.normalizePhone(phone)
       })
 
       return response
@@ -213,7 +213,7 @@ class DeviceService {
       console.error('Send OTP error:', error)
       return {
         success: false,
-        message: error.response?.data?.message || error.message || "Erreur lors de l'envoi du code OTP",
+        message: error.response?.data?.message || error.message || "Erreur lors de l'envoi du code OTP"
       }
     }
   }
@@ -229,7 +229,7 @@ class DeviceService {
         phone: this.normalizePhone(phone),
         otp,
         device_id: deviceInfo.device_id,
-        device_info: deviceInfo,
+        device_info: deviceInfo
       })
 
       return response
@@ -240,7 +240,7 @@ class DeviceService {
       }
       return {
         success: false,
-        message: error.message || 'Erreur lors de la vérification du code OTP',
+        message: error.message || 'Erreur lors de la vérification du code OTP'
       }
     }
   }
@@ -255,7 +255,7 @@ class DeviceService {
       const response = await apiService.post<PinLoginResponse>('/auth/device/login-pin', {
         phone: this.normalizePhone(phone),
         pin,
-        device_id: deviceInfo.device_id,
+        device_id: deviceInfo.device_id
       })
 
       return response
@@ -266,7 +266,7 @@ class DeviceService {
       }
       return {
         success: false,
-        message: error.message || 'Erreur de connexion',
+        message: error.message || 'Erreur de connexion'
       }
     }
   }
@@ -278,7 +278,7 @@ class DeviceService {
     try {
       const response = await apiService.post<{ success: boolean; message: string }>('/auth/device/set-pin', {
         pin,
-        pin_confirmation: pinConfirmation,
+        pin_confirmation: pinConfirmation
       })
 
       return response
@@ -289,7 +289,7 @@ class DeviceService {
       }
       return {
         success: false,
-        message: error.message || 'Erreur lors de la configuration du code PIN',
+        message: error.message || 'Erreur lors de la configuration du code PIN'
       }
     }
   }
@@ -302,7 +302,7 @@ class DeviceService {
       const response = await apiService.post<{ success: boolean; message: string }>('/auth/device/change-pin', {
         current_pin: currentPin,
         new_pin: newPin,
-        new_pin_confirmation: newPinConfirmation,
+        new_pin_confirmation: newPinConfirmation
       })
 
       return response
@@ -313,7 +313,7 @@ class DeviceService {
       }
       return {
         success: false,
-        message: error.message || 'Erreur lors du changement de code PIN',
+        message: error.message || 'Erreur lors du changement de code PIN'
       }
     }
   }
@@ -326,7 +326,7 @@ class DeviceService {
 
     try {
       const response = await apiService.post<{ success: boolean; message: string }>('/auth/device/logout', {
-        device_id: deviceInfo.device_id,
+        device_id: deviceInfo.device_id
       })
 
       return response
@@ -334,7 +334,7 @@ class DeviceService {
       // Still consider logout successful even if API fails
       return {
         success: true,
-        message: 'Déconnexion réussie',
+        message: 'Déconnexion réussie'
       }
     }
   }

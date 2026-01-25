@@ -12,7 +12,7 @@
       >
       <span
         v-if="discount"
-        class="relative sm:absolute left-4 top-4 rounded-full bg-blue-700 px-3 py-3 text-xs font-semibold text-gray-50 shadow-lg"
+        class="relative sm:absolute left-4 top-4 rounded-full bg-primary-700 px-3 py-3 text-xs font-semibold text-neutral-50 shadow-lg"
       >
         {{ discount }}
       </span>
@@ -20,10 +20,10 @@
 
     <div class="flex flex-1 flex-col gap-3 p-6">
       <div class="space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-50">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
           {{ name }}
         </h3>
-        <p class="text-sm text-gray-500 dark:text-gray-500">
+        <p class="text-sm text-neutral-500 dark:text-neutral-500">
           {{ merchant }}
         </p>
       </div>
@@ -32,7 +32,7 @@
         <span
           v-for="tag in tags"
           :key="tag"
-          class="rounded-full bg-blue-500/10 px-3 py-3 text-xs text-blue-900 dark:text-blue-200"
+          class="rounded-full bg-primary-500/10 px-3 py-3 text-xs text-primary-900 dark:text-primary-200"
         >
           {{ tag }}
         </span>
@@ -40,18 +40,18 @@
 
       <div class="mt-auto flex items-end justify-start sm:justify-between">
         <div>
-          <p class="text-xs uppercase tracking-wide text-blue-500">
+          <p class="text-xs uppercase tracking-wide text-primary-500">
             Prix anti-gaspi
           </p>
           <div class="flex items-baseline gap-2">
-            <span class="text-h2 font-semibold text-blue-900 dark:text-blue-200">
+            <span class="text-h2 font-semibold text-primary-900 dark:text-primary-200">
               {{ price }}
             </span>
-            <span v-if="originalPrice" class="text-sm text-gray-400 line-through">
+            <span v-if="originalPrice" class="text-sm text-neutral-400 line-through">
               {{ originalPrice }}
             </span>
           </div>
-          <p v-if="quantity" class="text-xs text-gray-500">
+          <p v-if="quantity" class="text-xs text-neutral-500">
             {{ quantity }}
           </p>
         </div>
@@ -105,7 +105,7 @@ const emit = defineEmits<{
 const attrs = useAttrs()
 
 const baseClasses =
-  'group relative flex flex-col overflow-hidden rounded border border-blue-500/15 bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl dark:bg-gray-900'
+  'group relative flex flex-col overflow-hidden rounded border border-primary-500/15 bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl dark:bg-neutral-900'
 
 const externalClass = computed(() => (attrs.class as string | undefined) ?? '')
 

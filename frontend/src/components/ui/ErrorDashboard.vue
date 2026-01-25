@@ -38,7 +38,7 @@
         </Card>
 
         <Card class="stat-item">
-          <Activity class="h-4 w-4 text-blue-500" />
+          <Activity class="h-4 w-4 text-primary-500" />
           <div>
             <div class="stat-value">{{ breadcrumbs.length }}</div>
             <div class="stat-label">Breadcrumbs</div>
@@ -46,7 +46,7 @@
         </Card>
 
         <Card class="stat-item">
-          <MousePointer class="h-4 w-4 text-green-600-500" />
+          <MousePointer class="h-4 w-4 text-green-500" />
           <div>
             <div class="stat-value">{{ userActions.length }}</div>
             <div class="stat-label">Actions utilisateur</div>
@@ -54,7 +54,7 @@
         </Card>
 
         <Card class="stat-item">
-          <Wifi class="h-4 w-4" :class="isOnline ? 'text-green-600-500' : 'text-red-500'" />
+          <Wifi class="h-4 w-4" :class="isOnline ? 'text-green-500' : 'text-red-500'" />
           <div>
             <div class="stat-value">{{ isOnline ? 'En ligne' : 'Hors ligne' }}</div>
             <div class="stat-label">Statut réseau</div>
@@ -83,7 +83,7 @@
         <!-- Errors Tab -->
         <div v-if="activeTab === 'errors'" class="errors-list">
           <div v-if="errorQueue.length === 0" class="empty-state">
-            <CheckCircle class="h-6 w-6 text-green-600-500" />
+            <CheckCircle class="h-6 w-6 text-green-500" />
             <p>Aucune erreur en attente</p>
           </div>
           <div v-else>
@@ -127,7 +127,7 @@
         <!-- Breadcrumbs Tab -->
         <div v-if="activeTab === 'breadcrumbs'" class="breadcrumbs-list">
           <div v-if="breadcrumbs.length === 0" class="empty-state">
-            <Navigation class="h-6 w-6 text-gray-400" />
+            <Navigation class="h-6 w-6 text-neutral-400" />
             <p>Aucun breadcrumb enregistré</p>
           </div>
           <div v-else>
@@ -152,7 +152,7 @@
         <!-- User Actions Tab -->
         <div v-if="activeTab === 'actions'" class="actions-list">
           <div v-if="userActions.length === 0" class="empty-state">
-            <MousePointer class="h-6 w-6 text-gray-400" />
+            <MousePointer class="h-6 w-6 text-neutral-400" />
             <p>Aucune action utilisateur enregistrée</p>
           </div>
           <div v-else>

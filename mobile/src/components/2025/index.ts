@@ -60,3 +60,6 @@ export { default as EmptyState, InlineEmptyState } from './EmptyState'
 
 // Enhanced Form
 export { default as FormInput, ValidationRules } from './FormInput'
+
+// Phone Input with country code selector
+export { PhoneInput } from './PhoneInput'

@@ -9,10 +9,10 @@
       <div v-if="currentView === 'list'" class="mt-4 sm:mb-3xl">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gapadding-xl">
           <div>
-            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-neutral-900 mt-2">
               Paniers Surprise
             </h1>
-            <p class="text-gray-700 text-lg">
+            <p class="text-neutral-700 text-lg">
               Créez des paniers mystère pour valoriser vos invendus
             </p>
           </div>
@@ -42,7 +42,7 @@
       <div v-else class="mt-4 sm:mb-3xl">
         <div class="flex items-center gap-3 mt-3">
           <button
-            class="flex items-center text-gray-700 hover:transition-colors"
+            class="flex items-center text-neutral-700 hover:transition-colors"
             @click="currentView = 'list'"
           >
             <ArrowLeftIcon class="h-4 w-4 mr-2" />
@@ -51,12 +51,12 @@
         </div>
 
         <div>
-          <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
+          <h1 class="text-xl lg:text-3xl font-semibold text-neutral-900 mt-2">
             <template v-if="currentView === 'create'">Nouveau Panier Surprise</template>
             <template v-else-if="currentView === 'edit'">Modifier le Panier</template>
             <template v-else-if="currentView === 'detail'">Détails du Panier</template>
           </h1>
-          <p class="text-gray-700 text-lg">
+          <p class="text-neutral-700 text-lg">
             <template v-if="currentView === 'create'">Créez un panier mystère attractif</template>
             <template v-else-if="currentView === 'edit'">{{ editingBasket?.name }}</template>
             <template v-else-if="currentView === 'detail'">{{ selectedBasket?.name }}</template>
@@ -67,8 +67,8 @@
       <!-- Loading State -->
       <Card v-if="loading && currentView === 'list'">
         <div class="flex items-center justify-center py-8 sm:py-12 lg:py-16">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <span class="ml-4 text-gray-700">Chargement des paniers surprise...</span>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+          <span class="ml-4 text-neutral-700">Chargement des paniers surprise...</span>
         </div>
       </Card>
 
@@ -87,7 +87,7 @@
       <div v-if="currentView === 'list' && !loading">
         <!-- Quick Stats -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gapadding-xl mt-4 sm:mb-3xl">
-          <Card class="bg-gradient-to-r from-purple-500 to-blue-600 text-white">
+          <Card class="bg-gradient-to-r from-purple-500 to-primary-600 text-white">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-purple-100 text-sm font-medium">Total Paniers</p>
@@ -99,10 +99,10 @@
             </div>
           </Card>
 
-          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-blue-100 text-sm font-medium">Actifs</p>
+                <p class="text-primary-100 text-sm font-medium">Actifs</p>
                 <p class="text-xl font-semibold">{{ activeBaskets.length }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded">
@@ -123,10 +123,10 @@
             </div>
           </Card>
 
-          <Card class="bg-gradient-to-r from-blue-500/50 to-blue-500/90 text-white">
+          <Card class="bg-gradient-to-r from-primary-500/50 to-primary-500/90 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-blue-500/60 text-sm font-medium">Revenus Potentiels</p>
+                <p class="text-primary-500/60 text-sm font-medium">Revenus Potentiels</p>
                 <p class="text-xl font-semibold">{{ formatPrice(totalRevenue) }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded">
@@ -138,11 +138,11 @@
 
         <!-- Empty State -->
         <Card v-if="baskets.length === 0" class="text-left sm:text-center py-8 sm:py-12 lg:py-16">
-          <div class="w-20 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mt-4">
+          <div class="w-20 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mt-4">
             <GiftIcon class="h-6 w-6 text-purple-500" />
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mt-2">Aucun panier surprise</h3>
-          <p class="text-gray-700 mt-4 max-w-xl mx-auto">
+          <h3 class="text-xl font-semibold text-neutral-900 mt-2">Aucun panier surprise</h3>
+          <p class="text-neutral-700 mt-4 max-w-xl mx-auto">
             Créez votre premier panier surprise pour valoriser vos invendus et offrir des surprises à vos clients
           </p>
           <Button
@@ -170,7 +170,7 @@
               <div class="relative sm:absolute top-4 right-4">
                 <span
                   class="px-3 py-3 text-xs font-medium rounded-full"
-                  :class="basket.is_active ? 'bg-blue-100 text-blue-900' : 'bg-gray-100 text-gray-700'"
+                  :class="basket.is_active ? 'bg-primary-100 text-primary-900' : 'bg-neutral-100 text-neutral-700'"
                 >
                   {{ basket.is_active ? 'Actif' : 'Inactif' }}
                 </span>
@@ -188,25 +188,25 @@
             <div class="p-6">
               <div class="flex items-stretch sm:items-start justify-between mt-3">
                 <div>
-                  <h3 class="font-semibold text-gray-900 mb-1">{{ basket.name }}</h3>
-                  <p class="text-sm text-gray-700 line-clamp-2">{{ basket.description }}</p>
+                  <h3 class="font-semibold text-neutral-900 mb-1">{{ basket.name }}</h3>
+                  <p class="text-sm text-neutral-700 line-clamp-2">{{ basket.description }}</p>
                 </div>
               </div>
 
               <!-- Pricing -->
               <div class="flex items-center gap-2 mt-3">
-                <span class="text-lg font-semibold text-blue-600">{{ formatPrice(basket.discounted_price) }}</span>
-                <span class="text-sm text-gray-400 line-through">{{ formatPrice(basket.original_price) }}</span>
+                <span class="text-lg font-semibold text-primary-600">{{ formatPrice(basket.discounted_price) }}</span>
+                <span class="text-sm text-neutral-400 line-through">{{ formatPrice(basket.original_price) }}</span>
               </div>
 
               <!-- Stock -->
-              <div class="flex items-center gap-2 mt-3 text-sm text-gray-700">
+              <div class="flex items-center gap-2 mt-3 text-sm text-neutral-700">
                 <PackageIcon class="h-4 w-4" />
                 <span>{{ basket.quantity_available }} disponible{{ basket.quantity_available > 1 ? 's' : '' }}</span>
               </div>
 
               <!-- Products Count -->
-              <div class="flex items-center gap-2 mt-4 text-sm text-gray-700">
+              <div class="flex items-center gap-2 mt-4 text-sm text-neutral-700">
                 <LayersIcon class="h-4 w-4" />
                 <span>{{ (basket as any).products?.length || 0 }} produit{{ ((basket as any).products?.length || 0) > 1 ? 's' : '' }}</span>
               </div>
@@ -234,7 +234,7 @@
                 <Button
                   variant="ghost"
                   size="sm"
-                  class="flex-1 text-blue-600"
+                  class="flex-1 text-primary-600"
                   :left-icon="basket.is_active ? EyeOffIcon : EyeIcon"
                   @click="handleToggleStatus(basket)"
                 >

@@ -14,7 +14,7 @@ describe('cartSlice', () => {
     items_count: 2,
     merchant: {
       id: 10,
-      name: 'Boulangerie Antigaspi',
+      name: 'Boulangerie GÊLADAL',
       business_type: 'boulangerie',
     },
     items: [
@@ -74,7 +74,7 @@ describe('cartSlice', () => {
           product: {
             id: 11,
             name: 'Panier surprise',
-            merchant: { name: 'Boulangerie Antigaspi' },
+            merchant: { name: 'Boulangerie GÊLADAL' },
           },
         } as any,
       ],

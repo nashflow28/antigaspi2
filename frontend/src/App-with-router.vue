@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Antigaspi avec Router</h1>
+    <h1>GÊLADAL avec Router</h1>
     <nav>
       <router-link to="/">Accueil</router-link> |
       <router-link to="/products">Produits</router-link>

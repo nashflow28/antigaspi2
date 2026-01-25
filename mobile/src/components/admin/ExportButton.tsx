@@ -30,18 +30,22 @@ const FORMAT_CONFIG = {
     icon: 'document-text-outline' as const,
     mimeType: 'text/csv',
     uti: 'public.comma-separated-values-text',
+    extension: 'csv',
   },
   pdf: {
-    label: 'PDF',
+    // Note: Backend returns HTML that can be printed as PDF
+    label: 'Rapport',
     icon: 'document-outline' as const,
-    mimeType: 'application/pdf',
-    uti: 'com.adobe.pdf',
+    mimeType: 'text/html',
+    uti: 'public.html',
+    extension: 'html',
   },
   xlsx: {
     label: 'Excel',
     icon: 'grid-outline' as const,
     mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     uti: 'org.openxmlformats.spreadsheetml.sheet',
+    extension: 'xlsx',
   },
 }
 
@@ -98,24 +102,27 @@ const ExportButton: React.FC<ExportButtonProps> = ({
         // Call API to get export data for CSV/PDF
         const response = await apiService.exportAnalytics(format === 'xlsx' ? 'csv' : format, filters)
 
-        if (!response.file_content && !response.file_url) {
+        // Handle both formats: {file_content, ...} or {data: {file_content, ...}}
+        const exportData = response.file_content ? response : (response.data || response)
+
+        if (!exportData.file_content && !exportData.file_url) {
           throw new Error('No export data received from server')
         }
 
-        // Generate filename
+        // Generate filename (use backend filename if provided, or use correct extension)
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-        const filename = `analytics-${timestamp}.${format}`
+        const filename = exportData.filename || `analytics-${timestamp}.${config.extension || format}`
         fileUri = `${FileSystem.documentDirectory}${filename}`
 
         // Write file to cache
-        if (response.file_content) {
+        if (exportData.file_content) {
           // Base64 content
-          await FileSystem.writeAsStringAsync(fileUri, response.file_content, {
+          await FileSystem.writeAsStringAsync(fileUri, exportData.file_content, {
             encoding: 'base64' as any,
           })
-        } else if (response.file_url) {
+        } else if (exportData.file_url) {
           // Download from URL
-          const downloadResult = await FileSystem.downloadAsync(response.file_url, fileUri)
+          const downloadResult = await FileSystem.downloadAsync(exportData.file_url, fileUri)
           if (downloadResult.status !== 200) {
             throw new Error('Failed to download export file')
           }

@@ -462,8 +462,6 @@ import CollectionCard from '@/components/ui/2025/CollectionCard.vue'
 import { notify } from '@/composables/useNotifications'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
-import { useReservationsStore } from '@/stores/reservations'
-import { usePaymentsStore } from '@/stores/payments'
 import { apiService } from '@/services/api'
 import type { ProductFilters } from '@/types'
 import { normalizeProduct, getCategoryKey, type NormalizedProduct } from '@/utils/productNormalizer'
@@ -471,8 +469,6 @@ import { normalizeProduct, getCategoryKey, type NormalizedProduct } from '@/util
 const router = useRouter()
 const authStore = useAuthStore()
 const cartStore = useCartStore()
-const reservationsStore = useReservationsStore()
-const paymentsStore = usePaymentsStore()
 
 const products = ref<NormalizedProduct[]>([])
 const loading = ref(true)
@@ -1135,53 +1131,6 @@ const handleAddToCart = (product: NormalizedProduct) => {
 const onReserve = async (product: NormalizedProduct) => {
   // Redirect to product details page instead of quick reserve
   viewProduct(product)
-}
-
-  if (quickReserveLoadingId.value === product.id) {
-    return
-  }
-
-  try {
-    quickReserveLoadingId.value = product.id
-
-    const result = await reservationsStore.createReservation({
-      productId: product.id,
-      quantity: 1,
-      paymentMethod: 'paystack',
-      customerPhone: authStore.user?.phone || undefined,
-      customerEmail: authStore.user?.email || undefined
-    })
-
-    if (!result.success || !result.data) {
-      throw new Error(result.error || 'Réservation rapide impossible')
-    }
-
-    if (result.payment) {
-      paymentsStore.recordPayment(result.payment)
-
-      if (result.payment.checkout_url) {
-        window.open(result.payment.checkout_url, '_blank', 'noopener')
-      }
-    }
-
-    const reservedProduct = products.value.find(item => item.id === product.id)
-    if (reservedProduct) {
-      reservedProduct.reserved_quantity = Math.min(
-        reservedProduct.available_quantity,
-        reservedProduct.reserved_quantity + 1
-      )
-    }
-
-    notify.success(
-      'Réservation rapide initiée ! Consultez vos paiements pour finaliser.',
-      'Paiement rapide'
-    )
-  } catch (error: any) {
-    const message = error?.message || 'Impossible d\'initier la réservation rapide.'
-    notify.error(message, 'Réservation rapide')
-  } finally {
-    quickReserveLoadingId.value = null
-  }
 }
 
 const enableLocationFilter = () => {

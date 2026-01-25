@@ -453,7 +453,7 @@ class AdminController extends Controller
 
             $validated = $request->validate([
                 'format' => ['required', 'in:csv,pdf'],
-                'period' => ['nullable', 'in:week,month,year'],
+                'period' => ['nullable', 'in:week,month,year,7d,30d,90d,custom'],
                 'start_date' => ['nullable', 'date'],
                 'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             ]);
@@ -467,9 +467,13 @@ class AdminController extends Controller
                 $endDate = \Carbon\Carbon::parse($validated['end_date']);
             } else {
                 $endDate = now();
+                // Support both legacy (week/month/year) and frontend (7d/30d/90d) formats
                 $startDate = match ($period) {
-                    'week' => now()->subWeek(),
+                    'week', '7d' => now()->subWeek(),
                     'year' => now()->subYear(),
+                    '90d' => now()->subDays(90),
+                    'month', '30d' => now()->subMonth(),
+                    'custom' => now()->subMonth(), // Default to month if custom without dates
                     default => now()->subMonth(),
                 };
             }
@@ -478,9 +482,9 @@ class AdminController extends Controller
             $data = $this->collectAnalyticsData($startDate, $endDate);
 
             if ($format === 'csv') {
-                return $this->generateCSV($data, $startDate, $endDate);
+                return $this->generateCSVJson($data, $startDate, $endDate);
             } else {
-                return $this->generatePDFHTML($data, $startDate, $endDate);
+                return $this->generatePDFJson($data, $startDate, $endDate);
             }
 
         } catch (\Exception $e) {
@@ -708,6 +712,109 @@ class AdminController extends Controller
             'Content-Type' => 'text/html; charset=UTF-8',
             'Content-Disposition' => 'inline; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        ]);
+    }
+
+    /**
+     * Generate CSV as JSON response with base64 content for mobile apps
+     */
+    private function generateCSVJson(array $data, $startDate, $endDate): JsonResponse
+    {
+        $filename = 'analytics-export-'.$startDate->format('Y-m-d').'-to-'.$endDate->format('Y-m-d').'.csv';
+
+        // Build CSV content
+        $output = fopen('php://memory', 'r+');
+
+        // UTF-8 BOM for Excel compatibility
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+
+        // Header
+        fputcsv($output, ['RAPPORT ANALYTICS ANTIGASPI']);
+        fputcsv($output, ['Période', $data['period']['start'].' au '.$data['period']['end']]);
+        fputcsv($output, ['Généré le', now()->format('Y-m-d H:i:s')]);
+        fputcsv($output, []); // Empty row
+
+        // Summary statistics
+        fputcsv($output, ['STATISTIQUES GÉNÉRALES']);
+        fputcsv($output, ['Métrique', 'Valeur']);
+
+        foreach ($data['summary'] as $key => $value) {
+            if (! is_array($value)) {
+                $label = ucfirst(str_replace('_', ' ', $key));
+                fputcsv($output, [$label, $value]);
+            }
+        }
+        fputcsv($output, []); // Empty row
+
+        // Environmental impact
+        fputcsv($output, ['IMPACT ENVIRONNEMENTAL']);
+        fputcsv($output, ['Métrique', 'Valeur']);
+        foreach ($data['summary']['environmental_impact'] as $key => $value) {
+            $label = ucfirst(str_replace('_', ' ', $key));
+            fputcsv($output, [$label, $value]);
+        }
+        fputcsv($output, []); // Empty row
+
+        // Top merchants
+        fputcsv($output, ['TOP COMMERÇANTS']);
+        fputcsv($output, ['Nom', 'Type', 'Email', 'Commandes', 'Vérifié']);
+
+        foreach ($data['top_merchants'] as $merchant) {
+            fputcsv($output, [
+                $merchant['name'],
+                $merchant['type'],
+                $merchant['email'],
+                $merchant['orders'],
+                $merchant['verified'],
+            ]);
+        }
+        fputcsv($output, []); // Empty row
+
+        // Popular categories
+        fputcsv($output, ['CATÉGORIES POPULAIRES']);
+        fputcsv($output, ['Nom', 'Nombre de produits', 'Icône']);
+
+        foreach ($data['popular_categories'] as $category) {
+            fputcsv($output, [
+                $category['name'],
+                $category['products_count'],
+                $category['icon'],
+            ]);
+        }
+
+        rewind($output);
+        $csvContent = stream_get_contents($output);
+        fclose($output);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'file_content' => base64_encode($csvContent),
+                'filename' => $filename,
+                'mime_type' => 'text/csv',
+            ],
+        ]);
+    }
+
+    /**
+     * Generate PDF-ready HTML as JSON response with base64 content for mobile apps
+     */
+    private function generatePDFJson(array $data, $startDate, $endDate): JsonResponse
+    {
+        $filename = 'analytics-export-'.$startDate->format('Y-m-d').'-to-'.$endDate->format('Y-m-d').'.html';
+
+        $html = view('exports.analytics-pdf', [
+            'data' => $data,
+            'generated_at' => now()->format('d/m/Y H:i:s'),
+        ])->render();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'file_content' => base64_encode($html),
+                'filename' => $filename,
+                'mime_type' => 'text/html',
+            ],
         ]);
     }
 

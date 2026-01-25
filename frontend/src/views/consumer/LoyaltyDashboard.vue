@@ -2,15 +2,15 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-gray-50 to-gray-100"
+    class="bg-gradient-to-br from-neutral-50 to-neutral-100"
   >
     <!-- Header -->
-    <div class="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+    <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
       <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 py-6">
         <div class="flex items-center justify-start sm:justify-between">
           <div>
-            <h1 class="text-xl font-semibold text-gray-900">Mes Points de Fidélité</h1>
-            <p class="text-gray-700 mt-1">
+            <h1 class="text-xl font-semibold text-neutral-900">Mes Points de Fidélité</h1>
+            <p class="text-neutral-700 mt-1">
               Gagnez des points et profitez de récompenses exclusives
             </p>
           </div>
@@ -37,13 +37,13 @@
             <Card class="glow-effect">
               <div class="flex items-center justify-start sm:justify-between">
                 <div>
-                  <p class="text-sm font-medium text-gray-700">Points Totaux</p>
-                  <p class="text-xl font-semibold text-blue-600 mt-1">
+                  <p class="text-sm font-medium text-neutral-700">Points Totaux</p>
+                  <p class="text-xl font-semibold text-primary-600 mt-1">
                     {{ formatPoints(totalPoints) }}
                   </p>
                 </div>
-                <div class="p-3 bg-blue-100 rounded">
-                  <Star class="h-6 w-6 text-blue-600" />
+                <div class="p-3 bg-primary-100 rounded">
+                  <Star class="h-6 w-6 text-primary-600" />
                 </div>
               </div>
             </Card>
@@ -52,11 +52,11 @@
             <Card class="">
               <div class="flex items-center justify-start sm:justify-between">
                 <div>
-                  <p class="text-sm font-medium text-gray-700">Points Expirent</p>
+                  <p class="text-sm font-medium text-neutral-700">Points Expirent</p>
                   <p class="text-xl font-semibold text-orange-500 mt-1">
                     {{ formatPoints(expiringPoints) }}
                   </p>
-                  <p class="text-xs text-gray-500">Dans 30 jours</p>
+                  <p class="text-xs text-neutral-500">Dans 30 jours</p>
                 </div>
                 <div class="p-3 bg-orange-500/15 rounded">
                   <Clock class="h-6 w-6 text-orange-500" />
@@ -68,14 +68,14 @@
             <Card class="cursor-pointer hover:transition-all duration-200" @click="scrollToRewards">
               <div class="flex items-center justify-start sm:justify-between">
                 <div>
-                  <p class="text-sm font-medium text-gray-700">Récompenses</p>
-                  <p class="text-xl font-semibold text-blue-500 mt-1">
+                  <p class="text-sm font-medium text-neutral-700">Récompenses</p>
+                  <p class="text-xl font-semibold text-primary-500 mt-1">
                     {{ availableRewards.length }}
                   </p>
-                  <p class="text-xs text-gray-500">Disponibles</p>
+                  <p class="text-xs text-neutral-500">Disponibles</p>
                 </div>
-                <div class="p-3 bg-blue-500/10 rounded">
-                  <Gift class="h-6 w-6 text-blue-500" />
+                <div class="p-3 bg-primary-500/10 rounded">
+                  <Gift class="h-6 w-6 text-primary-500" />
                 </div>
               </div>
             </Card>
@@ -86,8 +86,8 @@
         <div class="lg:col-span-2">
           <Card class="">
             <div class="flex items-center justify-start sm:justify-between mt-4">
-              <h3 class="text-xl font-semibold text-gray-900">Répartition des Points</h3>
-              <div class="flex items-center gap-2 text-sm text-gray-700">
+              <h3 class="text-xl font-semibold text-neutral-900">Répartition des Points</h3>
+              <div class="flex items-center gap-2 text-sm text-neutral-700">
                 <TrendingUp class="h-4 w-4" />
                 Par catégorie
               </div>
@@ -97,27 +97,27 @@
               <div
                 v-for="breakdown in pointsBreakdown"
                 :key="breakdown.earned_from"
-                class="flex items-center justify-start sm:justify-between p-4 bg-gray-50 rounded"
+                class="flex items-center justify-start sm:justify-between p-4 bg-neutral-50 rounded"
               >
                 <div class="flex items-center gap-4">
                   <div :class="getPointTypeColor(breakdown.earned_from)" class="p-2 bg-white rounded">
                     <component :is="getPointTypeIcon(breakdown.earned_from)" class="h-4 w-4" />
                   </div>
                   <div>
-                    <p class="font-medium text-gray-900">{{ getPointTypeLabel(breakdown.earned_from) }}</p>
-                    <p class="text-sm text-gray-700">{{ formatPoints(parseInt(String(breakdown.total))) }} points</p>
+                    <p class="font-medium text-neutral-900">{{ getPointTypeLabel(breakdown.earned_from) }}</p>
+                    <p class="text-sm text-neutral-700">{{ formatPoints(parseInt(String(breakdown.total))) }} points</p>
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="text-lg font-semibold text-gray-900">{{ breakdown.total }}</span>
+                  <span class="text-lg font-semibold text-neutral-900">{{ breakdown.total }}</span>
                 </div>
               </div>
             </div>
 
             <div v-else class="text-left sm:text-center py-6 sm:py-8">
-              <Star class="w-12 h-10 text-gray-500 mx-auto mt-3" />
-              <p class="text-gray-700">Aucun point gagné pour le moment</p>
-              <p class="text-sm text-gray-500">Commencez par faire un achat ou laisser un avis !</p>
+              <Star class="w-12 h-10 text-neutral-500 mx-auto mt-3" />
+              <p class="text-neutral-700">Aucun point gagné pour le moment</p>
+              <p class="text-sm text-neutral-500">Commencez par faire un achat ou laisser un avis !</p>
             </div>
           </Card>
         </div>
@@ -125,20 +125,20 @@
         <!-- Recent Activity -->
         <div class="lg:col-span-1">
           <Card class="">
-            <h3 class="text-xl font-semibold text-gray-900 mt-4">Activité Récente</h3>
+            <h3 class="text-xl font-semibold text-neutral-900 mt-4">Activité Récente</h3>
 
             <div v-if="recentHistory.length > 0" class="space-y-2">
               <div
                 v-for="activity in recentHistory.slice(0, 5)"
                 :key="activity.id"
-                class="flex items-center gap-4 p-3 bg-gray-50 rounded"
+                class="flex items-center gap-4 p-3 bg-neutral-50 rounded"
               >
                 <div :class="getPointTypeColor(activity.earned_from)" class="p-2 bg-white rounded flex-shrink-0">
                   <component :is="getPointTypeIcon(activity.earned_from)" class="h-4 w-4" />
                 </div>
                 <div class="flex-1 min-w-none">
-                  <p class="text-sm font-medium text-gray-900 truncate">{{ activity.description }}</p>
-                  <p class="text-xs text-gray-500">{{ formatDate(activity.created_at) }}</p>
+                  <p class="text-sm font-medium text-neutral-900 truncate">{{ activity.description }}</p>
+                  <p class="text-xs text-neutral-500">{{ formatDate(activity.created_at) }}</p>
                 </div>
                 <div class="text-right flex-shrink-0">
                   <span :class="activity.points > 0 ? 'text-green-600' : 'text-red-600'" class="text-sm font-semibold">
@@ -149,8 +149,8 @@
             </div>
 
             <div v-else class="text-left sm:text-center py-6">
-              <Clock class="w-12 h-10 text-gray-500 mx-auto mb-4" />
-              <p class="text-gray-700 text-sm">Aucune activité récente</p>
+              <Clock class="w-12 h-10 text-neutral-500 mx-auto mb-4" />
+              <p class="text-neutral-700 text-sm">Aucune activité récente</p>
             </div>
           </Card>
         </div>
@@ -160,14 +160,14 @@
           <Card>
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mt-4">
               <div>
-                <h3 class="text-xl font-semibold text-gray-900">Échange Manuel</h3>
-                <p class="text-sm text-gray-600">
+                <h3 class="text-xl font-semibold text-neutral-900">Échange Manuel</h3>
+                <p class="text-sm text-neutral-600">
                   Saisissez un montant spécifique pour échanger vos points en fonction des offres proposées par
                   les commerçants.
                 </p>
               </div>
-              <div class="text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded px-3 py-2 flex items-center gap-2">
-                <Minus class="h-4 w-4 text-blue-500" />
+              <div class="text-sm text-neutral-600 bg-primary-50 border border-primary-100 rounded px-3 py-2 flex items-center gap-2">
+                <Minus class="h-4 w-4 text-primary-500" />
                 <span>Points disponibles : {{ formatPoints(totalPoints) }}</span>
               </div>
             </div>
@@ -192,7 +192,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
-              <p class="text-sm text-gray-600">
+              <p class="text-sm text-neutral-600">
                 {{ manualPointsPreview }}
               </p>
 
@@ -210,34 +210,45 @@
 
           <Card>
             <div class="flex items-center justify-start sm:justify-between mt-4">
-              <h3 class="text-xl font-semibold text-gray-900">Récompenses Disponibles</h3>
-              <div class="flex items-center gap-2 text-sm text-gray-700">
+              <h3 class="text-xl font-semibold text-neutral-900">Récompenses Disponibles</h3>
+              <div class="flex items-center gap-2 text-sm text-neutral-700">
                 <Gift class="h-4 w-4" />
                 {{ availableRewards.length }} disponible(s)
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+            <div v-if="rewardsLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+              <Card v-for="index in 3" :key="index" class="animate-pulse">
+                <div class="h-6 bg-neutral-200 rounded w-1/2 mb-4" />
+                <div class="h-4 bg-neutral-200 rounded w-2/3" />
+              </Card>
+            </div>
+
+            <div v-else-if="rewardsError" class="text-sm text-accent-red mt-4">
+              {{ rewardsError }}
+            </div>
+
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               <div
                 v-for="reward in availableRewards"
                 :key="reward.id"
-                class="border border-gray-200 rounded p-6 hover:transition-all duration-200"
+                class="border border-neutral-200 rounded p-6 hover:transition-all duration-200"
                 :class="[
-                  canRedeem(reward.cost) ? 'bg-white hover:border-blue-300' : 'bg-gray-50',
+                  canRedeem(reward.cost) ? 'bg-white hover:border-primary-300' : 'bg-neutral-50',
                   reward.highlight ? 'ring-2 ring-primary-300 shadow-glow' : ''
                 ]"
               >
                 <div class="flex items-center gap-4 mt-3">
-                  <div class="p-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded">
+                  <div class="p-3 bg-gradient-to-r from-primary-600 to-primary-700 rounded">
                     <component :is="reward.icon" class="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h4 class="font-semibold text-gray-900">{{ reward.title }}</h4>
-                    <p class="text-sm text-gray-700">{{ reward.cost }} points</p>
+                    <h4 class="font-semibold text-neutral-900">{{ reward.title }}</h4>
+                    <p class="text-sm text-neutral-700">{{ reward.cost }} points</p>
                   </div>
                 </div>
 
-                <p class="text-sm text-gray-700 mt-3">{{ reward.description }}</p>
+                <p class="text-sm text-neutral-700 mt-3">{{ reward.description }}</p>
 
                 <Button
                   :disabled="!canRedeem(reward.cost)"
@@ -261,32 +272,32 @@
 
       <div class="flex min-h-screen items-center justify-center p-4">
         <div class="relative w-full max-w-xl bg-white rounded shadow-xl transform transition-all" @click.stop>
-          <div class="px-4 py-4 border-b border-gray-200">
+          <div class="px-4 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-start sm:justify-between">
-              <h3 class="text-lg font-semibold text-gray-900">Confirmer l'échange</h3>
+              <h3 class="text-lg font-semibold text-neutral-900">Confirmer l'échange</h3>
               <button class="p-2 hover:transition-colors" @click="closeRedeemModal">
-                <X class="h-4 w-4 text-gray-400" />
+                <X class="h-4 w-4 text-neutral-400" />
               </button>
             </div>
           </div>
 
           <div class="px-4 py-6">
             <div class="text-left sm:text-center mt-4">
-              <div class="p-4 bg-gradient-to-r from-blue-600 to-blue-700 rounded inline-block mt-3">
+              <div class="p-4 bg-gradient-to-r from-primary-600 to-primary-700 rounded inline-block mt-3">
                 <component :is="selectedReward.icon" class="h-6 w-6 text-white" />
               </div>
-              <h4 class="text-xl font-semibold text-gray-900 mt-2">{{ selectedReward.title }}</h4>
-              <p class="text-gray-700">{{ selectedReward.description }}</p>
+              <h4 class="text-xl font-semibold text-neutral-900 mt-2">{{ selectedReward.title }}</h4>
+              <p class="text-neutral-700">{{ selectedReward.description }}</p>
             </div>
 
-            <div class="bg-gray-50 rounded p-4 mt-4">
+            <div class="bg-neutral-50 rounded p-4 mt-4">
               <div class="flex justify-start sm:justify-between items-center">
-                <span class="text-gray-700">Coût de l'échange :</span>
-                <span class="font-semibold text-blue-600">{{ formatPoints(selectedReward.cost) }} points</span>
+                <span class="text-neutral-700">Coût de l'échange :</span>
+                <span class="font-semibold text-primary-600">{{ formatPoints(selectedReward.cost) }} points</span>
               </div>
               <div class="flex justify-start sm:justify-between items-center mt-2">
-                <span class="text-gray-700">Points restants :</span>
-                <span class="font-semibold text-gray-900">{{ formatPoints(totalPoints - selectedReward.cost) }} points</span>
+                <span class="text-neutral-700">Points restants :</span>
+                <span class="font-semibold text-neutral-900">{{ formatPoints(totalPoints - selectedReward.cost) }} points</span>
               </div>
             </div>
 
@@ -317,11 +328,14 @@ import {
   ShoppingBag, MessageSquare, Users, Award, Minus
 } from 'lucide-vue-next'
 import { useLoyaltyPoints } from '@/composables/useLoyaltyPoints'
+import { rewardsService } from '@/services/rewardsService'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import Button from '@/components/ui/2025/Button.vue'
 import Input from '@/components/ui/2025/Input.vue'
+import { notify } from '@/composables/useNotifications'
+import type { Reward } from '@/types'
 
 // Composables
 const {
@@ -346,11 +360,14 @@ interface RewardOption {
   cost: number
   icon: Component
   highlight?: boolean
+  reward: Reward
 }
 
 const selectedReward = ref<RewardOption | null>(null)
 const redeeming = ref(false)
 const rewardsSection = ref<HTMLElement | null>(null)
+const rewardsLoading = ref(false)
+const rewardsError = ref<string | null>(null)
 
 const manualPoints = ref('')
 const manualDescription = ref('')
@@ -359,30 +376,7 @@ const manualRedeeming = ref(false)
 const { sidebar, header } = useDashboardLayout('consumer')
 
 // Mock rewards data (this would come from an API in real app)
-const availableRewards = ref<RewardOption[]>([
-  {
-    id: 1,
-    title: 'Réduction 10%',
-    description: 'Obtenez 10% de réduction sur votre prochain achat',
-    cost: 50,
-    icon: ShoppingBag,
-    highlight: true
-  },
-  {
-    id: 2,
-    title: 'Livraison Gratuite',
-    description: 'Livraison gratuite pour votre prochaine commande',
-    cost: 30,
-    icon: Gift
-  },
-  {
-    id: 3,
-    title: 'Produit Bonus',
-    description: 'Recevez un produit gratuit avec votre achat',
-    cost: 100,
-    icon: Award
-  }
-])
+const availableRewards = ref<RewardOption[]>([])
 
 const manualPointsValue = computed(() => {
   if (!manualPoints.value) {
@@ -477,16 +471,17 @@ const confirmRedeem = async () => {
 
   redeeming.value = true
 
-  const success = await redeemPoints({
-    points: selectedReward.value.cost,
-    description: `Échange: ${selectedReward.value.title}`
-  })
-
-  if (success) {
+  try {
+    const response = await rewardsService.redeemReward(selectedReward.value.reward.id)
+    notify.success(response.message || 'Récompense échangée avec succès')
+    await fetchMyPoints()
+    await loadRewards()
     closeRedeemModal()
+  } catch (err: any) {
+    notify.error(err?.message || 'Impossible d’échanger cette récompense')
+  } finally {
+    redeeming.value = false
   }
-
-  redeeming.value = false
 }
 
 const submitManualRedeem = async () => {
@@ -509,9 +504,42 @@ const submitManualRedeem = async () => {
   manualRedeeming.value = false
 }
 
+const getRewardIcon = (reward: Reward): Component => {
+  const name = reward.name?.toLowerCase() ?? ''
+  if (name.includes('livraison')) return Gift
+  if (name.includes('réduction') || name.includes('reduction')) return ShoppingBag
+  if (name.includes('bonus') || name.includes('gratuit')) return Award
+  return Gift
+}
+
+const loadRewards = async () => {
+  rewardsLoading.value = true
+  rewardsError.value = null
+
+  try {
+    const response = await rewardsService.getRewards({ per_page: 12 })
+    const rewards = response.data || []
+
+    availableRewards.value = rewards.map((reward) => ({
+      id: reward.id,
+      title: reward.name,
+      description: reward.description || 'Récompense exclusive GÊLADAL.',
+      cost: reward.points_required,
+      icon: getRewardIcon(reward),
+      highlight: Boolean(reward.is_featured),
+      reward
+    }))
+  } catch (err: any) {
+    rewardsError.value = err?.message || 'Impossible de charger les récompenses'
+  } finally {
+    rewardsLoading.value = false
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   fetchMyPoints()
+  loadRewards()
 })
 </script>
 

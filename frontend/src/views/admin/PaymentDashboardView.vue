@@ -321,8 +321,8 @@ const filters = reactive({
 const notifications = ref<Notification[]>([])
 
 // Sidebar and Header config - Use 'as any' to bypass strict typing
-const sidebar = { brand: { name: 'Antigaspi Admin' }, navigation: [] } as any
-const header = { user: { name: 'Admin', email: 'admin@antigaspi.com' } } as any
+const sidebar = { brand: { name: 'GÊLADAL Admin' }, navigation: [] } as any
+const header = { user: { name: 'Admin', email: 'admin@geladal.com' } } as any
 
 // Dashboard Filters Configuration - Using 'id' as required by DashboardFilter type
 const dashboardFilters = [

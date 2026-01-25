@@ -1,9 +1,12 @@
+import { useMemo } from 'react'
 import * as Haptics from 'expo-haptics'
 import { Platform } from 'react-native'
 
 /**
  * Hook for haptic feedback on critical interactions
  * Provides consistent haptic patterns across the app
+ *
+ * FIX: Memoized to prevent unnecessary re-renders and useEffect restarts
  */
 export function useHaptics() {
   const isSupported = Platform.OS === 'ios' || Platform.OS === 'android'
@@ -92,7 +95,9 @@ export function useHaptics() {
     }
   }
 
-  return {
+  // FIX: Memoize the returned object to maintain referential equality
+  // This prevents useEffect hooks that depend on haptics from restarting on every render
+  return useMemo(() => ({
     lightTap,
     mediumTap,
     heavyTap,
@@ -100,7 +105,7 @@ export function useHaptics() {
     warning,
     error,
     selection,
-  }
+  }), [isSupported])
 }
 
 export default useHaptics

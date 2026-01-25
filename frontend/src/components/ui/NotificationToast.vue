@@ -48,12 +48,12 @@
           </svg>
         </div>
         <div class="ml-4 w-none flex-1 pt-0.5">
-          <p class="text-sm font-medium text-gray-900">{{ title }}</p>
-          <p class="mt-1 text-sm text-gray-500">{{ message }}</p>
+          <p class="text-sm font-medium text-neutral-900">{{ title }}</p>
+          <p class="mt-1 text-sm text-neutral-500">{{ message }}</p>
         </div>
         <div class="ml-6 flex-shrink-0 flex">
           <button
-            class="bg-white rounded inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="bg-white rounded inline-flex text-neutral-400 hover:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             @click="close"
           >
             <span class="sr-only">Fermer</span>
@@ -91,7 +91,7 @@ const isVisible = ref(false)
 const iconClass = computed(() => {
   switch (props.type) {
     case 'success':
-      return 'text-blue-400'
+      return 'text-primary-400'
     case 'error':
       return 'text-red-400'
     case 'warning':

@@ -132,12 +132,14 @@ const AdminBroadcastScreen: React.FC = () => {
                 }
               }
 
-              // Utiliser .post() au lieu de sendBroadcastNotification() qui n'existe peut-être pas
-              const response = await apiService.post('/admin/notifications/broadcast', data)
+              // POST /notifications/broadcast (not /admin/notifications/broadcast)
+              const response = await apiService.post('/notifications/broadcast', data)
 
+              // Backend returns { data: { recipient_count, channels } }
+              const recipientCount = response.data?.recipient_count || response.recipient_count || 0
               showSuccess(
                 'Succès',
-                `Notification envoyée à ${response.data?.sent_count || 0} utilisateur(s)`,
+                `Notification envoyée à ${recipientCount} utilisateur(s)`,
                 [
 	                  {
 	                    text: 'OK',

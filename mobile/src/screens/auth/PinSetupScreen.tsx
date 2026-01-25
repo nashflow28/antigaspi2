@@ -18,6 +18,7 @@ import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 import { useTheme } from '../../theme'
 import { useAlert } from '../../contexts/AlertContext'
 import { deviceService } from '../../services/deviceService'
+import { reset as navigationReset } from '../../navigation/NavigationRef'
 
 const PIN_LENGTH = 4
 
@@ -108,8 +109,11 @@ const PinSetupScreen: React.FC<Props> = ({ navigation, route }) => {
 
       if (result.success) {
         showSuccess('Succes', 'Code PIN configure avec succes!')
-        // Close auth modal and return to main app
-        navigation.getParent()?.getParent()?.goBack()
+        // Reset navigation to Main screen (closes auth modal)
+        navigationReset({
+          index: 0,
+          routes: [{ name: 'Main' }],
+        })
       } else {
         showError('Erreur', result.message || 'Erreur lors de la configuration du PIN')
         resetForm()
@@ -227,7 +231,10 @@ const PinSetupScreen: React.FC<Props> = ({ navigation, route }) => {
         {/* Skip Button (optional - only shown if user already has PIN from before) */}
         {step === 'create' && (
           <TouchableOpacity
-            onPress={() => navigation.getParent()?.getParent()?.goBack()}
+            onPress={() => navigationReset({
+              index: 0,
+              routes: [{ name: 'Main' }],
+            })}
             style={{ alignItems: 'center', marginTop: theme.spacing.md }}
             disabled={loading}
           >

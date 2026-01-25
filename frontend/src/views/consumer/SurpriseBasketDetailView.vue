@@ -1,26 +1,26 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 pb-16">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50 dark:from-neutral-900 dark:to-neutral-800 pb-16">
     <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 pt-10">
       <button
         type="button"
-        class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+        class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100"
         @click="router.back()"
       >
         <ArrowLeft class="h-4 w-4" />
         Retour
       </button>
 
-      <Card v-if="isLoading" class="flex min-h-[240px] items-center justify-center text-gray-500">
-        <span class="inline-flex h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-primary-500" />
+      <Card v-if="isLoading" class="flex min-h-[240px] items-center justify-center text-neutral-500 dark:text-neutral-400">
+        <span class="inline-flex h-8 w-8 animate-spin rounded-full border-2 border-neutral-200 dark:border-neutral-600 border-t-primary-500" />
         <span class="ml-4">Chargement du panier surprise...</span>
       </Card>
 
       <Card v-else-if="!basket" class="text-left sm:text-center py-16 sm:py-16 lg:py-16">
-        <div class="mx-auto mt-3 flex icon-xl items-center justify-center rounded-full bg-gray-100">
-          <Package class="h-8 w-8 text-gray-400" />
+        <div class="mx-auto mt-3 flex icon-xl items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-700">
+          <Package class="h-8 w-8 text-neutral-400 dark:text-neutral-500" />
         </div>
-        <h2 class="text-xl font-semibold text-gray-800">Panier introuvable</h2>
-        <p class="mt-2 text-gray-500">Ce panier surprise n'est plus disponible ou n'existe pas.</p>
+        <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100">Panier introuvable</h2>
+        <p class="mt-2 text-neutral-500 dark:text-neutral-400">Ce panier surprise n'est plus disponible ou n'existe pas.</p>
         <Button variant="primary" class="mt-6" @click="router.push({ name: 'surprise-baskets' })">
           Voir les autres paniers
         </Button>
@@ -37,14 +37,14 @@
             >
             <div
               v-else
-              class="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-50 to-blue-500/5"
+              class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-primary-500/5 dark:from-primary-900/20 dark:to-primary-500/10"
             >
-              <Package class="h-6 w-6 text-blue-400" />
+              <Package class="h-6 w-6 text-primary-400" />
             </div>
             <div class="relative sm:absolute left-6 top-6 flex items-center gap-3">
               <Badge variant="success" class="font-semibold">-{{ basket.basket_discount_percentage }}%</Badge>
-              <span class="rounded-full bg-white/90 px-3 py-3 text-xs font-medium text-gray-800 shadow-xl">
-                <Clock class="mr-1 inline-block h-4 w-4 text-blue-500" />
+              <span class="rounded-full bg-white/90 dark:bg-neutral-800/90 px-3 py-3 text-xs font-medium text-neutral-800 dark:text-neutral-100 shadow-xl">
+                <Clock class="mr-1 inline-block h-4 w-4 text-primary-500" />
                 {{ timeLeft }}
               </span>
             </div>
@@ -52,18 +52,18 @@
 
           <div class="space-y-6 p-6">
             <header class="space-y-4">
-              <h1 class="text-xl font-semibold text-gray-900">{{ basket.name }}</h1>
-              <p v-if="basket.surprise_description" class="text-gray-700">{{ basket.surprise_description }}</p>
-              <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-3 text-blue-900">
+              <h1 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">{{ basket.name }}</h1>
+              <p v-if="basket.surprise_description" class="text-neutral-700 dark:text-neutral-300">{{ basket.surprise_description }}</p>
+              <div class="flex flex-wrap items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+                <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 dark:bg-primary-500/20 px-3 py-3 text-primary-900 dark:text-primary-100">
                   <Store class="h-4 w-4" />
                   {{ basket.merchant.business_name }}
                 </span>
-                <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-blue-500/5 px-3 py-3 text-blue-500/90">
+                <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-primary-500/5 dark:bg-primary-500/10 px-3 py-3 text-primary-600 dark:text-primary-300">
                   <Tag class="h-4 w-4" />
                   {{ basket.category.name }}
                 </span>
-                <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-3 text-gray-700">
+                <span class="inline-flex items-center gap-2 rounded-full bg-neutral-100 dark:bg-neutral-700 px-3 py-3 text-neutral-700 dark:text-neutral-300">
                   <ShieldCheck class="h-4 w-4" />
                   Retrait garanti avant expiration
                 </span>
@@ -71,21 +71,21 @@
             </header>
 
             <section>
-              <h2 class="text-lg font-semibold text-gray-900">Contenu surprise</h2>
+              <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">Contenu surprise</h2>
               <ul v-if="basket.surprise_basket_items?.length" class="mt-3 space-y-2">
                 <li
                   v-for="item in basket.surprise_basket_items"
                   :key="item.id"
-                  class="flex items-stretch sm:items-start justify-start sm:justify-between rounded bg-gray-50 px-3 py-3"
+                  class="flex items-stretch sm:items-start justify-start sm:justify-between rounded bg-neutral-50 dark:bg-neutral-700/50 px-3 py-3"
                 >
                   <div>
-                    <p class="font-medium text-gray-800">{{ item.product.name }}</p>
-                    <p class="text-xs text-gray-500">Quantité min : {{ item.quantity }}</p>
+                    <p class="font-medium text-neutral-800 dark:text-neutral-100">{{ item.product.name }}</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Quantité min : {{ item.quantity }}</p>
                   </div>
-                  <span class="text-sm font-medium text-gray-700">{{ formatPrice(item.total_price) }}</span>
+                  <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">{{ formatPrice(item.total_price) }}</span>
                 </li>
               </ul>
-              <p v-else class="mt-3 text-sm text-gray-500">
+              <p v-else class="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
                 Ce panier est une surprise ! Le commerçant sélectionne les meilleurs produits disponibles.
               </p>
             </section>
@@ -94,20 +94,20 @@
 
         <Card class="space-y-6 p-6">
           <div>
-            <h2 class="text-lg font-semibold text-gray-900">Votre réservation</h2>
-            <p class="text-sm text-gray-500">Réservez dès maintenant et récupérez votre panier avant l'expiration.</p>
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">Votre réservation</h2>
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">Réservez dès maintenant et récupérez votre panier avant l'expiration.</p>
           </div>
 
-          <div class="space-y-2 rounded bg-gray-50 p-4">
+          <div class="space-y-2 rounded bg-neutral-50 dark:bg-neutral-700/50 p-4">
             <div class="flex items-center justify-start sm:justify-between">
-              <span class="text-sm text-gray-500">Prix réduit</span>
-              <span class="text-xl font-semibold text-blue-600">{{ formattedDiscountedPrice }}</span>
+              <span class="text-sm text-neutral-500 dark:text-neutral-400">Prix réduit</span>
+              <span class="text-xl font-semibold text-primary-600 dark:text-primary-400">{{ formattedDiscountedPrice }}</span>
             </div>
-            <div class="flex items-center justify-start sm:justify-between text-sm text-gray-500">
+            <div class="flex items-center justify-start sm:justify-between text-sm text-neutral-500 dark:text-neutral-400">
               <span>Valeur d'origine</span>
               <span class="line-through">{{ formattedOriginalPrice }}</span>
             </div>
-            <div class="flex items-center justify-start sm:justify-between text-sm font-semibold text-blue-600">
+            <div class="flex items-center justify-start sm:justify-between text-sm font-semibold text-primary-600 dark:text-primary-400">
               <span>Économies</span>
               <span>{{ formattedSavings }}</span>
             </div>
@@ -124,14 +124,14 @@
               class="input-field-2025"
               :disabled="maxQuantity === 0"
             >
-            <p class="text-xs text-gray-500">{{ maxQuantity }} panier{{ maxQuantity > 1 ? 's' : '' }} restant{{ maxQuantity > 1 ? 's' : '' }}</p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ maxQuantity }} panier{{ maxQuantity > 1 ? 's' : '' }} restant{{ maxQuantity > 1 ? 's' : '' }}</p>
           </div>
 
           <div class="space-y-4">
             <div>
               <div class="flex items-center justify-start sm:justify-between">
-                <h3 class="text-sm font-semibold text-gray-900">Moyen de paiement</h3>
-                <span class="text-xs text-gray-500">Sélectionnez une option</span>
+                <h3 class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">Moyen de paiement</h3>
+                <span class="text-xs text-neutral-500 dark:text-neutral-400">Sélectionnez une option</span>
               </div>
               <div class="mt-3 space-y-2">
                 <button
@@ -141,24 +141,24 @@
                   class="flex w-full items-stretch sm:items-start gap-3 rounded border p-4 text-left transition-all"
                   :class="[
                     paymentMethod === option.value
-                      ? 'border-blue-500 bg-blue-50 shadow-sm'
-                      : 'border-gray-200 hover:border-blue-200 hover:bg-blue-50/40'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/20 shadow-sm'
+                      : 'border-neutral-200 dark:border-neutral-600 hover:border-primary-200 dark:hover:border-primary-500/50 hover:bg-primary-50/40 dark:hover:bg-primary-500/10'
                   ]"
                   @click="paymentMethod = option.value"
                 >
                   <div
                     class="flex h-8 w-8 items-center justify-center rounded-full"
-                    :class="paymentMethod === option.value ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'"
+                    :class="paymentMethod === option.value ? 'bg-primary-500 text-white' : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'"
                   >
                     <component :is="option.icon" class="h-4 w-4" />
                   </div>
                   <div class="flex-1">
-                    <p class="font-medium text-gray-900">{{ option.label }}</p>
-                    <p class="text-xs text-gray-500">{{ option.description }}</p>
+                    <p class="font-medium text-neutral-900 dark:text-neutral-50">{{ option.label }}</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ option.description }}</p>
                   </div>
                   <span
                     v-if="paymentMethod === option.value"
-                    class="text-xs font-semibold text-blue-600"
+                    class="text-xs font-semibold text-primary-600 dark:text-primary-400"
                   >
                     Choisi
                   </span>
@@ -179,22 +179,22 @@
                 }"
                 :disabled="submitting"
               >
-              <p class="text-xs text-gray-500">Utilisez un numéro enregistré sur le portefeuille sélectionné.</p>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400">Utilisez un numéro enregistré sur le portefeuille sélectionné.</p>
               <p v-if="phoneError" class="text-xs font-medium text-red-600">{{ phoneError }}</p>
             </div>
 
             <p
               v-if="selectedPaymentOption?.instructions"
-              class="rounded bg-gray-50 p-3 text-xs text-gray-700"
+              class="rounded bg-neutral-50 dark:bg-neutral-700/50 p-3 text-xs text-neutral-700 dark:text-neutral-300"
             >
               {{ selectedPaymentOption.instructions }}
             </p>
           </div>
 
-          <div class="rounded bg-blue-50 p-4 text-sm text-blue-900">
+          <div class="rounded bg-primary-50 dark:bg-primary-500/20 p-4 text-sm text-primary-900 dark:text-primary-100">
             <p class="font-semibold">Montant à régler</p>
             <p class="text-xl font-semibold">{{ totalReservationPrice }}</p>
-            <p v-if="quantity > 1" class="mt-1 text-xs text-blue-600">Soit {{ formattedDiscountedPrice }} par panier</p>
+            <p v-if="quantity > 1" class="mt-1 text-xs text-primary-600 dark:text-primary-300">Soit {{ formattedDiscountedPrice }} par panier</p>
             <p v-if="methodRequiresPhone" class="mt-2 text-xs">
               Un SMS de validation sera envoyé par l'opérateur après la demande de paiement.
             </p>
@@ -219,10 +219,10 @@
               </span>
               <span v-else>{{ reserveButtonLabel }}</span>
             </button>
-            <p v-if="!authStore.isAuthenticated" class="text-left sm:text-center text-xs text-gray-500">
+            <p v-if="!authStore.isAuthenticated" class="text-left sm:text-center text-xs text-neutral-500 dark:text-neutral-400">
               Connectez-vous pour finaliser la réservation.
             </p>
-            <p v-else-if="!authStore.isConsumer" class="text-left sm:text-center text-xs text-gray-500">
+            <p v-else-if="!authStore.isConsumer" class="text-left sm:text-center text-xs text-neutral-500 dark:text-neutral-400">
               Seuls les consommateurs peuvent réserver des paniers.
             </p>
           </div>
@@ -457,12 +457,35 @@ const reserveBasket = async () => {
 
   submitting.value = true
   try {
-    // 🐛 BUG FIX #65-WEB: Add required pickupDate and pickupTime fields for surprise basket reservations
-    // Default to tomorrow at 10:00 AM to comply with backend validation
-    const tomorrow = new Date()
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    const pickupDate = tomorrow.toISOString().split('T')[0] // Format YYYY-MM-DD
-    const pickupTime = '10:00' // Default time
+    // Determine appropriate pickup date/time based on basket expiration
+    const now = new Date()
+    const today = now.toISOString().split('T')[0]
+    const expirationDate = basket.value.expiration_date
+      ? new Date(basket.value.expiration_date).toISOString().split('T')[0]
+      : null
+
+    let pickupDate: string
+    let pickupTime: string
+
+    if (expirationDate && expirationDate <= today) {
+      // Basket expires today - pickup must be today
+      // Set pickup time to 2 hours from now or minimum 10:00
+      const minPickupHour = Math.max(10, now.getHours() + 2)
+      if (minPickupHour >= 20) {
+        // Too late to pickup today
+        notify.error('Ce panier expire aujourd\'hui et il est trop tard pour le récupérer.')
+        submitting.value = false
+        return
+      }
+      pickupDate = today
+      pickupTime = `${String(minPickupHour).padStart(2, '0')}:00`
+    } else {
+      // Basket expires later - default to tomorrow at 10:00
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      pickupDate = tomorrow.toISOString().split('T')[0]
+      pickupTime = '10:00'
+    }
 
     const response = await reservationsStore.createReservation({
       productId: basket.value.id,

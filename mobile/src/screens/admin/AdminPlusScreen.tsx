@@ -168,7 +168,7 @@ const AdminPlusScreen: React.FC = () => {
             variant="caption"
             style={{ color: theme.colors.textTertiary, textAlign: 'center' }}
           >
-            Antigaspi Admin v1.0
+            GÊLADAL Admin v1.0
           </Typography>
         </View>
       </ScrollView>

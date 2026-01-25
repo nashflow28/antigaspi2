@@ -1,14 +1,14 @@
 <template>
   <div class="space-y-6">
     <!-- Filters -->
-    <div class="bg-white rounded shadow-lg border border-gray-100 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mt-3">Filtres</h3>
+    <div class="bg-white rounded shadow-lg border border-neutral-100 p-6">
+      <h3 class="text-lg font-semibold text-neutral-900 mt-3">Filtres</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
-          <label class="block text-sm font-medium text-gray-800 mt-2">Statut</label>
+          <label class="block text-sm font-medium text-neutral-800 mt-2">Statut</label>
           <select
             v-model="filters.status"
-            class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             @change="() => loadReports()"
           >
             <option value="">Tous les statuts</option>
@@ -20,10 +20,10 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-800 mt-2">Raison</label>
+          <label class="block text-sm font-medium text-neutral-800 mt-2">Raison</label>
           <select
             v-model="filters.reason"
-            class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full border border-neutral-300 rounded px-3 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             @change="() => loadReports()"
           >
             <option value="">Toutes les raisons</option>
@@ -39,7 +39,7 @@
 
         <div class="flex items-end">
           <button
-            class="w-full px-3 py-3 text-sm text-gray-700 border border-gray-300 rounded hover:transition-colors"
+            class="w-full px-3 py-3 text-sm text-neutral-700 border border-neutral-300 rounded hover:transition-colors"
             @click="resetFilters"
           >
             Réinitialiser
@@ -49,17 +49,17 @@
     </div>
 
     <!-- Reports List -->
-    <div class="bg-white rounded shadow-lg border border-gray-100">
-      <div class="px-4 py-4 border-b border-gray-200">
+    <div class="bg-white rounded shadow-lg border border-neutral-100">
+      <div class="px-4 py-4 border-b border-neutral-200">
         <div class="flex items-center justify-start sm:justify-between">
-          <h3 class="text-xl font-semibold text-gray-900">
+          <h3 class="text-xl font-semibold text-neutral-900">
             Avis signalés
-            <span v-if="pagination" class="text-gray-500 font-normal">
+            <span v-if="pagination" class="text-neutral-500 font-normal">
               ({{ pagination.total }} au total)
             </span>
           </h3>
           <button
-            class="inline-flex items-center px-3 py-3 text-sm text-blue-600 hover:transition-colors"
+            class="inline-flex items-center px-3 py-3 text-sm text-primary-600 hover:transition-colors"
             :disabled="loading"
             @click="() => loadReports()"
           >
@@ -72,15 +72,15 @@
       <div class="divide-y divide-neutral-200">
         <!-- Loading State -->
         <div v-if="loading" class="px-4 py-6 sm:py-8 text-left sm:text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" />
-          <p class="text-gray-500 mt-2">Chargement des signalements...</p>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
+          <p class="text-neutral-500 mt-2">Chargement des signalements...</p>
         </div>
 
         <!-- Empty State -->
         <div v-else-if="reports.length === 0" class="px-4 py-6 sm:py-8 text-left sm:text-center">
-          <CheckCircle class="w-12 h-10 text-blue-400 mx-auto mt-3" />
-          <h4 class="text-lg font-medium text-gray-900 mt-2">Aucun signalement</h4>
-          <p class="text-gray-700">
+          <CheckCircle class="w-12 h-10 text-primary-400 mx-auto mt-3" />
+          <h4 class="text-lg font-medium text-neutral-900 mt-2">Aucun signalement</h4>
+          <p class="text-neutral-700">
             {{ hasActiveFilters ? 'Aucun signalement ne correspond à vos critères' : 'Aucun avis signalé pour le moment' }}
           </p>
         </div>
@@ -114,12 +114,12 @@
                       {{ report.status_label }}
                     </span>
                   </div>
-                  <p class="text-sm text-gray-700 mt-1">
+                  <p class="text-sm text-neutral-700 mt-1">
                     Signalé par {{ report.reporter.name }} • {{ report.time_ago }}
                   </p>
                 </div>
               </div>
-              <div class="text-right text-sm text-gray-500">
+              <div class="text-right text-sm text-neutral-500">
                 ID: {{ report.id }}
               </div>
             </div>
@@ -133,10 +133,10 @@
             </div>
 
             <!-- Original Review -->
-            <div class="bg-gray-50 border border-gray-200 rounded p-4">
+            <div class="bg-neutral-50 border border-neutral-200 rounded p-4">
               <div class="flex items-stretch sm:items-start space-y-2 sm:space-x-3">
                 <div class="flex-shrink-0">
-                  <div class="h-6 w-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                  <div class="h-6 w-6 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
                     <span class="text-white text-sm font-medium">
                       {{ getInitials(report.review.user.name) }}
                     </span>
@@ -144,13 +144,13 @@
                 </div>
                 <div class="flex-1">
                   <div class="flex items-center space-y-4 sm:space-x-2 mt-2">
-                    <span class="font-medium text-gray-900">{{ report.review.user.name }}</span>
+                    <span class="font-medium text-neutral-900">{{ report.review.user.name }}</span>
                     <div class="flex items-center">
                       <Star
                         v-for="star in 5"
                         :key="star"
                         class="h-4 w-4"
-                        :class="star <= report.review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500'"
+                        :class="star <= report.review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-500'"
                       />
                     </div>
                     <span v-if="report.review.is_verified_purchase" class="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -159,14 +159,14 @@
                   </div>
 
                   <div v-if="report.review.title" class="mt-2">
-                    <h4 class="font-medium text-gray-900">{{ report.review.title }}</h4>
+                    <h4 class="font-medium text-neutral-900">{{ report.review.title }}</h4>
                   </div>
 
-                  <div v-if="report.review.comment" class="text-gray-800 text-sm mt-2">
+                  <div v-if="report.review.comment" class="text-neutral-800 text-sm mt-2">
                     {{ report.review.comment }}
                   </div>
 
-                  <div class="flex items-center space-y-4 sm:space-x-2 text-xs text-gray-500">
+                  <div class="flex items-center space-y-4 sm:space-x-2 text-xs text-neutral-500">
                     <span>{{ report.review.merchant.business_name }}</span>
                     <span v-if="report.review.product">• {{ report.review.product.name }}</span>
                   </div>
@@ -175,8 +175,8 @@
             </div>
 
             <!-- Admin Notes -->
-            <div v-if="report.admin_notes" class="bg-blue-50 border border-blue-200 rounded p-3">
-              <p class="text-sm text-gray-800">
+            <div v-if="report.admin_notes" class="bg-primary-50 border border-primary-200 rounded p-3">
+              <p class="text-sm text-neutral-800">
                 <strong>Notes administrateur :</strong><br>
                 {{ report.admin_notes }}
               </p>
@@ -189,7 +189,7 @@
             <div v-if="report.status === 'pending'" class="flex items-center space-y-2 sm:space-x-3">
               <button
                 :disabled="processing === report.id"
-                class="inline-flex items-center px-3 py-3 text-sm bg-gray-600 text-white rounded hover:transition-colors"
+                class="inline-flex items-center px-3 py-3 text-sm bg-neutral-600 text-white rounded hover:transition-colors"
                 @click="resolveReport(report.id, 'dismiss')"
               >
                 <X class="h-4 w-4 mr-2" />
@@ -219,23 +219,23 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="pagination && pagination.last_page > 1" class="px-4 py-4 border-t border-gray-200">
+      <div v-if="pagination && pagination.last_page > 1" class="px-4 py-4 border-t border-neutral-200">
         <div class="flex items-center justify-start sm:justify-between">
-          <div class="text-sm text-gray-500">
+          <div class="text-sm text-neutral-500">
             Page {{ pagination.current_page }} sur {{ pagination.last_page }}
             ({{ pagination.total }} signalements au total)
           </div>
           <div class="flex space-y-4 sm:space-x-2">
             <button
               :disabled="pagination.current_page <= 1"
-              class="px-3 py-3 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              class="px-3 py-3 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
               @click="loadPage(pagination.current_page - 1)"
             >
               Précédent
             </button>
             <button
               :disabled="pagination.current_page >= pagination.last_page"
-              class="px-3 py-3 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              class="px-3 py-3 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
               @click="loadPage(pagination.current_page + 1)"
             >
               Suivant
@@ -345,23 +345,23 @@ const getReasonClass = (reason: string) => {
   const classes = {
     'inappropriate_content': 'bg-red-100 text-red-800',
     'spam': 'bg-yellow-100 text-yellow-800',
-    'fake_review': 'bg-blue-100 text-blue-800',
+    'fake_review': 'bg-primary-100 text-primary-800',
     'offensive_language': 'bg-red-100 text-red-800',
     'harassment': 'bg-red-100 text-red-800',
-    'copyright_violation': 'bg-blue-100 text-gray-800',
-    'other': 'bg-gray-50-100 text-surface-800'
+    'copyright_violation': 'bg-primary-100 text-neutral-800',
+    'other': 'bg-neutral-50-100 text-surface-800'
   }
-  return classes[reason as keyof typeof classes] || 'bg-gray-50-100 text-surface-800'
+  return classes[reason as keyof typeof classes] || 'bg-neutral-50-100 text-surface-800'
 }
 
 const getStatusClass = (status: string) => {
   const classes = {
     'pending': 'bg-yellow-100 text-yellow-800',
-    'reviewed': 'bg-blue-100 text-gray-800',
+    'reviewed': 'bg-primary-100 text-neutral-800',
     'resolved': 'bg-green-100 text-green-800',
-    'dismissed': 'bg-gray-50-100 text-surface-800'
+    'dismissed': 'bg-neutral-50-100 text-surface-800'
   }
-  return classes[status as keyof typeof classes] || 'bg-gray-50-100 text-surface-800'
+  return classes[status as keyof typeof classes] || 'bg-neutral-50-100 text-surface-800'
 }
 
 const loadReports = async (page: number = 1) => {

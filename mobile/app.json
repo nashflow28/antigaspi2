@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Antigaspi",
-    "slug": "antigaspi",
+    "name": "GÊLADAL",
+    "slug": "geladal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#10B981"
+      "backgroundColor": "#fad02c"
     },
     "updates": {
       "fallbackToCacheTimeout": 0,
@@ -22,12 +22,12 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.antigaspi.app",
+      "bundleIdentifier": "com.geladal.app",
       "buildNumber": "1",
       "infoPlist": {
-        "NSCameraUsageDescription": "Antigaspi a besoin d'accéder à votre caméra pour scanner les codes QR",
-        "NSLocationWhenInUseUsageDescription": "Antigaspi a besoin d'accéder à votre position pour vous montrer les commerces proches",
-        "NSPhotoLibraryUsageDescription": "Antigaspi a besoin d'accéder à vos photos pour les avis produits"
+        "NSCameraUsageDescription": "GÊLADAL a besoin d'accéder à votre caméra pour scanner les codes QR",
+        "NSLocationWhenInUseUsageDescription": "GÊLADAL a besoin d'accéder à votre position pour vous montrer les commerces proches",
+        "NSPhotoLibraryUsageDescription": "GÊLADAL a besoin d'accéder à vos photos pour les avis produits"
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -36,7 +36,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#10B981"
+        "backgroundColor": "#fad02c"
       },
       "googleServicesFile": "./google-services.json",
       "package": "com.antigaspi.app",
@@ -64,7 +64,7 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#10B981",
+          "color": "#fad02c",
           "sounds": [],
           "defaultChannel": "default"
         }
@@ -72,7 +72,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Permettre à Antigaspi d'accéder à votre position pour trouver les commerces proches."
+          "locationAlwaysAndWhenInUsePermission": "Permettre à GÊLADAL d'accéder à votre position pour trouver les commerces proches."
         }
       ],
       [
@@ -94,9 +94,10 @@
       "testMode": false,
       "sentryDsn": "",
       "eas": {
-        "projectId": "3b3263bb-77cd-4547-a421-1bf2fa8530c6"
+        "projectId": "157d93a5-c53a-4e78-9351-364849a645f7"
       }
     },
-    "scheme": "antigaspi"
+    "scheme": "geladal",
+    "owner": "nashflow"
   }
 }

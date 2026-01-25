@@ -20,11 +20,11 @@
     >
       <div
         v-if="showMenu"
-        class="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-slate-800 shadow-lg ring-1 ring-black/5 z-50"
+        class="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-neutral-800 shadow-lg ring-1 ring-black/5 z-50"
       >
         <div class="py-1">
           <button
-            class="flex items-center gap-3 w-full px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+            class="flex items-center gap-3 w-full px-4 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700"
             :disabled="exporting"
             @click="exportAs('csv')"
           >
@@ -32,7 +32,7 @@
             Exporter en CSV
           </button>
           <button
-            class="flex items-center gap-3 w-full px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+            class="flex items-center gap-3 w-full px-4 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700"
             :disabled="exporting"
             @click="exportAs('pdf')"
           >
@@ -116,7 +116,7 @@ const exportPDF = async () => {
   // Header
   doc.setFontSize(18)
   doc.setTextColor(30, 64, 175)
-  doc.text('Antigaspi - Transactions Wallet', 20, 20)
+  doc.text('GÊLADAL - Transactions Wallet', 20, 20)
 
   doc.setFontSize(10)
   doc.setTextColor(100)

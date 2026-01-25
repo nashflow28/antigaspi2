@@ -14,10 +14,10 @@
         </div>
 
         <div class="space-y-4">
-          <h2 class="text-xl font-semibold text-gray-900">
+          <h2 class="text-xl font-semibold text-neutral-900">
             {{ errorInfo.title || 'Une erreur est survenue' }}
           </h2>
-          <p class="text-base text-gray-700">
+          <p class="text-base text-neutral-700">
             {{ errorInfo.message || 'Nous nous excusons pour le désagrément. Veuillez réessayer ou contacter le support si le problème persiste.' }}
           </p>
         </div>
@@ -25,23 +25,23 @@
 
       <details
         v-if="isDev && errorDetails"
-        class="rounded border border-gray-200 bg-white/70 text-left shadow-sm"
+        class="rounded border border-neutral-200 bg-white/70 text-left shadow-sm"
       >
-        <summary class="flex cursor-pointer items-center justify-start sm:justify-between gap-3 px-3 py-3 text-sm font-medium text-gray-800">
+        <summary class="flex cursor-pointer items-center justify-start sm:justify-between gap-3 px-3 py-3 text-sm font-medium text-neutral-800">
           Détails techniques (Mode développement)
         </summary>
-        <div class="space-y-4 border-t border-gray-100 bg-gray-50/80 px-3 py-4 text-sm text-gray-800">
+        <div class="space-y-4 border-t border-neutral-100 bg-neutral-50/80 px-3 py-4 text-sm text-neutral-800">
           <div v-if="errorDetails.stack" class="space-y-4">
-            <h4 class="font-semibold text-gray-800">Stack Trace</h4>
-            <pre class="max-h-9xl overflow-auto rounded bg-gray-900/90 p-3 text-xs text-gray-100">{{ errorDetails.stack }}</pre>
+            <h4 class="font-semibold text-neutral-800">Stack Trace</h4>
+            <pre class="max-h-9xl overflow-auto rounded bg-neutral-900/90 p-3 text-xs text-neutral-100">{{ errorDetails.stack }}</pre>
           </div>
           <div v-if="errorDetails.info" class="space-y-4">
-            <h4 class="font-semibold text-gray-800">Informations Vue</h4>
-            <pre class="max-h-8xl overflow-auto rounded bg-gray-900/90 p-3 text-xs text-gray-100">{{ errorDetails.info }}</pre>
+            <h4 class="font-semibold text-neutral-800">Informations Vue</h4>
+            <pre class="max-h-8xl overflow-auto rounded bg-neutral-900/90 p-3 text-xs text-neutral-100">{{ errorDetails.info }}</pre>
           </div>
           <div v-if="errorDetails.props" class="space-y-4">
-            <h4 class="font-semibold text-gray-800">Props du composant</h4>
-            <pre class="max-h-8xl overflow-auto rounded bg-gray-900/90 p-3 text-xs text-gray-100">{{ JSON.stringify(errorDetails.props, null, 2) }}</pre>
+            <h4 class="font-semibold text-neutral-800">Props du composant</h4>
+            <pre class="max-h-8xl overflow-auto rounded bg-neutral-900/90 p-3 text-xs text-neutral-100">{{ JSON.stringify(errorDetails.props, null, 2) }}</pre>
           </div>
         </div>
       </details>
@@ -76,20 +76,20 @@
         </Button>
       </div>
 
-      <div v-if="props.showSupportInfo" class="space-y-2 rounded bg-gray-50/70 px-xl py-4 text-left sm:text-center">
-        <p class="text-sm text-gray-700">
+      <div v-if="props.showSupportInfo" class="space-y-2 rounded bg-neutral-50/70 px-xl py-4 text-left sm:text-center">
+        <p class="text-sm text-neutral-700">
           Besoin d'aide ? Contactez notre support :
         </p>
-        <div class="flex flex-wrap items-center justify-center gap-2 text-sm font-medium text-gray-800">
+        <div class="flex flex-wrap items-center justify-center gap-2 text-sm font-medium text-neutral-800">
           <a
-            href="mailto:support@antigaspi.ci"
-            class="flex items-center gap-2 text-blue-600 transition hover:text-blue-900"
+            href="mailto:support@geladal.com"
+            class="flex items-center gap-2 text-primary-600 transition hover:text-primary-900"
           >
             <Mail class="h-4 w-4" />
-            support@antigaspi.ci
+            support@geladal.com
           </a>
-          <span class="text-gray-400">•</span>
-          <span class="rounded-full bg-white px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <span class="text-neutral-400">•</span>
+          <span class="rounded-full bg-white px-3 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">
             ID: {{ errorId }}
           </span>
         </div>

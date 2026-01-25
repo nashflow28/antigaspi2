@@ -33,7 +33,7 @@ import { TEST_IDS } from '../../utils/testIds'
 import { createLogger } from '../../utils/logger'
 
 const log = createLogger('ProductDetails')
-import { PAYMENT_OPTIONS, PaymentOption } from '../../constants/paymentOptions'
+import { PAYMENT_OPTIONS, PaymentOption, isMobileMoneyPayment } from '../../constants/paymentOptions'
 
 interface Props {
   route: any
@@ -56,6 +56,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [selectedQuantity, setSelectedQuantity] = useState(1)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('wallet')
   const [walletPin, setWalletPin] = useState('')
+  const [customerPhone, setCustomerPhone] = useState('')
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [cartAddedVisible, setCartAddedVisible] = useState(false)
@@ -311,6 +312,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         pickupTime,
         notes: null,
         ...(selectedPaymentMethod === 'wallet' && walletPin ? { walletPin } : {}),
+        ...(isMobileMoneyPayment(selectedPaymentMethod) && customerPhone ? { customerPhone } : {}),
       }))
 
       if (createReservation.fulfilled.match(result)) {
@@ -606,10 +608,33 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 )
               })}
             </View>
-            {selectedPaymentMethod === 'flooz' && (
-              <Typography variant="caption" color="secondary" style={{ marginTop: theme.spacing.xs }}>
-                Vous pourrez préciser votre opérateur mobile et numéro lors du paiement.
-              </Typography>
+            {isMobileMoneyPayment(selectedPaymentMethod) && (
+              <View style={{ marginTop: theme.spacing.md }}>
+                <Typography variant="caption" color="secondary" style={{ marginBottom: theme.spacing.xs }}>
+                  Numéro Mobile Money
+                </Typography>
+                <TextInput
+                  value={customerPhone}
+                  onChangeText={setCustomerPhone}
+                  keyboardType="phone-pad"
+                  maxLength={15}
+                  placeholder="+228 90 12 34 56"
+                  placeholderTextColor={theme.colors.textTertiary}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: theme.colors.border,
+                    borderRadius: theme.radius.md,
+                    paddingHorizontal: theme.spacing.md,
+                    paddingVertical: theme.spacing.sm,
+                    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
+                    color: theme.colors.text,
+                    fontSize: 16,
+                  }}
+                />
+                <Typography variant="caption" color="tertiary" style={{ marginTop: theme.spacing.xs }}>
+                  Ce numéro recevra la demande de paiement Mobile Money.
+                </Typography>
+              </View>
             )}
             {selectedPaymentMethod === 'paystack' && (
               <Typography variant="caption" color="secondary" style={{ marginTop: theme.spacing.xs }}>

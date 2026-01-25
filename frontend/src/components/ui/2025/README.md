@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Le Design System 2025 d'AntiGaspi est une collection complète de composants UI modernes conçus pour offrir une expérience utilisateur cohérente et accessible.
+Le Design System 2025 d'GELADAL est une collection complète de composants UI modernes conçus pour offrir une expérience utilisateur cohérente et accessible.
 
 ## Composants disponibles
 
@@ -150,4 +150,4 @@ Pour ajouter de nouveaux composants :
 
 ---
 
-*Maintenu par l'équipe AntiGaspi - Design System 2025*
+*Maintenu par l'équipe GELADAL - Design System 2025*

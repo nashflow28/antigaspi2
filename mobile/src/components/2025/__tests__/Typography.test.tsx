@@ -150,11 +150,11 @@ describe('Typography Component', () => {
 
       const { getByText } = renderWithTheme(
         <Typography variant="displayXl" weight="bold" align="center" style={combinedStyle}>
-          🌱 Antigaspi
+          🌱 GÊLADAL
         </Typography>
       )
 
-      expect(getByText('🌱 Antigaspi')).toBeTruthy()
+      expect(getByText('🌱 GÊLADAL')).toBeTruthy()
     })
   })
 })

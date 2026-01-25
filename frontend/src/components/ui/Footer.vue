@@ -1,5 +1,5 @@
 <template>
-  <footer class="mt-24 bg-blue-700 text-gray-50">
+  <footer class="mt-24 bg-primary-700 text-neutral-50">
     <div class="mx-auto flex max-w-full sm:max-w-7xl flex-col items-center justify-start sm:justify-between gap-3 sm:gap-6 px-3 py-12 text-left sm:text-center sm:flex-row sm:text-left sm:px-4 lg:px-6">
       <Motion
         tag="div"
@@ -9,11 +9,11 @@
       >
         <slot name="brand" :year="currentYear">
           <p class="text-lg font-semibold tracking-tight">{{ brandName }}</p>
-          <p class="text-sm text-gray-100/80">© {{ currentYear }} — {{ tagline }}</p>
+          <p class="text-sm text-neutral-100/80">© {{ currentYear }} — {{ tagline }}</p>
         </slot>
       </Motion>
 
-      <div class="flex items-center gap-3 text-gray-100/80">
+      <div class="flex items-center gap-3 text-neutral-100/80">
         <slot name="socials" :networks="networks">
           <template v-for="network in networks" :key="network.name">
             <Motion
@@ -56,7 +56,7 @@ const props = withDefaults(
     networks?: SocialNetwork[]
   }>(),
   {
-    brandName: 'Antigaspi',
+    brandName: 'GÊLADAL',
     tagline: 'Ensemble, réduisons le gaspillage alimentaire.',
     networks: () => [
       { name: 'twitter', href: '#' },

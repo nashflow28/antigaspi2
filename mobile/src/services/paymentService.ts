@@ -1,10 +1,10 @@
 /**
  * Service de Paiement Mobile Money pour l'Afrique de l'Ouest
- * Supporte Flooz (Moov) et TMoney (Togocom) via PayGate Global
+ * Supporte Flooz (Moov) et Mixx by Yas via PayGate Global
  *
  * PayGate API Documentation: https://paygateglobal.com/guide
  * - Flooz (Moov Togo)
- * - TMoney (Togocom)
+ * - Mixx by Yas (ex-TMoney)
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -84,7 +84,7 @@ class PaymentService {
     },
     {
       id: 'tmoney',
-      name: 'T-Money (Togocom)',
+      name: 'Mixx by Yas',
       logo: '💰',
       colors: {
         primary: '#FFCC00',
@@ -325,7 +325,7 @@ class PaymentService {
     if (provider === 'tmoney') {
       return [
         `Une demande de paiement arrive sur votre téléphone`,
-        `Validez avec votre code PIN TMoney pour payer ${formattedAmount}`,
+        `Validez avec votre code PIN Mixx by Yas pour payer ${formattedAmount}`,
         `Ne fermez pas cette fenêtre`,
         `La confirmation sera automatique`,
       ]

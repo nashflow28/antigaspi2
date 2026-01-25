@@ -11,14 +11,14 @@
       <RouterLink
         to="/"
         class="group inline-flex items-center gap-3 rounded-full px-3 py-2 text-neutral-900 transition-all duration-300 ease-spring-out focus-2025 hover:-translate-y-0.5 hover:text-primary-900 dark:text-dark-50"
-        aria-label="Antigaspi - Retour à l'accueil"
+        aria-label="GÊLADAL - Retour à l'accueil"
         :aria-current="route.path === '/' ? 'page' : undefined"
       >
         <span class="grid h-9 w-9 place-items-center rounded-2xl bg-gradient-to-br from-primary-500 via-accent-blue/70 to-accent-blue text-white shadow-lg shadow-primary-500/30 transition-transform duration-500 group-hover:scale-105">
           🌱
         </span>
         <span class="flex flex-col text-left">
-          <span class="text-base font-semibold tracking-tight text-neutral-900 dark:text-dark-50">Antigaspi</span>
+          <span class="text-base font-semibold tracking-tight text-neutral-900 dark:text-dark-50">GÊLADAL</span>
           <span class="text-xs font-medium text-neutral-500 transition-colors duration-300 group-hover:text-neutral-700 dark:text-dark-300">
             Sauvons ensemble
           </span>
@@ -115,7 +115,7 @@
                 aria-label="Parcourir les produits disponibles"
               >
                 <span class="relative z-10">Produits</span>
-                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:transition-opacity duration-200" />
+                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-700 opacity-0 group-hover:transition-opacity duration-200" />
               </RouterLink>
             </li>
 
@@ -129,7 +129,7 @@
                 aria-label="Explorer les paniers surprise disponibles"
               >
                 <span class="relative z-10">Paniers surprise</span>
-                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:transition-opacity duration-200" />
+                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-700 opacity-0 group-hover:transition-opacity duration-200" />
               </RouterLink>
             </li>
 
@@ -143,7 +143,7 @@
                 aria-label="Voir la carte des commerçants"
               >
                 <span class="relative z-10">Carte</span>
-                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:transition-opacity duration-200" />
+                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-700 opacity-0 group-hover:transition-opacity duration-200" />
               </RouterLink>
             </li>
 
@@ -157,7 +157,7 @@
                 aria-label="Consulter les avis clients"
               >
                 <span class="relative z-10">Avis</span>
-                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:transition-opacity duration-200" />
+                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-700 opacity-0 group-hover:transition-opacity duration-200" />
               </RouterLink>
             </li>
 
@@ -366,7 +366,8 @@ import {
   Gift,
   Wallet,
   MapPin,
-  Bell
+  Bell,
+  Truck
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
@@ -386,7 +387,7 @@ const authStore = useAuthStore()
 const cartStore = useCartStore()
 
 const brand = computed<NavigationBrand>(() => ({
-  name: 'Antigaspi',
+  name: 'GÊLADAL',
   tagline: 'Sauvons ensemble',
   to: '/'
 }))
@@ -493,6 +494,7 @@ const userMenuLinks = computed<UserMenuLink[]>(() => {
       { to: '/messaging', label: 'Messagerie commerçant', icon: MessageCircle },
       { to: '/surprise-baskets', label: 'Paniers surprise', icon: Gift },
       { to: '/reservations', label: 'Mes réservations', icon: ShoppingBag },
+      { to: '/deliveries/history', label: 'Mes livraisons', icon: Truck },
       { to: '/wallet', label: 'Mon portefeuille', icon: Wallet },
       { to: '/loyalty', label: 'Points de fidélité', icon: Star }
     ],
@@ -502,6 +504,13 @@ const userMenuLinks = computed<UserMenuLink[]>(() => {
       { to: '/merchant/payments', label: 'Paiements & Portefeuille', icon: Wallet },
       { to: '/merchant/reviews/dashboard', label: 'Mes avis', icon: MessageSquare },
       { to: '/merchant/loyalty', label: 'Points de fidélité', icon: Star }
+    ],
+    driver: [
+      { to: '/driver/deliveries/available', label: 'Livraisons disponibles', icon: Truck },
+      { to: '/driver/deliveries/active', label: 'Livraison en cours', icon: Truck },
+      { to: '/driver/history', label: 'Historique', icon: ShoppingBag },
+      { to: '/driver/earnings', label: 'Gains', icon: Wallet },
+      { to: '/driver/profile', label: 'Profil livreur', icon: User }
     ],
     admin: [
       { to: '/admin/users', label: 'Utilisateurs', icon: User },
@@ -608,6 +617,8 @@ const getDashboardRoute = () => {
       return '/admin/dashboard'
     case 'merchant':
       return '/merchant/dashboard'
+    case 'driver':
+      return '/driver/dashboard'
     case 'consumer':
     default:
       return '/dashboard'
@@ -619,7 +630,8 @@ const getRoleLabel = (role?: string) => {
   const labels: Record<string, string> = {
     consumer: 'Consommateur',
     merchant: 'Commerçant',
-    admin: 'Administrateur'
+    admin: 'Administrateur',
+    driver: 'Livreur'
   }
   return labels[role] ?? role
 }

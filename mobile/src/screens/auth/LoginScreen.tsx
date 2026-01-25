@@ -35,7 +35,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const insets = useSafeAreaInsets()
   const dispatch = useDispatch<AppDispatch>()
   const { loading: authLoading, error } = useSelector((state: RootState) => state.auth)
-  const { showSuccess, showError } = useAlert()
+  const { showAlert, showSuccess, showError } = useAlert()
 
   // Phone-based auth state
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -68,6 +68,24 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     return cleaned
   }
 
+  // Format phone for display in dialog
+  const formatPhoneForDisplay = (phone: string): string => {
+    const cleaned = phone.replace(/\D/g, '')
+    if (cleaned.length === 8) {
+      return `+228 ${cleaned.slice(0, 2)} ${cleaned.slice(2, 4)} ${cleaned.slice(4, 6)} ${cleaned.slice(6, 8)}`
+    }
+    return phone.startsWith('+') ? phone : `+228 ${phone}`
+  }
+
+  // Handle new user registration after confirmation
+  const handleCreateAccount = () => {
+    navigation.navigate('OTPVerification', {
+      phoneNumber,
+      isNewUser: true,
+      otpAlreadySent: false, // OTP not sent yet - let OTPVerificationScreen send it
+    })
+  }
+
   // Handle phone number submission
   const handlePhoneSubmit = async () => {
     if (!phoneNumber || phoneNumber.length < 8) {
@@ -87,12 +105,21 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       const data = result.data!
 
       if (!data.user_exists) {
-        // New user - navigate to registration flow
-        // OTP will be sent by OTPVerificationScreen (otpAlreadySent: false)
-        navigation.navigate('OTPVerification', {
-          phoneNumber,
-          isNewUser: true,
-          otpAlreadySent: false, // OTP not sent yet - let OTPVerificationScreen send it
+        // New user - ask for confirmation before creating account
+        showAlert({
+          title: 'Numéro non reconnu',
+          message: `Le numéro ${formatPhoneForDisplay(phoneNumber)} n'est pas encore enregistré.\n\nVoulez-vous créer un nouveau compte ?`,
+          type: 'info',
+          buttons: [
+            {
+              text: 'Annuler',
+              style: 'cancel',
+            },
+            {
+              text: 'Créer un compte',
+              onPress: handleCreateAccount,
+            },
+          ],
         })
       } else if (data.requires_pin && data.has_pin) {
         // Known device with valid OTP - can use PIN

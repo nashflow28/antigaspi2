@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 px-4 py-10 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-primary-50 px-4 py-10 sm:px-6 lg:px-8">
     <div class="mx-auto flex max-w-6xl flex-col gap-6">
       <div class="flex flex-col gap-2">
         <Button
@@ -19,12 +19,12 @@
       </div>
 
       <Card variant="elevated" class="overflow-hidden">
-        <div class="bg-gradient-to-r from-indigo-600/95 to-blue-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
+        <div class="bg-gradient-to-r from-indigo-600/95 to-primary-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
           <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-wide text-blue-100/90">Planification</p>
+              <p class="text-xs font-semibold uppercase tracking-wide text-primary-100/90">Planification</p>
               <h2 class="text-2xl font-semibold">Disponibilités hebdomadaires</h2>
-              <p class="mt-2 max-w-2xl text-sm text-blue-100/80">
+              <p class="mt-2 max-w-2xl text-sm text-primary-100/80">
                 Activez les créneaux souhaités et précisez les horaires de matinée et d&apos;après-midi. Vous pouvez copier un jour sur tous les autres en un clic.
               </p>
             </div>
@@ -46,11 +46,11 @@
               <div
                 v-for="(day, index) in schedule"
                 :key="day.day"
-                class="rounded-3xl border border-neutral-200 bg-white/80 p-5 shadow-sm shadow-neutral-200/40 transition-colors duration-150 hover:border-blue-200"
+                class="rounded-3xl border border-neutral-200 bg-white/80 p-5 shadow-sm shadow-neutral-200/40 transition-colors duration-150 hover:border-primary-200"
               >
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
                       <Calendar class="h-5 w-5" aria-hidden="true" />
                     </div>
                     <div>
@@ -61,7 +61,7 @@
                   <label class="flex cursor-pointer items-center gap-3 text-sm font-medium text-neutral-700">
                     <input
                       type="checkbox"
-                      class="h-4 w-4 rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
+                      class="h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
                       :checked="day.is_open"
                       @change="toggleDay(index)"
                     >
@@ -77,7 +77,7 @@
                         Début
                         <input
                           type="time"
-                          class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
+                          class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
                           :value="day.morning_start || '08:00'"
                           :disabled="!day.is_open"
                           @input="updateTime(index, 'morning_start', ($event.target as HTMLInputElement).value || '')"
@@ -87,7 +87,7 @@
                         Fin
                         <input
                           type="time"
-                          class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
+                          class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
                           :value="day.morning_end || '12:00'"
                           :disabled="!day.is_open"
                           @input="updateTime(index, 'morning_end', ($event.target as HTMLInputElement).value || '')"
@@ -103,7 +103,7 @@
                         Début
                         <input
                           type="time"
-                          class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
+                          class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
                           :value="day.afternoon_start || '14:00'"
                           :disabled="!day.is_open"
                           @input="updateTime(index, 'afternoon_start', ($event.target as HTMLInputElement).value || '')"
@@ -113,7 +113,7 @@
                         Fin
                         <input
                           type="time"
-                          class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
+                          class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
                           :value="day.afternoon_end || '18:00'"
                           :disabled="!day.is_open"
                           @input="updateTime(index, 'afternoon_end', ($event.target as HTMLInputElement).value || '')"
@@ -142,19 +142,19 @@
             </div>
 
             <div class="mt-8 grid gap-4 lg:grid-cols-[2fr_1fr]">
-              <div class="space-y-3 rounded-3xl border border-blue-100 bg-blue-50/70 p-5 text-sm text-blue-900">
+              <div class="space-y-3 rounded-3xl border border-primary-100 bg-primary-50/70 p-5 text-sm text-primary-900">
                 <p class="font-semibold">Conseils d&apos;optimisation</p>
                 <ul class="space-y-2">
                   <li class="flex items-start gap-2">
-                    <Check class="mt-1 h-4 w-4 text-blue-600" aria-hidden="true" />
+                    <Check class="mt-1 h-4 w-4 text-primary-600" aria-hidden="true" />
                     Indiquez vos horaires réels de retrait pour éviter les clients déçus.
                   </li>
                   <li class="flex items-start gap-2">
-                    <Check class="mt-1 h-4 w-4 text-blue-600" aria-hidden="true" />
+                    <Check class="mt-1 h-4 w-4 text-primary-600" aria-hidden="true" />
                     Ajustez les créneaux selon vos périodes de forte affluence.
                   </li>
                   <li class="flex items-start gap-2">
-                    <Check class="mt-1 h-4 w-4 text-blue-600" aria-hidden="true" />
+                    <Check class="mt-1 h-4 w-4 text-primary-600" aria-hidden="true" />
                     Fermez les jours fériés via la désactivation du jour concerné.
                   </li>
                 </ul>

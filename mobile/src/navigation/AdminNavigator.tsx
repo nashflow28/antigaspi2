@@ -28,6 +28,13 @@ const DashboardStack = () => (
     <Stack.Screen name="Analytics" component={AdminAnalyticsScreen} />
     <Stack.Screen name="Settings" component={AdminSettingsScreen} />
     <Stack.Screen name="Payments" component={AdminPaymentDashboardScreen} />
+    {/* Screens accessible from Dashboard quick actions */}
+    <Stack.Screen name="Categories" component={AdminCategoriesScreen} />
+    <Stack.Screen name="ReviewModeration" component={AdminReviewModerationScreen} />
+    <Stack.Screen name="Broadcast" component={AdminBroadcastScreen} />
+    <Stack.Screen name="Users" component={AdminUsersScreen} />
+    <Stack.Screen name="Merchants" component={AdminMerchantsScreen} />
+    <Stack.Screen name="Products" component={AdminProductsScreen} />
   </Stack.Navigator>
 )
 

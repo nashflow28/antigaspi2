@@ -1,17 +1,17 @@
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-slate-900">
+  <div class="min-h-screen bg-neutral-50 dark:bg-neutral-900">
     <!-- Header -->
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
+    <header class="bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10">
       <div class="max-w-lg mx-auto px-4 py-4">
         <div class="flex items-center gap-4">
           <button
             type="button"
-            class="p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            class="p-2 -ml-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
             @click="goBack"
           >
-            <ArrowLeft class="h-5 w-5 text-slate-600 dark:text-slate-400" />
+            <ArrowLeft class="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
           </button>
-          <h1 class="text-lg font-semibold text-slate-900 dark:text-white">
+          <h1 class="text-lg font-semibold text-neutral-900 dark:text-white">
             Recharger mon portefeuille
           </h1>
         </div>
@@ -25,8 +25,8 @@
         <Card class="p-4">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Solde actuel</p>
-              <p class="text-2xl font-bold text-slate-900 dark:text-white">
+              <p class="text-sm text-neutral-500 dark:text-neutral-400">Solde actuel</p>
+              <p class="text-2xl font-bold text-neutral-900 dark:text-white">
                 {{ formatAmount(currentBalance) }} <span class="text-sm">XOF</span>
               </p>
             </div>
@@ -38,7 +38,7 @@
 
         <!-- Quick Amount Buttons -->
         <div>
-          <h3 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+          <h3 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">
             Montants rapides
           </h3>
           <div class="grid grid-cols-3 gap-3">
@@ -49,7 +49,7 @@
               class="py-4 rounded-xl border-2 font-semibold transition-all"
               :class="selectedAmount === preset
                 ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary-300'"
+                : 'border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-primary-300'"
               @click="selectPreset(preset)"
             >
               {{ formatAmount(preset) }}
@@ -71,13 +71,13 @@
               @input="handleCustomAmount"
             />
             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <span class="text-slate-500 dark:text-slate-400">XOF</span>
+              <span class="text-neutral-500 dark:text-neutral-400">XOF</span>
             </div>
           </div>
           <p v-if="amountError" class="mt-1 text-sm text-red-600 dark:text-red-400">
             {{ amountError }}
           </p>
-          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
             Minimum : {{ formatAmount(minAmount) }} XOF • Maximum : {{ formatAmount(maxAmount) }} XOF
           </p>
         </div>
@@ -85,7 +85,7 @@
         <!-- Amount Summary -->
         <Card v-if="selectedAmount > 0" class="p-4 bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800">
           <div class="flex items-center justify-between">
-            <span class="text-slate-700 dark:text-slate-300">Montant à recharger</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Montant à recharger</span>
             <span class="text-xl font-bold text-primary-700 dark:text-primary-300">
               {{ formatAmount(selectedAmount) }} XOF
             </span>
@@ -125,25 +125,25 @@
           <div class="mx-auto w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-6">
             <CheckCircle class="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          <h2 class="text-2xl font-bold text-neutral-900 dark:text-white mb-2">
             Recharge réussie !
           </h2>
-          <p class="text-slate-600 dark:text-slate-400">
+          <p class="text-neutral-600 dark:text-neutral-400">
             Votre portefeuille a été crédité de {{ formatAmount(selectedAmount) }} XOF
           </p>
 
-          <div class="mt-6 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+          <div class="mt-6 p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl">
             <div class="flex items-center justify-between text-sm mb-2">
-              <span class="text-slate-500">Ancien solde</span>
-              <span class="text-slate-700 dark:text-slate-300">{{ formatAmount(currentBalance) }} XOF</span>
+              <span class="text-neutral-500">Ancien solde</span>
+              <span class="text-neutral-700 dark:text-neutral-300">{{ formatAmount(currentBalance) }} XOF</span>
             </div>
             <div class="flex items-center justify-between text-sm mb-2">
-              <span class="text-slate-500">Recharge</span>
+              <span class="text-neutral-500">Recharge</span>
               <span class="text-emerald-600 dark:text-emerald-400">+{{ formatAmount(selectedAmount) }} XOF</span>
             </div>
-            <div class="border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
+            <div class="border-t border-neutral-200 dark:border-neutral-700 pt-2 mt-2">
               <div class="flex items-center justify-between">
-                <span class="font-medium text-slate-700 dark:text-slate-300">Nouveau solde</span>
+                <span class="font-medium text-neutral-700 dark:text-neutral-300">Nouveau solde</span>
                 <span class="text-xl font-bold text-primary-600 dark:text-primary-400">
                   {{ formatAmount(newBalance) }} XOF
                 </span>

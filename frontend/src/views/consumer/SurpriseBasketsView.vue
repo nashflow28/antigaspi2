@@ -1,20 +1,20 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-900 dark:to-neutral-800">
+    <header class="border-b border-neutral-200 dark:border-neutral-700 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm">
       <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 py-6 sm:py-8">
         <div class="flex flex-col gap-3 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <nav class="text-sm text-gray-500" aria-label="Fil d'Ariane">
+            <nav class="text-sm text-neutral-500 dark:text-neutral-400" aria-label="Fil d'Ariane">
               <ol class="flex items-center gap-2">
                 <li>
-                  <router-link to="/" class="hover:text-gray-800">Accueil</router-link>
+                  <router-link to="/" class="hover:text-neutral-800 dark:hover:text-neutral-200">Accueil</router-link>
                 </li>
-                <li class="text-gray-400">/</li>
-                <li class="font-medium text-gray-800">Paniers surprise</li>
+                <li class="text-neutral-400 dark:text-neutral-500">/</li>
+                <li class="font-medium text-neutral-800 dark:text-neutral-100">Paniers surprise</li>
               </ol>
             </nav>
-            <h1 class="mt-4 text-xl font-semibold text-gray-900">Paniers surprise disponibles</h1>
-            <p class="mt-2 text-gray-700">
+            <h1 class="mt-4 text-xl font-semibold text-neutral-900 dark:text-neutral-50">Paniers surprise disponibles</h1>
+            <p class="mt-2 text-neutral-700 dark:text-neutral-300">
               {{ totalResults }} panier{{ totalResults > 1 ? 's' : '' }} disponible{{ totalResults > 1 ? 's' : '' }} près de chez vous
             </p>
           </div>
@@ -43,10 +43,10 @@
               :no-padding="true"
               class="flex items-center gap-3 rounded px-3 py-3 shadow-primary-500/10"
             >
-              <Package class="h-8 w-8 text-blue-500" />
+              <Package class="h-8 w-8 text-primary-500" />
               <div>
-                <p class="text-xs uppercase tracking-wide text-gray-500">Impact</p>
-                <p class="text-sm font-semibold text-gray-900">{{ totalResults }} commerçant{{ totalResults > 1 ? 's' : '' }}</p>
+                <p class="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Impact</p>
+                <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ totalResults }} commerçant{{ totalResults > 1 ? 's' : '' }}</p>
               </div>
             </Card>
           </div>
@@ -62,10 +62,10 @@
       <section class="space-y-6">
         <div
           v-if="loading"
-          class="flex min-h-[200px] items-center justify-center rounded border border-dashed border-gray-200 bg-white"
+          class="flex min-h-[200px] items-center justify-center rounded border border-dashed border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-800"
         >
-          <div class="flex items-center gap-3 text-gray-700">
-            <span class="inline-flex h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-primary-500" />
+          <div class="flex items-center gap-3 text-neutral-700 dark:text-neutral-300">
+            <span class="inline-flex h-8 w-8 animate-spin rounded-full border-2 border-neutral-200 dark:border-neutral-600 border-t-primary-500" />
             Chargement des paniers surprise...
           </div>
         </div>
@@ -75,11 +75,11 @@
           :no-padding="true"
           class="flex flex-col items-center gap-3 px-3 sm:px-4 lg:px-6 py-16 sm:py-16 lg:py-16 text-left sm:text-center"
         >
-          <div class="flex icon-xl items-center justify-center rounded-full bg-gray-100">
-            <Package class="h-8 w-8 text-gray-400" />
+          <div class="flex icon-xl items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-700">
+            <Package class="h-8 w-8 text-neutral-400 dark:text-neutral-500" />
           </div>
-          <h2 class="text-xl font-semibold text-gray-800">Aucun panier ne correspond à vos filtres</h2>
-          <p class="mt-2 text-gray-500">
+          <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100">Aucun panier ne correspond à vos filtres</h2>
+          <p class="mt-2 text-neutral-500 dark:text-neutral-400">
             Ajustez vos critères pour découvrir d'autres paniers surprise disponibles.
           </p>
           <Button
@@ -108,7 +108,7 @@
         <Card
           v-if="pagination.lastPage > 1"
           :no-padding="true"
-          class="flex items-center justify-between gap-3 rounded border border-gray-200 bg-white px-3 py-3 text-sm text-gray-700"
+          class="flex items-center justify-between gap-3 rounded border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3 py-3 text-sm text-neutral-700 dark:text-neutral-300"
         >
           <Button
             type="button"

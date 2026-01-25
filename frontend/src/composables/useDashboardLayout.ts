@@ -11,12 +11,15 @@ import {
   UsersIcon,
   GiftIcon,
   ShieldCheckIcon,
-  ClipboardDocumentCheckIcon
+  ClipboardDocumentCheckIcon,
+  TruckIcon,
+  MapIcon,
+  UserCircleIcon
 } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import type { User } from '@/types'
 
-type Role = 'consumer' | 'merchant' | 'admin'
+type Role = 'consumer' | 'merchant' | 'admin' | 'driver'
 
 type NavigationConfig = {
   label: string
@@ -44,6 +47,12 @@ const navigationByRole: Record<Role, NavigationConfig[]> = {
       href: '/reservations',
       icon: CalendarDaysIcon,
       routes: ['reservations', 'reservation-detail']
+    },
+    {
+      label: 'Mes livraisons',
+      href: '/deliveries/history',
+      icon: TruckIcon,
+      routes: ['delivery-history', 'delivery-tracking', 'delivery-request', 'delivery-rating']
     },
     {
       label: 'Mon portefeuille',
@@ -139,6 +148,44 @@ const navigationByRole: Record<Role, NavigationConfig[]> = {
       icon: ChatBubbleLeftRightIcon,
       routes: ['admin-reviews']
     }
+  ],
+  driver: [
+    {
+      label: 'Tableau de bord',
+      href: '/driver/dashboard',
+      icon: ChartBarIcon,
+      routes: ['driver-dashboard']
+    },
+    {
+      label: 'Livraisons disponibles',
+      href: '/driver/deliveries/available',
+      icon: MapIcon,
+      routes: ['driver-deliveries-available']
+    },
+    {
+      label: 'Livraison en cours',
+      href: '/driver/deliveries/active',
+      icon: TruckIcon,
+      routes: ['driver-deliveries-active']
+    },
+    {
+      label: 'Historique',
+      href: '/driver/history',
+      icon: ClipboardDocumentCheckIcon,
+      routes: ['driver-history']
+    },
+    {
+      label: 'Gains',
+      href: '/driver/earnings',
+      icon: BanknotesIcon,
+      routes: ['driver-earnings']
+    },
+    {
+      label: 'Profil',
+      href: '/driver/profile',
+      icon: UserCircleIcon,
+      routes: ['driver-profile', 'driver-profile-edit']
+    }
   ]
 }
 
@@ -154,6 +201,10 @@ const brandByRole: Record<Role, BrandConfig> = {
   admin: {
     name: 'Console Admin',
     logo: ShieldCheckIcon
+  },
+  driver: {
+    name: 'Espace Livreur',
+    logo: TruckIcon
   }
 }
 

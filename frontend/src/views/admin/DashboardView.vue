@@ -12,7 +12,7 @@
             Tableau de bord administrateur
           </h1>
           <p class="text-neutral-600 dark:text-neutral-300">
-            Supervision globale de la plateforme AntiGaspi
+            Supervision globale de la plateforme GÊLADAL
           </p>
         </div>
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center">

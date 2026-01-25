@@ -588,6 +588,13 @@ class ApiService {
     }, true)
   }
 
+  async rejectReservation(id: number, reason?: string): Promise<ApiResponse<Reservation>> {
+    return this.request<ApiResponse<Reservation>>(`/reservations/${id}/reject`, {
+      method: 'POST',
+      body: reason ? JSON.stringify({ reason }) : undefined
+    }, true)
+  }
+
   async updateReservationStatus(id: number, status: Reservation['status']): Promise<ApiResponse<Reservation>> {
     return this.request<ApiResponse<Reservation>>(`/reservations/${id}/status`, {
       method: 'PATCH',

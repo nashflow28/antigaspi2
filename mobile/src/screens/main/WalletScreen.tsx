@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
 
-import { Button, Card, Typography, Modal as Modal2025, Badge } from '../../components/2025'
+import { Button, Card, Typography, Modal as Modal2025, Badge, PhoneInput } from '../../components/2025'
 import AlertModal from '../../components/AlertModal'
 import { useTheme } from '../../theme'
 import { useAlert } from '../../hooks/useAlert'
@@ -37,10 +37,7 @@ import type { WalletTransaction, WalletTransactionType, WalletRechargePayload } 
 
 const paymentMethods: { id: WalletRechargePayload['paymentMethod']; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { id: 'flooz', label: 'Flooz', icon: 'phone-portrait' },
-  { id: 'tmoney', label: 'TMoney', icon: 'wallet' },
-  { id: 'orange_money', label: 'Orange Money', icon: 'flash' },
-  { id: 'mtn_momo', label: 'MTN MoMo', icon: 'card' },
-  { id: 'paystack', label: 'Paystack', icon: 'globe-outline' },
+  { id: 'tmoney', label: 'Mixx by Yas', icon: 'wallet' },
 ]
 
 const formatDateTime = (date: string) => {
@@ -378,7 +375,7 @@ const WalletScreen: React.FC = () => {
         <Typography variant="caption" color="secondary" style={styles.statusHint}>
           {wallet?.is_active
             ? 'Votre portefeuille est prêt à encaisser ou à payer les commandes.'
-            : 'Activez le portefeuille pour accepter des paiements Antigaspi.'}
+            : 'Activez le portefeuille pour accepter des paiements GÊLADAL.'}
         </Typography>
       </Card>
 
@@ -565,12 +562,12 @@ const WalletScreen: React.FC = () => {
           <Typography variant="caption" style={styles.modalSectionTitle}>
             Numéro Mobile Money (optionnel)
           </Typography>
-          <TextInput
+          <PhoneInput
             value={rechargePhone}
             onChangeText={setRechargePhone}
-            placeholder="Ex: 90 12 34 56"
-            keyboardType="phone-pad"
-            style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
+            placeholder="90 12 34 56"
+            defaultCountryCode="+228"
+            testID="wallet-recharge-phone-input"
           />
           <Button
             variant="primary"

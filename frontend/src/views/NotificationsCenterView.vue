@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 px-4 py-8 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50 px-4 py-8 sm:px-6 lg:px-8">
     <div class="mx-auto flex max-w-6xl flex-col gap-6">
       <div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <Card variant="elevated" class="overflow-hidden">
-          <div class="bg-gradient-to-r from-indigo-600/90 to-blue-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
-            <p class="text-sm font-semibold uppercase tracking-wide text-blue-100">Centre de notifications</p>
+          <div class="bg-gradient-to-r from-indigo-600/90 to-primary-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
+            <p class="text-sm font-semibold uppercase tracking-wide text-primary-100">Centre de notifications</p>
             <h1 class="mt-2 text-2xl font-semibold">Tous vos messages importants</h1>
-            <p class="mt-2 max-w-3xl text-sm text-blue-100/90">
-              Retrouvez l&apos;historique complet de vos alertes Antigaspi, suivez vos réservations et ajustez vos préférences de communication.
+            <p class="mt-2 max-w-3xl text-sm text-primary-100/90">
+              Retrouvez l&apos;historique complet de vos alertes GÊLADAL, suivez vos réservations et ajustez vos préférences de communication.
             </p>
-            <div class="mt-6 flex flex-wrap items-center gap-4 text-xs text-blue-50/80">
+            <div class="mt-6 flex flex-wrap items-center gap-4 text-xs text-primary-50/80">
               <span class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5">
                 <Sparkles class="h-4 w-4" aria-hidden="true" />
                 {{ unreadCount }} notification<span v-if="unreadCount > 1">s</span> non lue<span v-if="unreadCount > 1">s</span>
@@ -72,7 +72,7 @@
                   }"
                 >
                   <template #icon>
-                    <Inbox class="h-12 w-12 text-blue-500" aria-hidden="true" />
+                    <Inbox class="h-12 w-12 text-primary-500" aria-hidden="true" />
                   </template>
                 </EmptyState>
               </template>
@@ -85,13 +85,13 @@
                     'rounded-2xl border p-5 transition-shadow duration-200',
                     notification.is_read
                       ? 'bg-white border-neutral-200 hover:shadow-lg'
-                      : 'border-blue-200/80 bg-blue-50/70 shadow-blue-200/40 hover:shadow-xl'
+                      : 'border-primary-200/80 bg-primary-50/70 shadow-primary-200/40 hover:shadow-xl'
                   ]"
                 >
                   <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div class="space-y-3">
                       <div class="flex items-start gap-3">
-                        <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/30">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-indigo-500 text-white shadow-lg shadow-primary-500/30">
                           <component :is="typeIcon(notification.type)" class="h-5 w-5" aria-hidden="true" />
                         </span>
                         <div class="space-y-1">
@@ -112,7 +112,7 @@
                           <span>{{ formatRelativeTime(notification.sent_at || notification.created_at) }}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                          <component :is="channelIcon(notification.sent_via)" class="h-4 w-4 text-blue-500" aria-hidden="true" />
+                          <component :is="channelIcon(notification.sent_via)" class="h-4 w-4 text-primary-500" aria-hidden="true" />
                           <span>{{ formatChannelLabel(notification.sent_via) }}</span>
                         </div>
                       </div>
@@ -150,7 +150,7 @@
         <div class="space-y-6">
           <Card class="p-6">
             <div class="flex items-start gap-3">
-              <Settings2 class="h-5 w-5 text-blue-600" aria-hidden="true" />
+              <Settings2 class="h-5 w-5 text-primary-600" aria-hidden="true" />
               <div>
                 <h2 class="text-lg font-semibold text-neutral-900">Mes préférences</h2>
                 <p class="mt-1 text-sm text-neutral-500">
@@ -163,17 +163,17 @@
               <label
                 v-for="channel in preferenceOptions"
                 :key="channel.key"
-                class="flex cursor-pointer items-start gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3 transition hover:border-blue-300 hover:shadow-md"
+                class="flex cursor-pointer items-start gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3 transition hover:border-primary-300 hover:shadow-md"
               >
                 <input
                   v-model="localPreferences[channel.key]"
                   type="checkbox"
-                  class="mt-1 h-4 w-4 rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
+                  class="mt-1 h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
                   :disabled="channel.key === 'push' && pushNotSupported"
                 >
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <component :is="channel.icon" class="h-4 w-4 text-blue-500" aria-hidden="true" />
+                    <component :is="channel.icon" class="h-4 w-4 text-primary-500" aria-hidden="true" />
                     <p class="text-sm font-semibold text-neutral-800">{{ channel.label }}</p>
                     <Badge
                       v-if="channel.key === 'push' && !pushSupported"
@@ -197,7 +197,7 @@
 
             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p class="text-xs text-neutral-500">
-                Les modifications sont sauvegardées pour votre compte Antigaspi et synchronisées sur tous vos appareils.
+                Les modifications sont sauvegardées pour votre compte GÊLADAL et synchronisées sur tous vos appareils.
               </p>
               <Button
                 variant="primary"
@@ -213,7 +213,7 @@
 
           <Card variant="bordered" class="p-6">
             <div class="flex items-start gap-3">
-              <BellRing class="h-5 w-5 text-blue-600" aria-hidden="true" />
+              <BellRing class="h-5 w-5 text-primary-600" aria-hidden="true" />
               <div>
                 <h3 class="text-base font-semibold text-neutral-900">Notifications push</h3>
                 <p class="mt-1 text-sm text-neutral-500">
@@ -237,7 +237,7 @@
                 Activez les notifications dans les paramètres de votre navigateur pour recevoir des alertes push.
               </p>
               <p v-else class="flex items-center gap-2 text-xs text-neutral-500">
-                <Wifi class="h-4 w-4 text-blue-400" aria-hidden="true" />
+                <Wifi class="h-4 w-4 text-primary-400" aria-hidden="true" />
                 Les notifications push nécessitent un service worker actif et une connexion Internet.
               </p>
             </div>
@@ -405,7 +405,7 @@ const syncPreferences = () => {
 }
 
 const formatTypeLabel = (value?: string | null) => {
-  if (!value) return 'Notification Antigaspi'
+  if (!value) return 'Notification GÊLADAL'
   return value
     .replace(/[_-]+/g, ' ')
     .replace(/\s+/g, ' ')

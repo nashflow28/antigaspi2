@@ -2,15 +2,15 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-slate-50 via-blue-50/40 to-emerald-50/30"
+    class="bg-gradient-to-br from-neutral-50 via-primary-50/40 to-emerald-50/30"
   >
     <div class="space-y-6 px-4 py-6 lg:px-8">
       <section class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div class="space-y-2">
-          <h1 class="text-2xl font-semibold text-slate-900 lg:text-3xl">
+          <h1 class="text-2xl font-semibold text-neutral-900 lg:text-3xl">
             Suivi des paiements
           </h1>
-          <p class="text-base text-slate-600 lg:text-lg">
+          <p class="text-base text-neutral-600 lg:text-lg">
             Visualisez vos encaissements, filtrez les statuts et exportez vos transactions en un clic.
           </p>
         </div>
@@ -54,7 +54,7 @@
 
       <Card class="space-y-4 p-4">
         <header class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-2 text-sm font-medium text-slate-600">
+          <div class="flex items-center gap-2 text-sm font-medium text-neutral-600">
             <Filter class="h-4 w-4" />
             <span>Affiner l'analyse</span>
             <Badge v-if="activeFiltersCount" variant="info" size="sm">
@@ -65,7 +65,7 @@
           <Button
             variant="ghost"
             size="sm"
-            class="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
+            class="flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
             :disabled="activeFiltersCount === 0"
             @click="resetFilters"
           >
@@ -76,7 +76,7 @@
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700">Statut</label>
+            <label class="text-sm font-medium text-neutral-700">Statut</label>
             <Select v-model="filters.status" size="sm">
               <option value="all">Tous les statuts</option>
               <option value="success">Réussi</option>
@@ -88,10 +88,10 @@
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700">Méthode</label>
+            <label class="text-sm font-medium text-neutral-700">Méthode</label>
             <Select v-model="filters.method" size="sm">
               <option value="all">Toutes les méthodes</option>
-              <option value="wallet">Portefeuille AntiGaspi</option>
+              <option value="wallet">Portefeuille GÊLADAL</option>
               <option value="flooz">Flooz</option>
               <option value="tmoney">Mixx by Yas (Tmoney)</option>
               <option value="orange_money">Orange Money</option>
@@ -102,31 +102,31 @@
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700">Du</label>
+            <label class="text-sm font-medium text-neutral-700">Du</label>
             <div class="relative">
               <Input
                 v-model="filters.date_from"
                 type="date"
                 class="w-full"
               />
-              <CalendarRange class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <CalendarRange class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
             </div>
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700">Au</label>
+            <label class="text-sm font-medium text-neutral-700">Au</label>
             <div class="relative">
               <Input
                 v-model="filters.date_to"
                 type="date"
                 class="w-full"
               />
-              <CalendarRange class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <CalendarRange class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
             </div>
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700">Montant min.</label>
+            <label class="text-sm font-medium text-neutral-700">Montant min.</label>
             <Input
               v-model="filters.min_amount"
               type="number"
@@ -137,7 +137,7 @@
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700">Montant max.</label>
+            <label class="text-sm font-medium text-neutral-700">Montant max.</label>
             <Input
               v-model="filters.max_amount"
               type="number"
@@ -166,8 +166,8 @@
       >
         <template #cell-reference="{ row }">
           <div class="space-y-1">
-            <p class="font-medium text-slate-900">{{ row.reference }}</p>
-            <p class="text-xs text-slate-500">
+            <p class="font-medium text-neutral-900">{{ row.reference }}</p>
+            <p class="text-xs text-neutral-500">
               Réservation {{ row.reservationCode }}
             </p>
           </div>
@@ -175,27 +175,27 @@
 
         <template #cell-customer="{ row }">
           <div class="space-y-1">
-            <p class="font-medium text-slate-900">
+            <p class="font-medium text-neutral-900">
               {{ row.customer.name }}
             </p>
-            <p v-if="row.customer.phone" class="text-xs text-slate-500">
+            <p v-if="row.customer.phone" class="text-xs text-neutral-500">
               {{ row.customer.phone }}
             </p>
           </div>
         </template>
 
         <template #cell-product="{ row }">
-          <p class="text-sm text-slate-700">
+          <p class="text-sm text-neutral-700">
             {{ row.product }}
           </p>
         </template>
 
         <template #cell-amount="{ row }">
           <div class="flex flex-col items-end">
-            <span class="font-semibold text-slate-900">
+            <span class="font-semibold text-neutral-900">
               {{ formatAmountDisplay(row.amount, row.currency) }}
             </span>
-            <span class="text-xs text-slate-400">
+            <span class="text-xs text-neutral-400">
               {{ statusLabels[row.status] ?? row.status }}
             </span>
           </div>
@@ -214,13 +214,13 @@
         </template>
 
         <template #cell-created_at="{ row }">
-          <span class="text-sm text-slate-600">
+          <span class="text-sm text-neutral-600">
             {{ formatDateTime(row.created_at) }}
           </span>
         </template>
 
         <template #cell-paid_at="{ row }">
-          <span class="text-sm text-slate-600">
+          <span class="text-sm text-neutral-600">
             {{ row.paid_at ? formatDateTime(row.paid_at) : '—' }}
           </span>
         </template>
@@ -315,7 +315,7 @@ const statusBadgeVariant = (status?: string) => {
 }
 
 const methodLabels: Record<string, string> = {
-  wallet: 'Portefeuille AntiGaspi',
+  wallet: 'Portefeuille GÊLADAL',
   flooz: 'Flooz',
   tmoney: 'Mixx by Yas (Tmoney)',
   orange_money: 'Orange Money',

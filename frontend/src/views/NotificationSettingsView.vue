@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 px-4 py-10 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-primary-50 px-4 py-10 sm:px-6 lg:px-8">
     <div class="mx-auto flex max-w-4xl flex-col gap-6">
       <div class="flex flex-col gap-2">
         <Button
@@ -14,17 +14,17 @@
         </Button>
         <h1 class="text-3xl font-semibold text-neutral-900">Paramètres de notification</h1>
         <p class="max-w-2xl text-sm text-neutral-600">
-          Choisissez comment vous souhaitez être averti des réservations, rappels et offres Antigaspi. Les préférences sont synchronisées sur tous vos appareils.
+          Choisissez comment vous souhaitez être averti des réservations, rappels et offres GÊLADAL. Les préférences sont synchronisées sur tous vos appareils.
         </p>
       </div>
 
       <Card variant="elevated" class="overflow-hidden">
-        <div class="bg-gradient-to-r from-indigo-600/90 to-blue-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
+        <div class="bg-gradient-to-r from-indigo-600/90 to-primary-600/90 px-6 py-8 text-white sm:px-8 sm:py-10">
           <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-wide text-blue-100/80">Gestion des alertes</p>
+              <p class="text-xs font-semibold uppercase tracking-wide text-primary-100/80">Gestion des alertes</p>
               <h2 class="text-2xl font-semibold">Canaux de communication</h2>
-              <p class="mt-2 max-w-2xl text-sm text-blue-100/80">
+              <p class="mt-2 max-w-2xl text-sm text-primary-100/80">
                 Activez les canaux adaptés à vos habitudes : récapitulatifs e-mail, rappels SMS ou notifications push instantanées.
               </p>
             </div>
@@ -44,18 +44,18 @@
               <label
                 v-for="channel in preferenceOptions"
                 :key="channel.key"
-                class="flex cursor-pointer items-start gap-3 rounded-3xl border border-neutral-200 bg-white/90 px-5 py-4 transition hover:border-blue-300 hover:shadow-lg"
+                class="flex cursor-pointer items-start gap-3 rounded-3xl border border-neutral-200 bg-white/90 px-5 py-4 transition hover:border-primary-300 hover:shadow-lg"
               >
                 <input
                   v-model="localPreferences[channel.key]"
                   type="checkbox"
-                  class="mt-1 h-5 w-5 rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
+                  class="mt-1 h-5 w-5 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
                   :disabled="channel.key === 'push' && pushNotSupported"
                   @change="handleChannelToggle(channel.key)"
                 >
                 <div class="space-y-1">
                   <div class="flex flex-wrap items-center gap-2">
-                    <component :is="channel.icon" class="h-4 w-4 text-blue-500" aria-hidden="true" />
+                    <component :is="channel.icon" class="h-4 w-4 text-primary-500" aria-hidden="true" />
                     <p class="text-sm font-semibold text-neutral-900">{{ channel.label }}</p>
                     <Badge v-if="channel.key === 'push' && pushNotSupported" variant="warning" size="xs">
                       Navigateur non compatible
@@ -70,7 +70,7 @@
             </div>
 
             <div class="space-y-4">
-              <div class="rounded-3xl border border-blue-100 bg-blue-50/80 p-5 text-sm text-blue-900">
+              <div class="rounded-3xl border border-primary-100 bg-primary-50/80 p-5 text-sm text-primary-900">
                 <p class="flex items-center gap-2 font-semibold">
                   <Bell class="h-4 w-4" aria-hidden="true" />
                   Statut des notifications push
@@ -103,15 +103,15 @@
                 <p class="font-semibold text-neutral-900">Bonnes pratiques</p>
                 <ul class="mt-3 space-y-2">
                   <li class="flex items-start gap-2">
-                    <Check class="mt-1 h-4 w-4 text-blue-600" aria-hidden="true" />
+                    <Check class="mt-1 h-4 w-4 text-primary-600" aria-hidden="true" />
                     Les e-mails contiennent un récapitulatif détaillé de vos réservations.
                   </li>
                   <li class="flex items-start gap-2">
-                    <Check class="mt-1 h-4 w-4 text-blue-600" aria-hidden="true" />
+                    <Check class="mt-1 h-4 w-4 text-primary-600" aria-hidden="true" />
                     Les SMS sont idéals pour ne pas oublier le retrait le jour J.
                   </li>
                   <li class="flex items-start gap-2">
-                    <Check class="mt-1 h-4 w-4 text-blue-600" aria-hidden="true" />
+                    <Check class="mt-1 h-4 w-4 text-primary-600" aria-hidden="true" />
                     Les push offrent une réaction instantanée aux nouvelles offres.
                   </li>
                 </ul>
@@ -122,7 +122,7 @@
           <div class="mt-10 flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-xs text-neutral-500">
               Besoin d&apos;ajuster votre profil ? Rendez-vous sur la
-              <RouterLink class="font-medium text-blue-600 hover:underline" to="/profile/edit">page de modification du profil</RouterLink>.
+              <RouterLink class="font-medium text-primary-600 hover:underline" to="/profile/edit">page de modification du profil</RouterLink>.
             </p>
             <div class="flex flex-col gap-3 sm:flex-row">
               <Button

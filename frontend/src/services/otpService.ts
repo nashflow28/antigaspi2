@@ -218,7 +218,7 @@ class OTPService {
         first_name: data.first_name,
         last_name: data.last_name,
         role: data.role || 'consumer',
-        city: data.city || 'Lomé',
+        city: data.city || 'Lomé'
       }
 
       // Add optional fields
@@ -279,7 +279,7 @@ class OTPService {
         last_name: data.last_name,
         role: data.role || 'consumer',
         city: data.city || 'Lomé',
-        phone_verified: true, // Signal that phone is already verified
+        phone_verified: true // Signal that phone is already verified
       }
 
       // Add optional fields

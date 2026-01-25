@@ -131,7 +131,7 @@ class OrderController extends Controller
 
         // ========== DEBUG TEMPORAIRE ==========
         Log::info('STEP 3: Validation check', [
-            'validation_passed' => !$validator->fails(),
+            'validation_passed' => ! $validator->fails(),
             'errors' => $validator->fails() ? $validator->errors()->toArray() : [],
         ]);
         // ========== FIN DEBUG TEMPORAIRE ==========
@@ -141,6 +141,7 @@ class OrderController extends Controller
                 'errors' => $validator->errors()->toArray(),
                 'input_customer_phone' => $request->input('customer_phone'),
             ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',

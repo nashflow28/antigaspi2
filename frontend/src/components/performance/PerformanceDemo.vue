@@ -5,24 +5,24 @@
     <!-- Performance Metrics -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 sm:mb-3xl">
       <div class="bg-white rounded p-4 shadow-sm border">
-        <h3 class="font-semibold text-gray-800 mt-2">Performance Score</h3>
+        <h3 class="font-semibold text-neutral-800 mt-2">Performance Score</h3>
         <div class="text-xl font-semibold text-green-600">
           95/100
         </div>
       </div>
 
       <div class="bg-white rounded p-4 shadow-sm border">
-        <h3 class="font-semibold text-gray-800 mt-2">Memory Usage</h3>
+        <h3 class="font-semibold text-neutral-800 mt-2">Memory Usage</h3>
         <div class="text-lg">
           45MB / 128MB
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-4 mt-2">
-          <div class="bg-blue-600 h-4 rounded-full w-xs/3" />
+        <div class="w-full bg-neutral-200 rounded-full h-4 mt-2">
+          <div class="bg-primary-600 h-4 rounded-full w-xs/3" />
         </div>
       </div>
 
       <div class="bg-white rounded p-4 shadow-sm border">
-        <h3 class="font-semibold text-gray-800 mt-2">Bundle Size</h3>
+        <h3 class="font-semibold text-neutral-800 mt-2">Bundle Size</h3>
         <div class="text-lg">
           1.2MB gzipped
         </div>
@@ -77,10 +77,10 @@
     <div class="bg-white rounded p-6 shadow-sm border">
       <h3 class="text-lg font-semibold mt-3">🔧 Performance Tools</h3>
       <div class="flex flex-wrap gap-3">
-        <button class="px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors">
+        <button class="px-3 py-3 bg-primary-600 text-white rounded hover:transition-colors">
           Analyze Bundle
         </button>
-        <button class="px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors">
+        <button class="px-3 py-3 bg-primary-600 text-white rounded hover:transition-colors">
           Run Lighthouse
         </button>
         <button class="px-3 py-3 bg-purple-600 text-white rounded hover:transition-colors">

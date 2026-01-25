@@ -9,10 +9,10 @@
       <div class="mt-4 sm:mb-3xl">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-6">
           <div>
-            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-neutral-900 mt-2">
               Modération des Avis
             </h1>
-            <p class="text-gray-700 text-lg">
+            <p class="text-neutral-700 text-lg">
               Gérez les avis en attente et les signalements
             </p>
           </div>
@@ -62,7 +62,7 @@
           </div>
         </Card>
 
-        <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+        <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-secondary-100 text-sm font-medium">Avis aujourd'hui</p>
@@ -80,9 +80,9 @@
         <Card class="bg-gradient-to-r from-green-500 to-green-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-blue-100 text-sm font-medium">Traités</p>
+              <p class="text-primary-100 text-sm font-medium">Traités</p>
               <p class="text-xl font-semibold">{{ stats.resolved_reports }}</p>
-              <p class="text-blue-200 text-sm mt-1">
+              <p class="text-primary-200 text-sm mt-1">
                 Signalements résolus
               </p>
             </div>
@@ -95,14 +95,14 @@
 
       <!-- Tabs Navigation -->
       <div class="mt-4 sm:mb-3xl">
-        <div class="border-b border-gray-200">
+        <div class="border-b border-neutral-200">
           <nav class="-mb-px flex space-y-8 sm:space-x-8">
             <button
               :class="[
                 'py-3 px-1 border-b-2 font-medium text-sm',
                 activeTab === 'pending'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-800 hover:border-neutral-300'
               ]"
               @click="activeTab = 'pending'"
             >
@@ -115,8 +115,8 @@
               :class="[
                 'py-3 px-1 border-b-2 font-medium text-sm',
                 activeTab === 'reported'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-800 hover:border-neutral-300'
               ]"
               @click="activeTab = 'reported'"
             >

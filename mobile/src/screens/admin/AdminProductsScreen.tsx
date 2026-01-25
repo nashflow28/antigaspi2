@@ -76,8 +76,9 @@ const AdminProductsScreen: React.FC = () => {
       }
 
       // Charger produits avec pagination et catégories en parallèle
+      // Use admin endpoint to get ALL products (including inactive)
       const requests: Promise<any>[] = [
-        apiService.get(`/products?per_page=${PER_PAGE}&page=${page}`),
+        apiService.get(`/admin/products?per_page=${PER_PAGE}&page=${page}`),
       ]
 
       // Ne charger les catégories que la première fois
@@ -91,8 +92,8 @@ const AdminProductsScreen: React.FC = () => {
       // Extraire les produits
       const newProducts = Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || [])
 
-      // Vérifier s'il y a plus de pages
-      const totalPages = productsRes.data?.last_page || productsRes.meta?.last_page || 1
+      // Vérifier s'il y a plus de pages - backend returns pagination.last_page
+      const totalPages = productsRes.pagination?.last_page || productsRes.data?.last_page || productsRes.meta?.last_page || 1
       setHasMorePages(page < totalPages)
       setCurrentPage(page)
 
@@ -149,14 +150,14 @@ const AdminProductsScreen: React.FC = () => {
       filtered = filtered.filter(p => p.category?.id === categoryFilter)
     }
 
-    // Filtre par recherche
+    // Filtre par recherche (guard against null description/merchant)
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
         p =>
-          p.name.toLowerCase().includes(query) ||
-          p.description.toLowerCase().includes(query) ||
-          p.merchant.business_name.toLowerCase().includes(query)
+          (p.name || '').toLowerCase().includes(query) ||
+          (p.description || '').toLowerCase().includes(query) ||
+          (p.merchant?.business_name || '').toLowerCase().includes(query)
       )
     }
 
@@ -224,14 +225,16 @@ const AdminProductsScreen: React.FC = () => {
           setProducts(prev =>
             prev.map(p => (p.id === productToConfirm.id ? { ...p, is_active: true } : p))
           )
-          await apiService.put(`/products/${productToConfirm.id}`, { is_active: true })
+          // Use admin endpoint for activation (allows admin to update any product)
+          await apiService.put(`/admin/products/${productToConfirm.id}`, { is_active: true })
           break
 
         case 'deactivate':
           setProducts(prev =>
             prev.map(p => (p.id === productToConfirm.id ? { ...p, is_active: false } : p))
           )
-          await apiService.put(`/products/${productToConfirm.id}`, { is_active: false })
+          // Use admin endpoint for deactivation (allows admin to update any product)
+          await apiService.put(`/admin/products/${productToConfirm.id}`, { is_active: false })
           break
 
         case 'approve':

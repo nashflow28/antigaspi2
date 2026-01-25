@@ -179,7 +179,7 @@ const FavoritesScreen: React.FC = () => {
                 label: 'Creer un compte',
                 icon: 'person-add-outline',
                 variant: 'secondary',
-                onPress: () => navigationRef.navigate('Auth', { screen: 'Register' }),
+                onPress: () => navigationRef.navigate('Auth', { screen: 'Login' }),
               },
             ]}
           />

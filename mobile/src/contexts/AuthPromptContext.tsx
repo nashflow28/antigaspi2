@@ -78,8 +78,8 @@ export const AuthPromptProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [])
 
   const handleRegister = useCallback(() => {
-    // Navigate to register screen
-    navigationRef.navigate('Auth', { screen: 'Register' })
+    // Navigate to login screen (phone-based auth handles both login and registration)
+    navigationRef.navigate('Auth', { screen: 'Login' })
   }, [])
 
   // Set global references

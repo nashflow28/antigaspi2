@@ -1,7 +1,7 @@
 /**
  * Business Constants
  *
- * Centralized business logic constants for the Antigaspi application.
+ * Centralized business logic constants for the GÊLADAL application.
  * All magic numbers should be defined here with documentation.
  */
 

@@ -15,7 +15,7 @@
       <Star
         :size="size"
         :class="[
-          star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500',
+          star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-500',
           !readonly && star <= hoverRating ? 'text-yellow-400 fill-yellow-400' : '',
           !readonly ? 'hover:text-yellow-300' : ''
         ]"
@@ -24,7 +24,7 @@
       />
     </button>
 
-    <span v-if="showText" class="ml-2 text-sm text-gray-700">
+    <span v-if="showText" class="ml-2 text-sm text-neutral-700">
       {{ ratingText }}
     </span>
   </div>

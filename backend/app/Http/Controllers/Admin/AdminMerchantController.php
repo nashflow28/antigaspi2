@@ -347,6 +347,188 @@ class AdminMerchantController extends Controller
     }
 
     /**
+     * List all products for admin (without active/available filtering)
+     */
+    public function adminProducts(Request $request): JsonResponse
+    {
+        try {
+            $query = Product::with(['merchant.user', 'category']);
+
+            // Server-side filtering by status
+            if ($request->has('status')) {
+                switch ($request->status) {
+                    case 'active':
+                        $query->where('is_active', true);
+                        break;
+                    case 'inactive':
+                        $query->where('is_active', false);
+                        break;
+                    case 'pending':
+                        // Guard: Only filter by moderation_status if column exists
+                        if (\Schema::hasColumn('products', 'moderation_status')) {
+                            $query->where('moderation_status', 'pending');
+                        } else {
+                            // Fallback: treat all inactive products as "pending"
+                            $query->where('is_active', false);
+                        }
+                        break;
+                        // 'all' - no filter
+                }
+            }
+
+            // Filter by category
+            if ($request->has('category_id') && $request->category_id !== 'all') {
+                $query->where('category_id', $request->category_id);
+            }
+
+            // Search
+            if ($request->has('search') && $request->search) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('description', 'like', '%'.$search.'%')
+                        ->orWhereHas('merchant', function ($mq) use ($search) {
+                            $mq->where('business_name', 'like', '%'.$search.'%');
+                        });
+                });
+            }
+
+            // Sorting
+            $sortBy = $request->get('sort_by', 'created_at');
+            $sortOrder = $request->get('sort_order', 'desc');
+            $allowedSortFields = ['created_at', 'name', 'discounted_price', 'quantity_available'];
+            if (in_array($sortBy, $allowedSortFields)) {
+                $query->orderBy($sortBy, $sortOrder === 'asc' ? 'asc' : 'desc');
+            } else {
+                $query->orderBy('created_at', 'desc');
+            }
+
+            // Pagination
+            $perPage = min($request->get('per_page', 50), 100);
+            $products = $query->paginate($perPage);
+
+            // Transform data
+            $products->getCollection()->transform(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'original_price' => $product->original_price,
+                    'discounted_price' => $product->discounted_price,
+                    'discount_percentage' => $product->discount_percentage,
+                    'quantity_available' => $product->quantity_available,
+                    'expiration_date' => $product->expiration_date,
+                    'image_url' => $product->image_url,
+                    'is_active' => $product->is_active,
+                    'is_surprise_basket' => (bool) $product->is_surprise_basket,
+                    'moderation_status' => $product->moderation_status ?? 'approved',
+                    'needs_approval' => ($product->moderation_status ?? 'approved') === 'pending',
+                    'rejection_reason' => $product->rejection_reason,
+                    'category' => $product->category ? [
+                        'id' => $product->category->id,
+                        'name' => $product->category->name,
+                        'icon' => $product->category->icon,
+                    ] : null,
+                    'merchant' => [
+                        'id' => $product->merchant->id,
+                        'business_name' => $product->merchant->business_name,
+                        'business_type' => $product->merchant->business_type,
+                        'city' => $product->merchant->user->city ?? null,
+                        'address' => $product->merchant->user->address ?? null,
+                        'phone' => $product->merchant->user->phone ?? null,
+                        'is_verified' => $product->merchant->is_verified,
+                    ],
+                    'created_at' => $product->created_at,
+                    'updated_at' => $product->updated_at,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $products->items(),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'per_page' => $products->perPage(),
+                    'total' => $products->total(),
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des produits',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update product status (admin can activate/deactivate any product)
+     */
+    public function updateProduct(Request $request, $id): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+
+            $product = Product::findOrFail($id);
+
+            $validated = $request->validate([
+                'is_active' => 'sometimes|boolean',
+                'moderation_status' => 'sometimes|string|in:pending,approved,rejected',
+            ]);
+
+            // Store original value for audit logging
+            $oldIsActive = $product->is_active;
+
+            if (isset($validated['is_active'])) {
+                $product->is_active = $validated['is_active'];
+            }
+
+            if (isset($validated['moderation_status'])) {
+                if ($product->getConnection()->getSchemaBuilder()->hasColumn('products', 'moderation_status')) {
+                    $product->moderation_status = $validated['moderation_status'];
+                }
+            }
+
+            $product->save();
+
+            // Log action with correct signature
+            $action = $product->is_active ? 'product_activated' : 'product_deactivated';
+            $this->auditService->log(
+                $action,
+                'product',
+                $product->id,
+                $product->name,
+                null,
+                ['is_active' => $oldIsActive],
+                ['is_active' => $product->is_active]
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Produit mis à jour avec succès',
+                'data' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'is_active' => $product->is_active,
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour du produit',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Resolve a flagged reservation
      */
     public function resolveReservation(Request $request, $id): JsonResponse

@@ -374,7 +374,7 @@ export const exportAnalyticsToExcel = async (
 
   // ===== FEUILLE 1: RÉSUMÉ =====
   const summarySheet: any[][] = [
-    ['Rapport Analytics Antigaspi'],
+    ['Rapport Analytics GÊLADAL'],
     [`Période: ${dateRange ? `${formatDate(dateRange.start.toISOString())} - ${formatDate(dateRange.end.toISOString())}` : 'Toutes les données'}`],
     [`Généré le ${new Date().toLocaleDateString('fr-FR')}`],
     [],

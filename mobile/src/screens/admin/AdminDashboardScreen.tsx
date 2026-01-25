@@ -48,12 +48,15 @@ const getActivityIcon = (type: string): any => {
       return 'receipt-outline'
     case 'user':
     case 'new_user':
+    case 'user_registered':
       return 'person-add-outline'
     case 'product':
     case 'new_product':
+    case 'product_sold':
       return 'cube-outline'
     case 'merchant':
     case 'new_merchant':
+    case 'merchant_joined':
       return 'storefront-outline'
     case 'review':
       return 'star-outline'
@@ -71,12 +74,15 @@ const getActivityColor = (type: string, theme: any): string => {
       return theme.colors.primary[500]
     case 'user':
     case 'new_user':
+    case 'user_registered':
       return '#06B6D4'
     case 'product':
     case 'new_product':
+    case 'product_sold':
       return theme.colors.warning
     case 'merchant':
     case 'new_merchant':
+    case 'merchant_joined':
       return theme.colors.success
     case 'review':
       return '#F59E0B'
@@ -198,16 +204,16 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
           showWarning(
             'Session expirée',
             'Votre session a expiré. Veuillez vous reconnecter.',
-	            [
-	              {
-	                text: 'OK',
-	                onPress: () => {
-	                  hideAlert()
-	                  navigation.replace('Login')
-	                },
-	              },
-	            ]
-	          )
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  hideAlert()
+                  dispatch(logoutUser())
+                },
+              },
+            ]
+          )
         }
         return
       }
@@ -537,7 +543,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
 
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('Reviews')}
+              onPress={() => navigation.navigate('ReviewModeration')}
               testID="action-moderation-button"
               style={styles.actionButton}
             >
@@ -553,7 +559,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
 
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('Notifications')}
+              onPress={() => navigation.navigate('Broadcast')}
               testID="action-broadcast-button"
               style={styles.actionButton}
             >

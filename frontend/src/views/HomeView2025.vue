@@ -350,10 +350,10 @@
     <section class="py-16 bg-white">
       <div :class="layoutContainerClass">
         <div class="mb-8">
-          <h2 class="text-3xl font-semibold text-gray-900 mb-2">
+          <h2 class="text-3xl font-semibold text-neutral-900 mb-2">
             Catégories populaires
           </h2>
-          <p class="text-gray-600">
+          <p class="text-neutral-600">
             Explorez nos produits par catégorie
           </p>
         </div>
@@ -361,8 +361,8 @@
         <!-- Loading State -->
         <div v-if="categoriesLoading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           <Card v-for="i in 5" :key="i" class="animate-pulse">
-            <div class="h-24 bg-gray-200 rounded-lg mb-4" />
-            <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto" />
+            <div class="h-24 bg-neutral-200 rounded-lg mb-4" />
+            <div class="h-4 bg-neutral-200 rounded w-3/4 mx-auto" />
           </Card>
         </div>
 
@@ -378,7 +378,7 @@
           >
             <div class="flex flex-col items-center justify-center p-6">
               <div class="text-4xl mb-3">{{ (category as any).icon || '📦' }}</div>
-              <h3 class="font-semibold text-gray-900">{{ category.name }}</h3>
+              <h3 class="font-semibold text-neutral-900">{{ category.name }}</h3>
             </div>
           </Card>
         </div>
@@ -386,13 +386,13 @@
     </section>
 
     <!-- Featured Products Section -->
-    <section class="py-16 bg-gray-50">
+    <section class="py-16 bg-neutral-50">
       <div :class="layoutContainerClass">
         <div class="mb-8">
-          <h2 class="text-3xl font-semibold text-gray-900 mb-2">
+          <h2 class="text-3xl font-semibold text-neutral-900 mb-2">
             Produits en vedette
           </h2>
-          <p class="text-gray-600">
+          <p class="text-neutral-600">
             Découvrez les meilleures offres anti-gaspillage près de chez vous
           </p>
         </div>
@@ -400,9 +400,9 @@
         <!-- Loading State -->
         <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card v-for="i in 4" :key="i" class="animate-pulse">
-            <div class="h-48 bg-gray-200 rounded-lg mb-4" />
-            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-            <div class="h-4 bg-gray-200 rounded w-1/2" />
+            <div class="h-48 bg-neutral-200 rounded-lg mb-4" />
+            <div class="h-4 bg-neutral-200 rounded w-3/4 mb-2" />
+            <div class="h-4 bg-neutral-200 rounded w-1/2" />
           </Card>
         </div>
 
@@ -422,15 +422,15 @@
                 :alt="product.name"
                 class="w-full h-full object-cover"
               >
-              <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
+              <div v-else class="w-full h-full bg-neutral-200 flex items-center justify-center">
                 <span class="text-4xl">📦</span>
               </div>
             </div>
             <div class="p-4">
-              <h3 class="font-semibold text-gray-900 mb-1" data-testid="product-name">
+              <h3 class="font-semibold text-neutral-900 mb-1" data-testid="product-name">
                 {{ product.name }}
               </h3>
-              <p class="text-sm text-gray-500 mb-2">
+              <p class="text-sm text-neutral-500 mb-2">
                 {{ product.category }}
               </p>
               <div class="flex items-center justify-between">
@@ -438,7 +438,7 @@
                   <span class="text-lg font-bold text-primary-600" data-testid="product-price">
                     {{ product.discounted_price }} XOF
                   </span>
-                  <span class="text-sm text-gray-400 line-through ml-2">
+                  <span class="text-sm text-neutral-400 line-through ml-2">
                     {{ product.original_price }} XOF
                   </span>
                 </div>
@@ -452,7 +452,7 @@
 
         <!-- Empty State -->
         <div v-else class="text-center py-12">
-          <p class="text-gray-500">Aucun produit disponible pour le moment</p>
+          <p class="text-neutral-500">Aucun produit disponible pour le moment</p>
         </div>
 
         <!-- View All Button -->

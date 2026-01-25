@@ -24,6 +24,7 @@ class ReservationResource extends JsonResource
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'expires_at' => $this->expires_at,
             'confirmed_at' => $this->confirmed_at,
             'ready_at' => $this->ready_at,
             'completed_at' => $this->completed_at,

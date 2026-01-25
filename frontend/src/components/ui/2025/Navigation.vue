@@ -370,7 +370,7 @@ const props = withDefaults(
     sticky?: boolean
   }>(),
   {
-    brand: () => ({ name: 'Antigaspi', to: '/' }),
+    brand: () => ({ name: 'GÊLADAL', to: '/' }),
     mainLinks: () => [],
     secondaryLinks: () => [],
     authCta: null,
@@ -402,7 +402,7 @@ const skipToContentHref = computed(() =>
   props.skipToContentId ? `#${props.skipToContentId}` : null
 )
 
-const brand = computed(() => props.brand ?? { name: 'Antigaspi', to: '/' })
+const brand = computed(() => props.brand ?? { name: 'GÊLADAL', to: '/' })
 
 const brandComponent = computed(() =>
   brand.value.to ? RouterLink : brand.value.href ? 'a' : 'div'

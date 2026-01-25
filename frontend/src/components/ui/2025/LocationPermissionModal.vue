@@ -38,8 +38,8 @@
         </div>
 
         <div class="flex items-start gap-3">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/20">
-            <Clock class="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50 dark:bg-primary-900/20">
+            <Clock class="h-5 w-5 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
             <h4 class="font-medium text-neutral-900 dark:text-neutral-50">Récupération rapide</h4>

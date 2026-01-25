@@ -254,7 +254,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       // Demander permission
       showWarning(
         'Autorisation requise',
-        'Antigaspi a besoin d\'accéder à votre position pour afficher les produits proches de vous.',
+        'GÊLADAL a besoin d\'accéder à votre position pour afficher les produits proches de vous.',
         [
           { text: 'Annuler', onPress: hideAlert },
           {
@@ -445,9 +445,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               Bonjour {user?.first_name || 'Invité'}
             </Typography>
             <View style={styles.locationRow}>
-              <Typography variant="body" color="secondary">Qu'allons-nous sauver au </Typography>
-              <Typography variant="body" weight="semibold" color="primary">Togo</Typography>
-              <Typography variant="body" color="secondary"> ?</Typography>
+              <Typography variant="body" color="secondary">Ton Panier N'attend Que Toi !</Typography>
             </View>
           </View>
           <View style={styles.headerActions}>

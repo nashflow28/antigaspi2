@@ -1,7 +1,7 @@
 {
-  "name": "Antigaspi - Lutte contre le gaspillage alimentaire",
-  "short_name": "Antigaspi",
-  "description": "Découvrez des produits frais à prix réduits près de chez vous. Faites des économies tout en luttant contre le gaspillage alimentaire en Côte d'Ivoire.",
+  "name": "GÊLADAL - Ton panier n'attend que toi !",
+  "short_name": "GÊLADAL",
+  "description": "Découvrez des produits frais à prix réduits près de chez vous. Faites des économies tout en luttant contre le gaspillage alimentaire au Togo.",
   "version": "1.0.0",
   "manifest_version": 2,
   "default_locale": "fr",
@@ -9,7 +9,7 @@
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#10B981",
+  "theme_color": "#fad02c",
   "background_color": "#ffffff",
   "lang": "fr",
   "dir": "ltr",
@@ -125,14 +125,14 @@
   "related_applications": [
     {
       "platform": "webapp",
-      "url": "https://antigaspi.ci/manifest.json"
+      "url": "https://geladal.com/manifest.json"
     }
   ],
   "prefer_related_applications": false,
   "edge_side_panel": {
     "preferred_width": 320
   },
-  "id": "antigaspi-app",
+  "id": "geladal-app",
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
