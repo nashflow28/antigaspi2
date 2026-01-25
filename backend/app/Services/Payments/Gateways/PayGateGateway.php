@@ -100,10 +100,8 @@ class PayGateGateway implements PaymentGateway
             'description' => "Paiement réservation #{$reservation->reservation_code}",
         ];
 
-        // Add callback URL if configured (required for wallet recharge webhooks)
-        if (! empty($this->config['callback_url'])) {
-            $payload['callback_url'] = $this->config['callback_url'];
-        }
+        // Note: callback_url must be configured in PayGate dashboard/portal, not in API payload
+        // PayGate will use the webhook URL configured in their system
 
         Log::info('PayGate: Initializing payment', [
             'reservation_id' => $reservation->id,

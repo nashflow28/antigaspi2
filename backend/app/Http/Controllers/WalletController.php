@@ -477,8 +477,9 @@ class WalletController extends Controller
                 'identifier' => $payment->reference,
                 'network' => $paymentMethod === \App\Enums\PaymentMethod::FLOOZ ? 'FLOOZ' : 'TMONEY',
                 'description' => "Recharge portefeuille #{$wallet->id}",
-                'callback_url' => $paygateConfig['callback_url'] ?? config('app.url').'/api/webhook/paygate',
             ];
+
+            // Note: callback_url must be configured in PayGate dashboard, not in API payload
 
             $response = \Illuminate\Support\Facades\Http::timeout(30)
                 ->acceptJson()
