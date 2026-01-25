@@ -42,7 +42,7 @@ class DeliveryController extends Controller
         $pickupLng = $merchant->longitude ?? 1.2314;
 
         try {
-            $estimate = $this->pricingService->calculateFee(
+            $estimate = $this->pricingService->estimateDelivery(
                 $pickupLat,
                 $pickupLng,
                 $request->delivery_latitude,
