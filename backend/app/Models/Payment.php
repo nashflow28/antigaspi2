@@ -23,6 +23,7 @@ class Payment extends Model
         'provider',
         'checkout_url',
         'customer_phone',
+        'customer_email',
         'reference',
         'payload',
         'paid_at',
@@ -84,6 +85,28 @@ class Payment extends Model
     public function isRefunded(): bool
     {
         return $this->status === PaymentStatus::REFUNDED;
+    }
+
+    /**
+     * Check if this payment is a wallet recharge (no associated reservation).
+     */
+    public function isWalletRecharge(): bool
+    {
+        return $this->reservation_id === null
+            && isset($this->payload['type'])
+            && $this->payload['type'] === 'wallet_recharge';
+    }
+
+    /**
+     * Get the wallet ID for wallet recharge payments.
+     */
+    public function getWalletId(): ?int
+    {
+        if (! $this->isWalletRecharge()) {
+            return null;
+        }
+
+        return $this->payload['wallet_id'] ?? null;
     }
 
     protected function provider(): Attribute
