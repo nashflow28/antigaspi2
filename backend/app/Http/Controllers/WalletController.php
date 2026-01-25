@@ -467,11 +467,7 @@ class WalletController extends Controller
                 ],
             ]);
 
-            // Initialize PayGate payment
-            $paymentService = app(\App\Services\Payments\PaymentService::class);
-            $gateway = app(\App\Services\Payments\GatewayRegistry::class)->forProvider('paygate');
-
-            // Build PayGate API payload manually since we don't have a reservation
+            // Build PayGate API payload for wallet recharge
             $paygateConfig = config('payments.paygate');
 
             $paygatePayload = [
