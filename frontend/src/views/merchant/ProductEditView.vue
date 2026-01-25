@@ -86,31 +86,26 @@
 
                 <!-- Description -->
                 <div>
-                  <label for="description" class="block text-sm font-medium text-neutral-800 mt-2">
-                    Description <span class="text-red-500">*</span>
-                  </label>
-                  <textarea
+                  <Textarea
                     id="description"
                     v-model="form.description"
+                    label="Description *"
                     rows="4"
-                    class="w-full px-3 py-3 text-neutral-900 bg-white border border-neutral-200 rounded shadow-sm placeholder:text-neutral-400 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.description }"
                     placeholder="Décrivez votre produit..."
+                    :error="errors.description"
                     required
                   />
-                  <p v-if="errors.description" class="mt-2 text-sm text-red-600">{{ errors.description }}</p>
                 </div>
 
                 <!-- Catégorie -->
                 <div>
-                  <label for="category" class="block text-sm font-medium text-neutral-800 mt-2">
+                  <label for="category" class="block text-sm font-medium text-neutral-800 mb-2">
                     Catégorie <span class="text-red-500">*</span>
                   </label>
-                  <select
+                  <Select
                     id="category"
                     v-model="form.category_id"
-                    class="w-full px-3 py-3 text-neutral-900 bg-white border border-neutral-200 rounded shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.category_id }"
+                    :variant="errors.category_id ? 'error' : 'default'"
                     required
                   >
                     <option value="">Sélectionner une catégorie</option>
@@ -121,7 +116,7 @@
                     >
                       {{ category.name }}
                     </option>
-                  </select>
+                  </Select>
                   <p v-if="errors.category_id" class="mt-2 text-sm text-red-600">{{ errors.category_id }}</p>
                 </div>
               </div>
@@ -272,17 +267,10 @@
               <template #header>
                 <h3 class="text-xl font-semibold text-neutral-900">Statut</h3>
               </template>
-              <div class="flex items-center gap-3">
-                <input
-                  id="is_active"
-                  v-model="form.is_active"
-                  type="checkbox"
-                  class="h-4 w-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
-                >
-                <label for="is_active" class="text-neutral-800">
-                  Produit actif (visible par les clients)
-                </label>
-              </div>
+              <Checkbox
+                v-model="form.is_active"
+                label="Produit actif (visible par les clients)"
+              />
             </Card>
 
             <!-- Actions -->
@@ -404,6 +392,9 @@ import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
 import Input from '@/components/ui/2025/Input.vue'
+import Textarea from '@/components/ui/2025/Textarea.vue'
+import Select from '@/components/ui/2025/Select.vue'
+import Checkbox from '@/components/ui/2025/Checkbox.vue'
 
 const route = useRoute()
 const router = useRouter()

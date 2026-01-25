@@ -36,10 +36,7 @@
             <div class="space-y-4">
               <label class="flex flex-col gap-2">
                 <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Statut</span>
-                <select
-                  v-model="filters.status"
-                  class="w-full rounded-modern border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 px-3 py-3 text-neutral-700 dark:text-neutral-200 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-500/30"
-                >
+                <Select v-model="filters.status">
                   <option value="">Tous les statuts</option>
                   <option value="pending">En attente</option>
                   <option value="confirmed">Confirmée</option>
@@ -47,21 +44,18 @@
                   <option value="completed">Récupérée</option>
                   <option value="cancelled">Annulée</option>
                   <option value="expired">Expirée</option>
-                </select>
+                </Select>
               </label>
 
               <label class="flex flex-col gap-2">
                 <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Période</span>
-                <select
-                  v-model="filters.period"
-                  class="w-full rounded-modern border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 px-3 py-3 text-neutral-700 dark:text-neutral-200 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-500/30"
-                >
+                <Select v-model="filters.period">
                   <option value="">Toutes</option>
                   <option value="today">Aujourd'hui</option>
                   <option value="week">Cette semaine</option>
                   <option value="month">Ce mois</option>
                   <option value="year">Cette année</option>
-                </select>
+                </Select>
               </label>
             </div>
 
@@ -149,15 +143,12 @@
                     {{ filteredReservations.length }} réservation{{ filteredReservations.length > 1 ? 's' : '' }}
                   </p>
                 </div>
-                <select
-                  v-model="sortBy"
-                  class="w-full rounded-modern border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 px-3 py-3 text-neutral-700 dark:text-neutral-200 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-500/30 sm:w-auto"
-                >
+                <Select v-model="sortBy" class="sm:w-auto">
                   <option value="created_at_desc">Plus récentes</option>
                   <option value="created_at_asc">Plus anciennes</option>
                   <option value="pickup_date_asc">Date de retrait</option>
                   <option value="status">Statut</option>
-                </select>
+                </Select>
               </div>
             </template>
 
@@ -273,7 +264,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
-import { Button, Card, EmptyState, Loading } from '@/components/ui/2025'
+import { Button, Card, EmptyState, Loading, Select } from '@/components/ui/2025'
 import Toast from '@/components/ui/Toast.vue'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import ReservationCard from '@/components/reservation/ReservationCard.vue'
@@ -501,7 +492,54 @@ const clearFilters = () => {
 }
 
 const exportReservations = () => {
-  openToast('success', 'Export en cours', 'Un export de vos réservations est en préparation.')
+  const rows = filteredReservationsAll.value
+
+  if (!rows.length) {
+    openToast('info', 'Aucune réservation', 'Aucune réservation à exporter pour le moment.')
+    return
+  }
+
+  const headers = [
+    'Code',
+    'Produit',
+    'Commerçant',
+    'Quantité',
+    'Montant',
+    'Statut',
+    'Paiement',
+    'Date création',
+    'Date retrait'
+  ]
+
+  const escapeCsv = (value: string | number | null | undefined) => {
+    const stringValue = value === null || value === undefined ? '' : String(value)
+    return `"${stringValue.replace(/"/g, '""')}"`
+  }
+
+  const lines = rows.map((reservation) => [
+    reservation.reservation_code,
+    reservation.product?.name ?? '',
+    reservation.product?.merchant?.name ?? '',
+    reservation.quantity,
+    formatPrice((reservation.discounted_price || 0) * reservation.quantity),
+    reservation.status,
+    reservation.payment_status ?? '—',
+    reservation.created_at ? new Date(reservation.created_at).toLocaleString('fr-FR') : '—',
+    reservation.pickup_date ? `${reservation.pickup_date} ${reservation.pickup_time ?? ''}`.trim() : '—'
+  ])
+
+  const csvContent = [headers, ...lines].map((row) => row.map(escapeCsv).join(',')).join('\n')
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `reservations_${new Date().toISOString().split('T')[0]}.csv`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+
+  openToast('success', 'Export prêt', 'Le fichier CSV a été téléchargé.')
 }
 
 const markAllAsRead = () => {
