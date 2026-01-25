@@ -225,54 +225,67 @@ class Reservation extends Model
     }
 
     /**
-     * Refund wallet payment if the reservation was paid via wallet
+     * Refund payment to wallet if applicable
+     * Handles: wallet payments (direct refund) and Mobile Money payments (credit to wallet)
      * BUG-008 FIX: Now throws exception on refund failure instead of silent logging
      *
      * @throws \Exception If refund fails for any reason
      */
     protected function refundWalletPaymentIfApplicable(): void
     {
-        // Get the latest successful wallet payment for this reservation
-        $walletPayment = $this->payments()
-            ->where('payment_method', 'wallet')
+        // Get the latest successful payment for this reservation (wallet, flooz, or tmoney)
+        $successfulPayment = $this->payments()
+            ->whereIn('payment_method', ['wallet', 'flooz', 'tmoney'])
             ->where('status', PaymentStatus::SUCCESS)
             ->latest()
             ->first();
 
-        if (! $walletPayment) {
-            return; // No wallet payment to refund - OK to proceed
+        if (! $successfulPayment) {
+            return; // No refundable payment - OK to proceed (on_site payments are not refunded)
         }
 
         $user = $this->user;
         if (! $user) {
-            \Log::error('BUG-008: Cannot refund wallet - user not found', ['reservation_id' => $this->id]);
+            \Log::error('BUG-008: Cannot refund - user not found', ['reservation_id' => $this->id]);
             throw new \Exception('Impossible de rembourser: utilisateur non trouvé. Contactez le support.');
         }
 
         try {
-            // Use WalletService to refund
             $walletService = app(\App\Services\WalletService::class);
-            $refundAmount = (float) $walletPayment->amount;
-            $description = "Remboursement réservation #{$this->reservation_code}";
+            $refundAmount = (float) $successfulPayment->amount;
+            $paymentMethod = $successfulPayment->payment_method->value ?? $successfulPayment->payment_method;
 
-            $walletService->rechargeWallet($user, $refundAmount, $description);
+            // Different description based on original payment method
+            if ($paymentMethod === 'wallet') {
+                $description = "Remboursement réservation #{$this->reservation_code}";
+            } else {
+                // For Mobile Money (flooz/tmoney), credit to wallet with clear description
+                $methodName = strtoupper($paymentMethod);
+                $description = "Remboursement {$methodName} → Wallet - Réservation #{$this->reservation_code}";
+            }
 
-            \Log::info('Wallet refund processed successfully', [
+            $walletService->refundWallet($user, $refundAmount, $description);
+
+            // Mark the original payment as refunded
+            $successfulPayment->update(['status' => PaymentStatus::REFUNDED]);
+
+            \Log::info('Payment refund processed successfully', [
                 'reservation_id' => $this->id,
                 'user_id' => $user->id,
                 'amount' => $refundAmount,
-                'payment_id' => $walletPayment->id,
+                'original_payment_method' => $paymentMethod,
+                'payment_id' => $successfulPayment->id,
             ]);
         } catch (\Exception $e) {
-            // BUG-008 FIX: Now we throw instead of silently logging
-            \Log::error('BUG-008: Wallet refund failed - blocking cancellation', [
+            \Log::error('BUG-008: Payment refund failed - blocking cancellation', [
                 'reservation_id' => $this->id,
                 'user_id' => $user->id,
-                'amount' => $walletPayment->amount,
+                'amount' => $successfulPayment->amount,
+                'payment_method' => $successfulPayment->payment_method,
                 'error' => $e->getMessage(),
             ]);
             throw new \Exception(
-                'Échec du remboursement portefeuille: '.$e->getMessage().
+                'Échec du remboursement: '.$e->getMessage().
                 '. L\'annulation a été bloquée. Contactez le support.'
             );
         }

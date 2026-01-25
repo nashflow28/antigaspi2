@@ -76,6 +76,47 @@ class WalletService
         });
     }
 
+    /**
+     * Refund amount to wallet (no minimum amount restriction)
+     * Used for reservation cancellations and other refunds
+     */
+    public function refundWallet(User $user, float $amount, string $description = 'Remboursement'): WalletTransaction
+    {
+        if ($amount <= 0) {
+            throw new \InvalidArgumentException('Le montant de remboursement doit être supérieur à zéro');
+        }
+
+        // No minimum for refunds - even 1 XOF should be refunded
+        // Maximum still applies for safety
+        if ($amount > 1000000) {
+            throw new \InvalidArgumentException('Le montant maximum de remboursement est de 1,000,000 XOF');
+        }
+
+        $wallet = $this->getOrCreateWallet($user);
+
+        if ($wallet->currency !== 'XOF') {
+            throw new \Exception('Ce portefeuille n\'utilise pas la devise XOF');
+        }
+
+        if (! $wallet->is_active) {
+            throw new \Exception('Le portefeuille est désactivé');
+        }
+
+        return DB::transaction(function () use ($wallet, $amount, $description) {
+            $transaction = $wallet->credit($amount, $description);
+
+            Log::info('Wallet refund processed', [
+                'user_id' => $wallet->user_id,
+                'wallet_id' => $wallet->id,
+                'amount' => $amount,
+                'new_balance' => $wallet->fresh()->balance,
+                'transaction_id' => $transaction->id,
+            ]);
+
+            return $transaction;
+        });
+    }
+
     public function processWalletPayment(User $user, float $amount, string $description = 'Paiement commande', ?string $pin = null): WalletTransaction
     {
         if ($amount <= 0) {

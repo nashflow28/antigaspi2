@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "GÊLADAL",
-    "slug": "geladal",
+    "slug": "antigaspi",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,7 +22,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.geladal.app",
+      "bundleIdentifier": "com.antigaspi.app",
       "buildNumber": "1",
       "infoPlist": {
         "NSCameraUsageDescription": "GÊLADAL a besoin d'accéder à votre caméra pour scanner les codes QR",
@@ -97,7 +97,7 @@
         "projectId": "157d93a5-c53a-4e78-9351-364849a645f7"
       }
     },
-    "scheme": "geladal",
+    "scheme": "antigaspi",
     "owner": "nashflow"
   }
 }
