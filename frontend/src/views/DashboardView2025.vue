@@ -352,7 +352,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useWalletStore } from '@/stores/wallet'
 import { formatPrice } from '@/utils/currency'
 import { apiService } from '@/services/api'
-import type { Reservation } from '@/types'
+import type { ApiResponse, Product, Reservation } from '@/types'
 import {
   TrendingUp, DollarSign, Package, ShoppingBag, Leaf, TreePine,
   Clock, Calendar, ArrowRight, Search, User, Lightbulb, Wallet
@@ -372,12 +372,12 @@ const { sidebar, header } = useDashboardLayout('consumer')
 
 // État des données utilisateur
 const userStats = ref({
-  totalSavings: 83670, // 127.50€ × 656
-  monthSavings: 15609, // 23.80€ × 656
-  productsSaved: 42,
-  monthProducts: 8,
-  co2Saved: 12.4,
-  activeReservations: 3
+  totalSavings: 0,
+  monthSavings: 0,
+  productsSaved: 0,
+  monthProducts: 0,
+  co2Saved: 0,
+  activeReservations: 0
 })
 
 interface ReservationItem {
@@ -392,24 +392,16 @@ interface ReservationItem {
 const recentReservations = ref<ReservationItem[]>([])
 const loading = ref(true)
 
-const recommendedProducts = ref([
-  {
-    id: 1,
-    name: 'Pâtisseries du jour',
-    merchant: { name: 'Pâtisserie Delacroix' },
-    original_price: 9840, // 15.00€ × 656
-    discounted_price: 4920, // 7.50€ × 656
-    discount: 50
-  },
-  {
-    id: 2,
-    name: 'Sandwich club',
-    merchant: { name: 'Café Central' },
-    original_price: 5576, // 8.50€ × 656
-    discounted_price: 2788, // 4.25€ × 656
-    discount: 50
-  }
-])
+interface RecommendedProduct {
+  id: number
+  name: string
+  merchant: { name: string }
+  original_price: number
+  discounted_price: number
+  discount: number
+}
+
+const recommendedProducts = ref<RecommendedProduct[]>([])
 
 const ecoTips = ref([
   { text: 'Privilégiez les commerces de proximité pour réduire votre empreinte carbone.' },
@@ -420,6 +412,34 @@ const ecoTips = ref([
 
 const currentTipIndex = ref(0)
 const currentTip = computed(() => ecoTips.value[currentTipIndex.value])
+
+type ReservationListResponse = ApiResponse<Reservation[]> & {
+  meta?: {
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  }
+}
+
+const toNumber = (value: unknown) => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+  return 0
+}
+
+const isSameMonth = (dateValue?: string | null) => {
+  if (!dateValue) return false
+  const date = new Date(dateValue)
+  if (Number.isNaN(date.getTime())) return false
+  const now = new Date()
+  return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
+}
 
 const normalizeRecentReservation = (reservation: Reservation): ReservationItem => {
   const merchant = reservation.product?.merchant ?? { name: 'Commerçant inconnu' }
@@ -450,22 +470,134 @@ const normalizeRecentReservation = (reservation: Reservation): ReservationItem =
   }
 }
 
-// Load recent reservations
-const loadRecentReservations = async () => {
-  loading.value = true
-  try {
-    const response = await apiService.getReservations({ per_page: 3 })
+const fetchAllReservations = async (): Promise<Reservation[]> => {
+  const perPage = 50
+  let page = 1
+  let lastPage = 1
+  const all: Reservation[] = []
 
-    if (response.success && Array.isArray(response.data)) {
-      recentReservations.value = response.data.map(normalizeRecentReservation)
-    } else {
-      recentReservations.value = []
+  do {
+    const response = await apiService.getReservations({ page, per_page: perPage }) as ReservationListResponse
+    if (!response?.success || !Array.isArray(response.data)) {
+      break
     }
+
+    all.push(...response.data)
+
+    const pagination = response.meta ?? response.pagination
+    lastPage = pagination?.last_page ?? 1
+    page += 1
+  } while (page <= lastPage)
+
+  return all
+}
+
+const computeUserStats = (reservations: Reservation[]) => {
+  const completedReservations = reservations.filter(r => r.status === 'completed')
+  const activeReservations = reservations.filter(r => ['pending', 'confirmed', 'ready'].includes(r.status))
+
+  const totalSavings = completedReservations.reduce((total, reservation) => {
+    const quantity = reservation.quantity ?? reservation.quantity_reserved ?? 0
+    const original = toNumber(reservation.original_price ?? reservation.product?.original_price)
+    const discounted = toNumber(reservation.discounted_price ?? reservation.product?.discounted_price)
+    const savings = Math.max(0, (original - discounted) * quantity)
+    return total + savings
+  }, 0)
+
+  const monthSavings = completedReservations.reduce((total, reservation) => {
+    const dateRef = reservation.completed_at ?? reservation.created_at
+    if (!isSameMonth(dateRef)) {
+      return total
+    }
+
+    const quantity = reservation.quantity ?? reservation.quantity_reserved ?? 0
+    const original = toNumber(reservation.original_price ?? reservation.product?.original_price)
+    const discounted = toNumber(reservation.discounted_price ?? reservation.product?.discounted_price)
+    const savings = Math.max(0, (original - discounted) * quantity)
+    return total + savings
+  }, 0)
+
+  const productsSaved = completedReservations.reduce((total, reservation) => {
+    const quantity = reservation.quantity ?? reservation.quantity_reserved ?? 0
+    return total + quantity
+  }, 0)
+
+  const monthProducts = completedReservations.reduce((total, reservation) => {
+    const dateRef = reservation.completed_at ?? reservation.created_at
+    if (!isSameMonth(dateRef)) {
+      return total
+    }
+
+    const quantity = reservation.quantity ?? reservation.quantity_reserved ?? 0
+    return total + quantity
+  }, 0)
+
+  return {
+    totalSavings,
+    monthSavings,
+    productsSaved,
+    monthProducts,
+    co2Saved: Number((productsSaved * 2.5).toFixed(1)),
+    activeReservations: activeReservations.length
+  }
+}
+
+const loadReservationStats = async () => {
+  loading.value = true
+
+  try {
+    const reservations = await fetchAllReservations()
+    const sorted = [...reservations].sort((a, b) => {
+      const aDate = new Date(a.created_at ?? 0).getTime()
+      const bDate = new Date(b.created_at ?? 0).getTime()
+      return bDate - aDate
+    })
+
+    recentReservations.value = sorted.slice(0, 3).map(normalizeRecentReservation)
+    userStats.value = computeUserStats(reservations)
   } catch (error) {
-    // console.error('Erreur lors du chargement des réservations récentes:', error)
     recentReservations.value = []
+    userStats.value = {
+      totalSavings: 0,
+      monthSavings: 0,
+      productsSaved: 0,
+      monthProducts: 0,
+      co2Saved: 0,
+      activeReservations: 0
+    }
   } finally {
     loading.value = false
+  }
+}
+
+const computeDiscount = (product: Product) => {
+  const discountValue = toNumber(product.discount_percentage)
+  if (discountValue > 0) {
+    return Math.round(discountValue)
+  }
+
+  const original = toNumber(product.original_price)
+  const discounted = toNumber(product.discounted_price)
+  if (original <= 0) return 0
+  return Math.round(((original - discounted) / original) * 100)
+}
+
+const loadRecommendedProducts = async () => {
+  try {
+    const response = await apiService.getProducts({ per_page: 8, sort_by: 'created_at', sort_order: 'desc' })
+    const list = Array.isArray(response.data) ? response.data : []
+    const sorted = [...list].sort((a, b) => computeDiscount(b) - computeDiscount(a))
+
+    recommendedProducts.value = sorted.slice(0, 4).map(product => ({
+      id: product.id,
+      name: product.name,
+      merchant: { name: product.merchant?.business_name ?? 'Commerçant GÊLADAL' },
+      original_price: toNumber(product.original_price),
+      discounted_price: toNumber(product.discounted_price),
+      discount: computeDiscount(product)
+    }))
+  } catch (error) {
+    recommendedProducts.value = []
   }
 }
 
@@ -509,12 +641,15 @@ const nextTip = () => {
 }
 
 // Vérifier l'authentification au montage
-onMounted(() => {
+onMounted(async () => {
   if (!authStore.isAuthenticated) {
     router.push('/login')
   } else {
-    loadRecentReservations()
-    walletStore.fetchWallet()
+    await Promise.all([
+      loadReservationStats(),
+      loadRecommendedProducts(),
+      walletStore.fetchWallet()
+    ])
   }
 })
 </script>

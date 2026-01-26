@@ -122,7 +122,7 @@
           <Card
             v-for="(insight, index) in insights"
             :key="index"
-            variant="muted"
+            variant="elevated"
             class="bg-white/70"
           >
             <template #header>
@@ -146,8 +146,8 @@
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import Card from '@/components/ui/Card.vue'
-import Button from '@/components/ui/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
 import { useOnboardingStore } from '@/stores/onboarding'
 import { Sparkles, MapPin, ShoppingBag, ShieldCheck, Wallet, BellRing, Heart } from 'lucide-vue-next'
 

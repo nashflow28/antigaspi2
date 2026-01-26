@@ -21,20 +21,13 @@
               <p class="text-sm text-neutral-500 dark:text-neutral-400">Affinez vos résultats en direct grâce aux filtres dynamiques.</p>
             </template>
             <div class="space-y-4">
-              <div class="relative">
-                <Search class="relative sm:absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Ex : Boulangerie, Lomé, petit-déjeuner"
-                  class="w-full rounded border border-neutral-200 bg-white px-11 py-3 text-sm shadow-inner focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
-                >
-              </div>
+              <Input
+                v-model="searchQuery"
+                placeholder="Ex : Boulangerie, Lomé, petit-déjeuner"
+                :left-icon="Search"
+              />
               <div class="grid gap-3 md:grid-cols-2">
-                <select
-                  v-model="selectedCategory"
-                  class="rounded border border-neutral-200 px-3 py-3 text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
-                >
+                <Select v-model="selectedCategory">
                   <option value="">Toutes les catégories</option>
                   <option
                     v-for="category in availableCategories"
@@ -43,11 +36,8 @@
                   >
                     {{ category }}
                   </option>
-                </select>
-                <select
-                  v-model="selectedCity"
-                  class="rounded border border-neutral-200 px-3 py-3 text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
-                >
+                </Select>
+                <Select v-model="selectedCity">
                   <option value="">Toutes les villes</option>
                   <option
                     v-for="city in availableCities"
@@ -56,7 +46,7 @@
                   >
                     {{ city }}
                   </option>
-                </select>
+                </Select>
               </div>
             </div>
             <template #footer>
@@ -209,6 +199,8 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { Button, Card, Loading } from '@/components/ui/2025'
+import Input from '@/components/ui/2025/Input.vue'
+import Select from '@/components/ui/2025/Select.vue'
 import { useMerchantsStore } from '@/stores/merchants'
 import { useProductsStore } from '@/stores/products'
 import { useFavoritesStore } from '@/stores/favorites'

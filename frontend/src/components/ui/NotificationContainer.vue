@@ -1,9 +1,7 @@
 <template>
-  <!-- Legacy placeholder - notifications are now handled globally -->
-  <div class="notification-container-placeholder" />
+  <NotificationSystem />
 </template>
 
 <script setup lang="ts">
-// NotificationContainer is kept for backwards compatibility with legacy layouts.
-// Business stores now push notifications directly through the global composable.
+import NotificationSystem from '@/components/ui/NotificationSystem.vue'
 </script>

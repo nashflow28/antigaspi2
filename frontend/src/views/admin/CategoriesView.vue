@@ -284,7 +284,7 @@
       @action="handleModalAction"
     />
 
-    <!-- Notifications are handled by the NotificationToast component -->
+    <!-- Notifications are handled by the useNotifications composable -->
   </DashboardLayout>
 </template>
 

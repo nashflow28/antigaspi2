@@ -362,7 +362,7 @@
       </section>
     </div>
 
-    <ConfirmModal
+    <ConfirmDialog
       :is-open="confirmModal.isOpen"
       :type="confirmModal.type"
       :title="confirmModal.title"
@@ -371,23 +371,30 @@
       :cancel-text="confirmModal.cancelText"
       @confirm="confirmModal.onConfirm"
       @cancel="closeConfirmModal"
+      @update:is-open="(v) => confirmModal.isOpen = v"
     />
 
-    <div class="fixed top-4 right-4 z-[110] space-y-3">
-      <NotificationToast
-        v-for="notification in notifications"
-        :key="notification.id"
-        :type="notification.type"
-        :title="notification.title"
-        :message="notification.message"
-        @close="removeNotification(notification.id)"
-      />
-    </div>
+    <Teleport to="body">
+      <div class="fixed top-4 right-4 z-[110] space-y-3">
+        <TransitionGroup name="toast">
+          <Toast
+            v-for="notification in notifications"
+            :key="notification.id"
+            :is-open="true"
+            :tone="mapNotificationType(notification.type)"
+            :title="notification.title"
+            :description="notification.message"
+            position="stacked"
+            @close="removeNotification(notification.id)"
+          />
+        </TransitionGroup>
+      </div>
+    </Teleport>
   </DashboardLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, Teleport, TransitionGroup } from 'vue'
 import {
   ArrowPathIcon,
   BuildingStorefrontIcon,
@@ -408,10 +415,9 @@ import {
   ArrowUturnLeftIcon
 } from '@heroicons/vue/24/outline'
 import apiService from '@/services/api'
-import ConfirmModal from '@/components/ui/ConfirmModal.vue'
-import NotificationToast from '@/components/ui/NotificationToast.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
-import { Button, Card, Badge, EmptyState, Grid, Loading } from '@/components/ui/2025'
+import Toast from '@/components/ui/Toast.vue'
+import { Button, Card, Badge, EmptyState, Grid, Loading, ConfirmDialog } from '@/components/ui/2025'
 import {
   DashboardHeader,
   StatCard,
@@ -633,6 +639,16 @@ const showNotification = (type: Notification['type'], title: string, message: st
     message
   }
   notifications.value.push(notification)
+}
+
+const mapNotificationType = (type: Notification['type']): 'success' | 'info' | 'warning' | 'error' => {
+  const mapping: Record<Notification['type'], 'success' | 'info' | 'warning' | 'error'> = {
+    success: 'success',
+    error: 'error',
+    warning: 'warning',
+    info: 'info'
+  }
+  return mapping[type]
 }
 
 const removeNotification = (id: string) => {

@@ -14,10 +14,7 @@
             </p>
           </div>
           <div class="flex flex-wrap gap-3">
-            <select
-              v-model="selectedMerchant"
-              class="rounded border border-neutral-200 px-3 py-3 text-sm shadow-inner focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
-            >
+            <Select v-model="selectedMerchant" aria-label="Filtrer par commerçant">
               <option value="">Tous les commerçants</option>
               <option
                 v-for="merchant in merchantOptions"
@@ -26,16 +23,13 @@
               >
                 {{ merchant.name }}
               </option>
-            </select>
-            <select
-              v-model="selectedRating"
-              class="rounded border border-neutral-200 px-3 py-3 text-sm shadow-inner focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
-            >
+            </Select>
+            <Select v-model="selectedRating" aria-label="Filtrer par note">
               <option value="">Toutes les notes</option>
               <option v-for="rating in [5,4,3,2,1]" :key="rating" :value="rating">
                 {{ rating }} étoiles et plus
               </option>
-            </select>
+            </Select>
             <Button
               variant="ghost"
               size="sm"
@@ -67,9 +61,7 @@
 
           <div v-if="reviewsLoading" class="space-y-4">
             <Card v-for="n in 3" :key="n" class="bg-white/80">
-              <Skeleton class="h-4 w-3/4" />
-              <Skeleton class="h-4 w-full" />
-              <Skeleton class="h-4 w-3/4" />
+              <Loading type="skeleton" :skeleton-lines="3" />
             </Card>
           </div>
 
@@ -158,9 +150,10 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import Button from '@/components/ui/Button.vue'
-import Card from '@/components/ui/Card.vue'
-import Skeleton from '@/components/ui/Skeleton.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
+import Select from '@/components/ui/2025/Select.vue'
+import Loading from '@/components/ui/2025/Loading.vue'
 import { useMerchantsStore } from '@/stores/merchants'
 import { notify } from '@/composables/useNotifications'
 import { apiService } from '@/services/api'

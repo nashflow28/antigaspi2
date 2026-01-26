@@ -184,11 +184,10 @@
                   <!-- Notes spéciales -->
                   <div>
                     <Label for="notes">Notes spéciales (optionnel)</Label>
-                    <textarea
+                    <Textarea
                       id="notes"
                       v-model="reservation.notes"
                       placeholder="Allergies, préférences particulières..."
-                      class="w-full px-3 py-3 text-neutral-900 dark:text-neutral-100 bg-surface-light dark:bg-surface-dark border border-neutral-200 dark:border-neutral-700 rounded shadow-sm placeholder:text-neutral-400 dark:text-neutral-500 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       rows="3"
                     />
                   </div>
@@ -223,10 +222,9 @@
                         <Label for="pickup-time">
                           Heure de récupération
                         </Label>
-                        <select
+                        <Select
                           id="pickup-time"
                           v-model="reservation.pickup_time"
-                          class="w-full px-3 py-3 text-neutral-900 dark:text-neutral-100 bg-surface-light dark:bg-surface-dark border border-neutral-200 dark:border-neutral-700 rounded shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           required
                         >
                           <option value="">Choisir un créneau</option>
@@ -238,7 +236,7 @@
                           <option value="16:00">16:00 - 17:00</option>
                           <option value="17:00">17:00 - 18:00</option>
                           <option value="18:00">18:00 - 19:00</option>
-                        </select>
+                        </Select>
                       </div>
                     </div>
                   </div>
@@ -261,11 +259,10 @@
                   <!-- Instructions spéciales -->
                   <div>
                     <Label for="pickup-instructions">Instructions particulières (optionnel)</Label>
-                    <textarea
+                    <Textarea
                       id="pickup-instructions"
                       v-model="reservation.pickup_instructions"
                       placeholder="Comment vous trouver, indications spéciales..."
-                      class="w-full px-3 py-3 text-neutral-900 dark:text-neutral-100 bg-surface-light dark:bg-surface-dark border border-neutral-200 dark:border-neutral-700 rounded shadow-sm placeholder:text-neutral-400 dark:text-neutral-500 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       rows="3"
                     />
                   </div>
@@ -598,6 +595,8 @@ import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
 import Input from '@/components/ui/2025/Input.vue'
 import Label from '@/components/ui/2025/Label.vue'
+import Select from '@/components/ui/2025/Select.vue'
+import Textarea from '@/components/ui/2025/Textarea.vue'
 
 interface ReserveProduct {
   id: number

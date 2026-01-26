@@ -20,6 +20,7 @@ export const useLoyaltyPoints = () => {
   const expiringPoints = computed(() => points.value?.expiring_soon || 0)
   const recentHistory = computed(() => points.value?.recent_history || [])
   const pointsBreakdown = computed(() => points.value?.breakdown || [])
+  const tier = computed(() => points.value?.tier || null)
 
   const getErrorMessage = (err: unknown, fallback: string): string => {
     if (err instanceof Error && err.message) {
@@ -155,6 +156,7 @@ export const useLoyaltyPoints = () => {
     expiringPoints,
     recentHistory,
     pointsBreakdown,
+    tier,
 
     // Methods
     fetchMyPoints,

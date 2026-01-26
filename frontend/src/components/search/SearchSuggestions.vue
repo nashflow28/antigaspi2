@@ -126,7 +126,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { Clock, RefreshCcw, Sparkles, Trash2 } from 'lucide-vue-next'
 
-import Button from '@/components/ui/Button.vue'
+import Button from '@/components/ui/2025/Button.vue'
 import {
   deleteHistoryEntry,
   getSuggestions,

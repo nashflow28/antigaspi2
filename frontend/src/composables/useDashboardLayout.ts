@@ -2,6 +2,9 @@ import { computed, type Component } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   ChartBarIcon,
+  HomeIcon,
+  MagnifyingGlassIcon,
+  HeartIcon,
   CalendarDaysIcon,
   SparklesIcon,
   BanknotesIcon,
@@ -9,6 +12,7 @@ import {
   Squares2X2Icon,
   BuildingStorefrontIcon,
   UsersIcon,
+  Cog6ToothIcon,
   GiftIcon,
   ShieldCheckIcon,
   ClipboardDocumentCheckIcon,
@@ -37,16 +41,34 @@ type BrandConfig = {
 const navigationByRole: Record<Role, NavigationConfig[]> = {
   consumer: [
     {
-      label: 'Tableau de bord',
+      label: 'Accueil',
       href: '/dashboard',
-      icon: ChartBarIcon,
+      icon: HomeIcon,
       routes: ['dashboard']
+    },
+    {
+      label: 'Découvrir',
+      href: '/discover',
+      icon: MagnifyingGlassIcon,
+      routes: ['discover']
+    },
+    {
+      label: 'Favoris',
+      href: '/favorites',
+      icon: HeartIcon,
+      routes: ['favorites']
     },
     {
       label: 'Mes réservations',
       href: '/reservations',
       icon: CalendarDaysIcon,
       routes: ['reservations', 'reservation-detail']
+    },
+    {
+      label: 'Mon compte',
+      href: '/profile',
+      icon: UserCircleIcon,
+      routes: ['profile', 'profile-edit']
     },
     {
       label: 'Mes livraisons',
@@ -115,6 +137,12 @@ const navigationByRole: Record<Role, NavigationConfig[]> = {
       href: '/merchant/loyalty',
       icon: SparklesIcon,
       routes: ['merchant-loyalty']
+    },
+    {
+      label: 'Mon compte',
+      href: '/merchant/profile',
+      icon: UserCircleIcon,
+      routes: ['merchant-profile', 'merchant-profile-edit']
     }
   ],
   admin: [
@@ -123,6 +151,12 @@ const navigationByRole: Record<Role, NavigationConfig[]> = {
       href: '/admin/dashboard',
       icon: ChartBarIcon,
       routes: ['admin-dashboard']
+    },
+    {
+      label: 'Analytics',
+      href: '/admin/analytics',
+      icon: ChartBarIcon,
+      routes: ['admin-analytics']
     },
     {
       label: 'Utilisateurs',
@@ -147,6 +181,12 @@ const navigationByRole: Record<Role, NavigationConfig[]> = {
       href: '/admin/reviews',
       icon: ChatBubbleLeftRightIcon,
       routes: ['admin-reviews']
+    },
+    {
+      label: 'Paramètres',
+      href: '/admin/settings',
+      icon: Cog6ToothIcon,
+      routes: ['admin-settings']
     }
   ],
   driver: [

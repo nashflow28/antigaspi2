@@ -62,23 +62,25 @@
           </div>
         </div>
         <div class="flex flex-col gap-2">
-          <button
-            class="button-ghost-2025 text-sm"
+          <Button
+            variant="ghost"
+            size="sm"
             type="button"
             data-testid="surprise-basket-view"
             @click="$emit('view', basket)"
           >
             Voir les détails
-          </button>
-          <button
-            class="button-primary-2025 text-sm"
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
             type="button"
             :disabled="basket.quantity_available === 0"
             data-testid="surprise-basket-reserve"
             @click="$emit('reserve', basket)"
           >
             {{ basket.quantity_available === 0 ? 'Épuisé' : 'Réserver' }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -91,6 +93,7 @@ import { Clock, Package, Store, Tag } from 'lucide-vue-next'
 import type { SurpriseBasket } from '@/services/surpriseBasketService'
 import { formatPrice, formatSavings } from '@/utils/currency'
 import Badge from '@/components/ui/2025/Badge.vue'
+import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
 
 interface Props {

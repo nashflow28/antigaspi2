@@ -473,8 +473,25 @@ export interface Reward {
   description?: string | null
   points_required: number
   image_url?: string | null
+  type?: 'discount' | 'product' | 'voucher' | 'experience' | string
+  value?: number | null
+  value_type?: 'fixed' | 'percentage' | string
+  quantity_available?: number | null
+  quantity_redeemed?: number
+  valid_from?: string | null
+  valid_until?: string | null
+  tier_required?: 'bronze' | 'silver' | 'gold' | 'platinum' | null
   is_active?: boolean
   is_featured?: boolean
+  merchant_id?: number | null
+  merchant?: {
+    id: number
+    business_name: string
+  } | null
+  remaining_quantity?: number | null
+  formatted_value?: string
+  can_redeem?: boolean
+  points_needed?: number
   created_at?: string
 }
 
@@ -670,6 +687,33 @@ export interface LoyaltyPointsSummary {
   expiring_soon: number
   breakdown: LoyaltyPointsBreakdown[]
   recent_history: LoyaltyPoint[]
+  tier?: LoyaltyTierData
+}
+
+export interface LoyaltyTierBenefits {
+  points_multiplier: number
+  exclusive_rewards: boolean
+  priority_support: boolean
+  early_access: boolean
+}
+
+export interface LoyaltyTierInfo {
+  key: string
+  name: string
+  threshold: number
+  benefits: LoyaltyTierBenefits
+}
+
+export interface LoyaltyTierData {
+  current_tier: string
+  current_tier_name: string
+  lifetime_points: number
+  next_tier: string | null
+  next_tier_name: string | null
+  points_to_next_tier: number
+  progress_percentage: number
+  benefits: LoyaltyTierBenefits
+  all_tiers: LoyaltyTierInfo[]
 }
 
 export interface LoyaltyParticipantSummary {
@@ -727,6 +771,8 @@ export interface ProductFilters {
   merchant_id?: number
   max_price?: number
   max_expiry_days?: number
+  sort_by?: 'created_at' | 'discounted_price' | 'expiration_date' | 'name'
+  sort_order?: 'asc' | 'desc'
   page?: number
   per_page?: number
   latitude?: number

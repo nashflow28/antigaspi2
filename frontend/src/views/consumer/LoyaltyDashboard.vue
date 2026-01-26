@@ -15,14 +15,15 @@
             </p>
           </div>
           <div class="flex items-center gap-4">
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               :disabled="loading"
-              class="button-outline-2025 text-sm"
               @click="refreshPoints"
             >
               <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': loading }" />
               Actualiser
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -80,6 +81,39 @@
               </div>
             </Card>
           </div>
+
+          <Card v-if="tier" class="mt-4">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div class="space-y-1">
+                <p class="text-sm font-medium text-neutral-600">Niveau actuel</p>
+                <div class="flex flex-wrap items-center gap-3">
+                  <span
+                    class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide"
+                    :class="tierColors[currentTier] || tierColors.bronze"
+                  >
+                    {{ tierLabel }}
+                  </span>
+                  <span class="text-sm text-neutral-500">
+                    {{ formatPoints(tier?.lifetime_points ?? totalPoints) }} points cumulés
+                  </span>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-600">
+                <span v-if="tierNextLabel">
+                  Prochain niveau : {{ tierNextLabel }} ({{ formatPoints(pointsToNextTier) }} pts)
+                </span>
+                <span v-else>Niveau maximum atteint</span>
+              </p>
+            </div>
+
+            <div class="mt-4 h-3 w-full overflow-hidden rounded-full bg-neutral-200">
+              <div
+                class="h-full rounded-full transition-all duration-300"
+                :class="tierProgressColors[currentTier] || tierProgressColors.bronze"
+                :style="{ width: `${Math.min(100, Math.max(0, tierProgress))}%` }"
+              />
+            </div>
+          </Card>
         </div>
 
         <!-- Points Breakdown -->
@@ -243,7 +277,16 @@
                     <component :is="reward.icon" class="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h4 class="font-semibold text-neutral-900">{{ reward.title }}</h4>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <h4 class="font-semibold text-neutral-900">{{ reward.title }}</h4>
+                      <span
+                        v-if="reward.reward.tier_required"
+                        class="rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wide"
+                        :class="tierColors[reward.reward.tier_required] || 'bg-neutral-200 text-neutral-700'"
+                      >
+                        {{ tierLabels[reward.reward.tier_required] || reward.reward.tier_required }}
+                      </span>
+                    </div>
                     <p class="text-sm text-neutral-700">{{ reward.cost }} points</p>
                   </div>
                 </div>
@@ -302,17 +345,17 @@
             </div>
 
             <div class="flex gap-4">
-              <button class="flex-1 button-outline-2025" @click="closeRedeemModal">
+              <Button variant="outline" class="flex-1" @click="closeRedeemModal">
                 Annuler
-              </button>
-              <button
+              </Button>
+              <Button
                 :disabled="redeeming"
-                class="flex-1 button-primary-2025"
+                class="flex-1"
                 @click="confirmRedeem"
               >
                 <Loader2 v-if="redeeming" class="h-4 w-4 mr-2 animate-spin" />
                 {{ redeeming ? 'Échange...' : 'Confirmer' }}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -349,7 +392,8 @@ const {
   formatPoints,
   getPointTypeLabel,
   getPointTypeColor,
-  canRedeem
+  canRedeem,
+  tier
 } = useLoyaltyPoints()
 
 // State
@@ -428,6 +472,33 @@ const manualPointsPreview = computed(() => {
   const remaining = Math.max(totalPoints.value - manualPointsValue.value, 0)
   return `Après l'échange vous conserverez ${formatPoints(remaining)} point(s).`
 })
+
+const tierColors: Record<string, string> = {
+  bronze: 'bg-amber-100 text-amber-700',
+  silver: 'bg-neutral-200 text-neutral-700',
+  gold: 'bg-yellow-100 text-yellow-800',
+  platinum: 'bg-indigo-100 text-indigo-700'
+}
+
+const tierProgressColors: Record<string, string> = {
+  bronze: 'bg-amber-400',
+  silver: 'bg-neutral-500',
+  gold: 'bg-yellow-500',
+  platinum: 'bg-indigo-500'
+}
+
+const tierLabels: Record<string, string> = {
+  bronze: 'Bronze',
+  silver: 'Argent',
+  gold: 'Or',
+  platinum: 'Platine'
+}
+
+const currentTier = computed(() => tier.value?.current_tier ?? 'bronze')
+const tierLabel = computed(() => tier.value?.current_tier_name ?? 'Bronze')
+const tierProgress = computed(() => tier.value?.progress_percentage ?? 0)
+const tierNextLabel = computed(() => tier.value?.next_tier_name ?? null)
+const pointsToNextTier = computed(() => tier.value?.points_to_next_tier ?? 0)
 
 // Methods
 const refreshPoints = async () => {

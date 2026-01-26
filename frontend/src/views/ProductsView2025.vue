@@ -463,7 +463,7 @@ import { notify } from '@/composables/useNotifications'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
 import { apiService } from '@/services/api'
-import type { ProductFilters } from '@/types'
+import type { ApiResponse, ProductFilters, Reservation } from '@/types'
 import { normalizeProduct, getCategoryKey, type NormalizedProduct } from '@/utils/productNormalizer'
 
 const router = useRouter()
@@ -480,6 +480,15 @@ const featuredSectionRef = ref<HTMLElement | null>(null)
 
 // User impact data (mock for now, would come from API)
 const userImpactData = ref<{ baskets_saved: number } | null>(null)
+
+type ReservationListResponse = ApiResponse<Reservation[]> & {
+  meta?: {
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  }
+}
 
 // Editorial collections
 const collections = computed(() => [
@@ -835,12 +844,68 @@ const loadCategories = async () => {
   }
 }
 
+const toNumber = (value: unknown) => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+
+  return 0
+}
+
+const isSameMonth = (dateValue?: string | null) => {
+  if (!dateValue) return false
+  const date = new Date(dateValue)
+  if (Number.isNaN(date.getTime())) return false
+  const now = new Date()
+  return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
+}
+
 const loadUserImpact = async () => {
-  // Mock data - would come from API
-  if (authStore.isAuthenticated) {
+  if (!authStore.isAuthenticated) {
+    userImpactData.value = null
+    return
+  }
+
+  try {
+    const perPage = 50
+    let page = 1
+    let lastPage = 1
+    let basketsSaved = 0
+
+    do {
+      const response = await apiService.getReservations({
+        status: 'completed',
+        page,
+        per_page: perPage
+      }) as ReservationListResponse
+
+      if (!response?.success || !Array.isArray(response.data)) {
+        break
+      }
+
+      response.data.forEach((reservation) => {
+        const dateRef = reservation.completed_at ?? reservation.created_at
+        if (!isSameMonth(dateRef)) {
+          return
+        }
+        basketsSaved += toNumber(reservation.quantity ?? reservation.quantity_reserved ?? 0)
+      })
+
+      const pagination = response.meta ?? response.pagination
+      lastPage = pagination?.last_page ?? 1
+      page += 1
+    } while (page <= lastPage)
+
     userImpactData.value = {
-      baskets_saved: 3
+      baskets_saved: basketsSaved
     }
+  } catch (error) {
+    userImpactData.value = null
   }
 }
 

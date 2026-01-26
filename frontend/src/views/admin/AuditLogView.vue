@@ -289,21 +289,27 @@
     </Teleport>
 
     <!-- Notifications -->
-    <div class="fixed top-4 right-4 z-[110] space-y-3">
-      <NotificationToast
-        v-for="notification in notifications"
-        :key="notification.id"
-        :type="notification.type"
-        :title="notification.title"
-        :message="notification.message"
-        @close="removeNotification(notification.id)"
-      />
-    </div>
+    <Teleport to="body">
+      <div class="fixed top-4 right-4 z-[110] space-y-3">
+        <TransitionGroup name="toast">
+          <Toast
+            v-for="notification in notifications"
+            :key="notification.id"
+            :is-open="true"
+            :tone="notification.type"
+            :title="notification.title"
+            :description="notification.message"
+            position="stacked"
+            @close="removeNotification(notification.id)"
+          />
+        </TransitionGroup>
+      </div>
+    </Teleport>
   </DashboardLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, Teleport, TransitionGroup } from 'vue'
 import {
   ArrowPathIcon,
   ClipboardDocumentListIcon,
@@ -314,7 +320,7 @@ import {
   XMarkIcon
 } from '@heroicons/vue/24/outline'
 import apiService from '@/services/api'
-import NotificationToast from '@/components/ui/NotificationToast.vue'
+import Toast from '@/components/ui/Toast.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { Button, Badge, Pagination } from '@/components/ui/2025'
 import {

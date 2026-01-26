@@ -114,16 +114,15 @@
           </div>
 
           <div class="space-y-2">
-            <Label for="quantity">Quantité</Label>
-            <input
+            <Input
               id="quantity"
               v-model.number="quantity"
               type="number"
               min="1"
               :max="Math.max(1, maxQuantity)"
-              class="input-field-2025"
+              label="Quantité"
               :disabled="maxQuantity === 0"
-            >
+            />
             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ maxQuantity }} panier{{ maxQuantity > 1 ? 's' : '' }} restant{{ maxQuantity > 1 ? 's' : '' }}</p>
           </div>
 
@@ -167,20 +166,16 @@
             </div>
 
             <div v-if="methodRequiresPhone" class="space-y-4">
-              <Label for="mobile-money-phone">Numéro Mobile Money</Label>
-              <input
+              <Input
                 id="mobile-money-phone"
                 v-model.trim="mobileMoneyPhone"
                 type="tel"
+                label="Numéro Mobile Money"
                 placeholder="+228 90 00 00 00"
-                class="input-field-2025"
-                :class="{
-                  'border-red-600/50 focus:border-red-600/50 focus:ring-accent-red/20': mobileMoneyPhone && !isPhoneValid
-                }"
+                :error="mobileMoneyPhone && !isPhoneValid ? phoneError : ''"
                 :disabled="submitting"
-              >
-              <p class="text-xs text-neutral-500 dark:text-neutral-400">Utilisez un numéro enregistré sur le portefeuille sélectionné.</p>
-              <p v-if="phoneError" class="text-xs font-medium text-red-600">{{ phoneError }}</p>
+                help-text="Utilisez un numéro enregistré sur le portefeuille sélectionné."
+              />
             </div>
 
             <p
@@ -207,9 +202,10 @@
           </div>
 
           <div class="space-y-4">
-            <button
+            <Button
               type="button"
-              class="button-primary-2025 w-full"
+              variant="primary"
+              class="w-full"
               :disabled="!canReserve || submitting"
               @click="reserveBasket"
             >
@@ -218,7 +214,7 @@
                 Réservation en cours...
               </span>
               <span v-else>{{ reserveButtonLabel }}</span>
-            </button>
+            </Button>
             <p v-if="!authStore.isAuthenticated" class="text-left sm:text-center text-xs text-neutral-500 dark:text-neutral-400">
               Connectez-vous pour finaliser la réservation.
             </p>
@@ -247,7 +243,7 @@ import type { PaymentMethod } from '@/types'
 import Badge from '@/components/ui/2025/Badge.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
-import Label from '@/components/ui/2025/Label.vue'
+import Input from '@/components/ui/2025/Input.vue'
 
 const route = useRoute()
 const router = useRouter()

@@ -1,6 +1,19 @@
 import { apiService } from '@/services/api'
 import type { ApiResponse, Reward, RewardRedemption } from '@/types'
 
+export interface RewardsResponse extends ApiResponse<Reward[]> {
+  meta?: {
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  }
+  user_context?: {
+    current_points: number
+    loyalty_tier: string
+  }
+}
+
 export interface RewardsQuery {
   per_page?: number
   page?: number
@@ -10,7 +23,7 @@ export interface RewardsQuery {
 class RewardsService {
   private readonly baseUrl = '/rewards'
 
-  async getRewards(query?: RewardsQuery): Promise<ApiResponse<Reward[]>> {
+  async getRewards(query?: RewardsQuery): Promise<RewardsResponse> {
     if (!query || Object.keys(query).length === 0) {
       return apiService.get<ApiResponse<Reward[]>>(this.baseUrl)
     }
@@ -23,7 +36,7 @@ class RewardsService {
     })
 
     const suffix = params.toString() ? `?${params.toString()}` : ''
-    return apiService.get<ApiResponse<Reward[]>>(`${this.baseUrl}${suffix}`)
+    return apiService.get<RewardsResponse>(`${this.baseUrl}${suffix}`)
   }
 
   async getFeaturedRewards(): Promise<ApiResponse<Reward[]>> {

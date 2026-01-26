@@ -77,23 +77,16 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
-              Description
-            </label>
-            <textarea
+            <Textarea
               v-model="formData.description"
+              label="Description"
               rows="4"
-              class="w-full rounded-xl border border-neutral-200 px-4 py-3 text-neutral-900 placeholder-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
               placeholder="Décrivez votre commerce, vos spécialités, votre engagement contre le gaspillage..."
-              :class="{ 'border-red-500': formErrors.description }"
+              :error="formErrors.description"
+              helper-text="Maximum 1000 caractères"
+              maxlength="1000"
               data-testid="description-textarea"
             />
-            <p v-if="formErrors.description" class="mt-1 text-sm text-red-600">
-              {{ formErrors.description }}
-            </p>
-            <p class="mt-1 text-xs text-neutral-500">
-              Maximum 1000 caractères
-            </p>
           </div>
         </div>
       </Card>
@@ -188,6 +181,7 @@ import DashboardHeader from '@/components/dashboard/2025/DashboardHeader.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Input from '@/components/ui/2025/Input.vue'
+import Textarea from '@/components/ui/2025/Textarea.vue'
 import { merchantService } from '@/services/merchantService'
 import { useAuthStore } from '@/stores/auth'
 import { notify } from '@/composables/useNotifications'

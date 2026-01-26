@@ -34,44 +34,34 @@
             <h2 id="checkout-pickup" class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Informations de retrait</h2>
           </template>
           <div class="grid gap-3 md:grid-cols-2" role="group" aria-labelledby="checkout-pickup">
-            <label class="flex flex-col gap-2 text-sm text-neutral-700 dark:text-neutral-200">
-              Nom complet
-              <input
-                v-model="contactName"
-                type="text"
-                class="rounded border border-neutral-200 bg-white/80 px-3 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
-                placeholder="Ex : Kossi Awesso"
-              >
-            </label>
-            <label class="flex flex-col gap-2 text-sm text-neutral-700 dark:text-neutral-200">
-              Numéro de téléphone
-              <input
-                v-model="contactPhone"
-                type="tel"
-                class="rounded border border-neutral-200 bg-white/80 px-3 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
-                placeholder="Ex : +228 90 00 00 00"
-              >
-            </label>
-            <label class="flex flex-col gap-2 text-sm text-neutral-700 dark:text-neutral-200">
-              Créneau de retrait
-              <select
-                v-model="pickupSlot"
-                class="rounded border border-neutral-200 bg-white/80 px-3 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
-              >
+            <Input
+              v-model="contactName"
+              label="Nom complet"
+              placeholder="Ex : Kossi Awesso"
+            />
+            <Input
+              v-model="contactPhone"
+              type="tel"
+              label="Numéro de téléphone"
+              placeholder="Ex : +228 90 00 00 00"
+            />
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                Créneau de retrait
+              </label>
+              <Select v-model="pickupSlot">
                 <option value="asap">Dès que possible</option>
                 <option value="lunch">Pause déjeuner (12h-14h)</option>
                 <option value="evening">Fin de journée (18h-20h)</option>
-              </select>
-            </label>
-            <label class="flex flex-col gap-2 text-sm text-neutral-700 dark:text-neutral-200">
-              Notes pour le commerçant
-              <textarea
-                v-model="notes"
-                rows="3"
-                class="rounded border border-neutral-200 bg-white/80 px-3 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
-                placeholder="Ex : Merci de prévoir un sac réutilisable."
-              />
-            </label>
+              </Select>
+            </div>
+            <Textarea
+              v-model="notes"
+              label="Notes pour le commerçant"
+              rows="3"
+              helper-text="Ajoutez des précisions pour le retrait."
+              placeholder="Ex : Merci de prévoir un sac réutilisable."
+            />
           </div>
         </Card>
 
@@ -107,18 +97,15 @@
 
           <!-- Wallet PIN field (shown only when wallet payment is selected) -->
           <div v-if="selectedPayment === 'wallet'" class="mt-4 space-y-2">
-            <label class="flex flex-col gap-2 text-sm text-neutral-700 dark:text-neutral-200">
-              Code PIN Portefeuille
-              <input
-                v-model="walletPin"
-                type="password"
-                inputmode="numeric"
-                maxlength="6"
-                class="rounded border border-neutral-200 bg-white/80 px-3 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
-                placeholder="••••••"
-              >
-              <span class="text-xs text-neutral-500 dark:text-neutral-400">Code à 4-6 chiffres configuré dans votre portefeuille</span>
-            </label>
+            <Input
+              v-model="walletPin"
+              type="password"
+              label="Code PIN Portefeuille"
+              placeholder="••••••"
+              inputmode="numeric"
+              maxlength="6"
+              help-text="Code à 4-6 chiffres configuré dans votre portefeuille"
+            />
           </div>
 
           <div class="mt-4 flex items-center gap-2 rounded bg-primary-50 px-3 py-3 text-sm text-primary-900 dark:bg-primary-500/15 dark:text-primary-100">
@@ -131,15 +118,13 @@
           <template #header>
             <h2 id="checkout-terms" class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Conditions</h2>
           </template>
-          <div class="space-y-2 text-sm text-neutral-700 dark:text-neutral-500" role="group" aria-labelledby="checkout-terms">
-            <label class="flex items-stretch sm:items-start gap-3">
-              <input v-model="termsAccepted" type="checkbox" class="mt-1 w-4 h-4 rounded border-neutral-300 text-primary-600 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-400 dark:focus-visible:ring-offset-neutral-950">
-              <span>J'accepte les conditions d'annulation GÊLADAL et m'engage à récupérer mon panier dans le créneau choisi.</span>
-            </label>
-            <label class="flex items-stretch sm:items-start gap-3">
-              <input v-model="subscribeNotifications" type="checkbox" class="mt-1 w-4 h-4 rounded border-neutral-300 text-primary-600 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-400 dark:focus-visible:ring-offset-neutral-950">
-              <span>Recevoir des alertes lorsqu'un panier similaire est publié par mes commerçants favoris.</span>
-            </label>
+          <div class="space-y-3 text-sm text-neutral-700 dark:text-neutral-500" role="group" aria-labelledby="checkout-terms">
+            <Checkbox v-model="termsAccepted">
+              J'accepte les conditions d'annulation GÊLADAL et m'engage à récupérer mon panier dans le créneau choisi.
+            </Checkbox>
+            <Checkbox v-model="subscribeNotifications">
+              Recevoir des alertes lorsqu'un panier similaire est publié par mes commerçants favoris.
+            </Checkbox>
           </div>
         </Card>
 
@@ -220,6 +205,10 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { Button, Card } from '@/components/ui/2025'
+import Input from '@/components/ui/2025/Input.vue'
+import Select from '@/components/ui/2025/Select.vue'
+import Checkbox from '@/components/ui/2025/Checkbox.vue'
+import Textarea from '@/components/ui/2025/Textarea.vue'
 import { useCartStore } from '@/stores/cart'
 import { useFavoritesStore } from '@/stores/favorites'
 import { notify } from '@/composables/useNotifications'

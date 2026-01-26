@@ -124,7 +124,6 @@
     <Footer class="border-t border-primary-500/10 bg-primary-800 text-neutral-50" />
 
     <NotificationContainer />
-    <NotificationSystem />
 
     <!-- TEMPORARILY DISABLED - Network Status -->
     <!-- <NetworkStatus /> -->
@@ -155,8 +154,7 @@ import Navigation from '@/components/ui/Navigation.vue'
 import Footer from '@/components/ui/Footer.vue'
 import PageTransition from '@/components/ui/PageTransition.vue'
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
-import NotificationSystem from '@/components/ui/NotificationSystem.vue'
-import Button from '@/components/ui/Button.vue'
+import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
 
 const authStore = useAuthStore()
@@ -194,22 +192,54 @@ const dashboardTarget = computed(() => {
 const dashboardRouteNames = computed(() => {
   const role = authStore.user?.role
   if (role === 'admin') {
-    return ['admin-dashboard', 'admin-users', 'admin-merchants', 'admin-categories', 'admin-reviews']
+    return [
+      'admin-dashboard',
+      'admin-analytics',
+      'admin-users',
+      'admin-merchants',
+      'admin-categories',
+      'admin-reviews',
+      'admin-products',
+      'admin-payments',
+      'admin-settings',
+      'admin-audit'
+    ]
   }
   if (role === 'merchant') {
     return [
       'merchant-dashboard',
+      'merchant-analytics',
       'merchant-products',
       'merchant-product-create',
       'merchant-product-edit',
       'merchant-reservations',
+      'merchant-payments',
       'merchant-reviews-dashboard',
       'merchant-reviews',
       'merchant-surprise-baskets',
-      'merchant-loyalty'
+      'merchant-loyalty',
+      'merchant-profile'
     ]
   }
-  return ['dashboard', 'wallet', 'reservations', 'reservation-detail', 'consumer-loyalty']
+  return [
+    'dashboard',
+    'discover',
+    'favorites',
+    'wallet',
+    'wallet-topup',
+    'reservations',
+    'reservation-detail',
+    'consumer-loyalty',
+    'notifications',
+    'notifications-inbox',
+    'notifications-settings',
+    'profile',
+    'profile-edit',
+    'delivery-history',
+    'delivery-tracking',
+    'delivery-request',
+    'delivery-rating'
+  ]
 })
 
 const baseNavigation = computed<NavigationEntry[]>(() => {

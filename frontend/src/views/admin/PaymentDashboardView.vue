@@ -172,7 +172,7 @@
               size="sm"
               class="text-primary-600 hover:text-primary-700 dark:text-primary-300"
               :aria-label="`Voir détails paiement ${row.transaction_id}`"
-              @click="viewPaymentDetails(row)"
+              @click="viewPaymentDetails(row as Payment)"
             >
               <EyeIcon class="h-4 w-4" />
               <span class="sr-only">Détails</span>
@@ -193,21 +193,105 @@
       </DataTableCard>
     </div>
 
-    <div class="fixed top-4 right-4 z-[110] space-y-3">
-      <NotificationToast
-        v-for="notification in notifications"
-        :key="notification.id"
-        :type="notification.type"
-        :title="notification.title"
-        :message="notification.message"
-        @close="removeNotification(notification.id)"
-      />
-    </div>
+    <Modal
+      v-model="showDetailsModal"
+      size="lg"
+      title="Détails du paiement"
+      description="Informations complètes sur la transaction sélectionnée."
+      @close="closeDetailsModal"
+    >
+      <div v-if="selectedPayment" class="space-y-4 text-sm text-neutral-600 dark:text-neutral-300">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Transaction</p>
+            <p class="font-semibold text-neutral-900 dark:text-neutral-50">
+              {{ selectedPayment.transaction_id || '—' }}
+            </p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Référence</p>
+            <p class="font-semibold text-neutral-900 dark:text-neutral-50">
+              {{ selectedPayment.reference || '—' }}
+            </p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Montant</p>
+            <p class="font-semibold text-neutral-900 dark:text-neutral-50">
+              {{ formatCurrency(selectedPayment.amount) }}
+            </p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Statut</p>
+            <Badge :variant="getStatusVariant(selectedPayment.status)" size="sm">
+              {{ getStatusLabel(selectedPayment.status) }}
+            </Badge>
+          </div>
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Méthode</p>
+            <p class="font-semibold text-neutral-900 dark:text-neutral-50">
+              {{ getPaymentMethodLabel(selectedPayment.payment_method) }}
+            </p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Téléphone</p>
+            <p class="font-semibold text-neutral-900 dark:text-neutral-50">
+              {{ selectedPayment.customer_phone || selectedPayment.customer?.phone || '—' }}
+            </p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Client</p>
+            <p class="font-semibold text-neutral-900 dark:text-neutral-50">
+              {{ selectedPayment.customer?.name || '—' }}
+            </p>
+            <p class="text-xs text-neutral-400">{{ selectedPayment.customer?.email || '' }}</p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Commerçant</p>
+            <p class="font-semibold text-neutral-900 dark:text-neutral-50">
+              {{ selectedPayment.merchant?.business_name || '—' }}
+            </p>
+            <p class="text-xs text-neutral-400">{{ selectedPayment.merchant?.business_type || '' }}</p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Créé le</p>
+            <p class="font-semibold text-neutral-900 dark:text-neutral-50">
+              {{ formatDate(selectedPayment.created_at) }}
+            </p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-neutral-400">Payé le</p>
+            <p class="font-semibold text-neutral-900 dark:text-neutral-50">
+              {{ selectedPayment.paid_at ? formatDate(selectedPayment.paid_at) : '—' }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div v-else class="text-sm text-neutral-500 dark:text-neutral-400">
+        Sélectionnez un paiement pour afficher les détails.
+      </div>
+    </Modal>
+
+    <Teleport to="body">
+      <div class="fixed top-4 right-4 z-[110] space-y-3">
+        <TransitionGroup name="toast">
+          <Toast
+            v-for="notification in notifications"
+            :key="notification.id"
+            :is-open="true"
+            :tone="notification.type"
+            :title="notification.title"
+            :description="notification.message"
+            position="stacked"
+            @close="removeNotification(notification.id)"
+          />
+        </TransitionGroup>
+      </div>
+    </Teleport>
   </DashboardLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, Teleport, TransitionGroup } from 'vue'
 import {
   ArrowPathIcon,
   BanknotesIcon,
@@ -218,9 +302,9 @@ import {
   EyeIcon
 } from '@heroicons/vue/24/outline'
 import apiService from '@/services/api'
-import NotificationToast from '@/components/ui/NotificationToast.vue'
+import Toast from '@/components/ui/Toast.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
-import { Button, Badge, Pagination } from '@/components/ui/2025'
+import { Button, Badge, Modal, Pagination } from '@/components/ui/2025'
 import {
   DashboardHeader,
   StatCard,
@@ -457,14 +541,17 @@ const handlePageChange = (page: number) => {
   fetchPayments()
 }
 
-const viewPaymentDetails = (payment: Record<string, unknown>) => {
-  console.log('View payment details:', payment)
-  // TODO: Open modal or navigate to details page
-  addNotification({
-    type: 'info',
-    title: 'Détails du paiement',
-    message: `Transaction: ${(payment as unknown as Payment).transaction_id}`
-  })
+const selectedPayment = ref<Payment | null>(null)
+const showDetailsModal = ref(false)
+
+const viewPaymentDetails = (payment: Payment) => {
+  selectedPayment.value = payment
+  showDetailsModal.value = true
+}
+
+const closeDetailsModal = () => {
+  showDetailsModal.value = false
+  selectedPayment.value = null
 }
 
 // Helper Functions

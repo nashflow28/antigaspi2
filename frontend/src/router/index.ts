@@ -389,6 +389,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {
+      path: '/merchant/profile',
+      name: 'merchant-profile',
+      component: () => import('@/views/merchant/ProfileEditView.vue'),
+      meta: { requiresAuth: true, roles: ['merchant'] }
+    },
+    {
       path: '/driver',
       name: 'driver',
       redirect: '/driver/dashboard'
@@ -443,6 +449,12 @@ const router = createRouter({
     {
       path: '/admin/dashboard',
       name: 'admin-dashboard',
+      component: () => import('@/views/admin/DashboardView2025.vue'),
+      meta: { requiresAuth: true, roles: ['admin'] }
+    },
+    {
+      path: '/admin/analytics',
+      name: 'admin-analytics',
       component: () => import('@/views/admin/DashboardView2025.vue'),
       meta: { requiresAuth: true, roles: ['admin'] }
     },
