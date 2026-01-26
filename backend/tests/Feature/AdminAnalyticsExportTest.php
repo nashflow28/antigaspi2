@@ -145,11 +145,14 @@ class AdminAnalyticsExportTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertHeader('Content-Type', 'text/csv; charset=UTF-8')
-            ->assertHeader('Content-Disposition');
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure([
+                'success',
+                'data' => ['file_content', 'filename', 'mime_type'],
+            ]);
 
-        // Verify CSV content contains expected headers
-        $content = $response->streamedContent();
+        // Verify CSV content contains expected headers (decode base64)
+        $content = base64_decode($response->json('data.file_content'));
         $this->assertStringContainsString('RAPPORT ANALYTICS ANTIGASPI', $content);
         $this->assertStringContainsString('STATISTIQUES GÉNÉRALES', $content);
         $this->assertStringContainsString('TOP COMMERÇANTS', $content);
@@ -166,11 +169,14 @@ class AdminAnalyticsExportTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertHeader('Content-Type', 'text/html; charset=UTF-8')
-            ->assertHeader('Content-Disposition');
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure([
+                'success',
+                'data' => ['file_content', 'filename', 'mime_type'],
+            ]);
 
-        // Verify HTML content contains expected elements
-        $content = $response->getContent();
+        // Verify HTML content contains expected elements (decode base64)
+        $content = base64_decode($response->json('data.file_content'));
         $this->assertStringContainsString('Rapport Analytics Antigaspi', $content);
         $this->assertStringContainsString('Générales', $content);
         $this->assertStringContainsString('Environnemental', $content);
@@ -188,9 +194,10 @@ class AdminAnalyticsExportTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.mime_type', 'text/csv');
 
-        $content = $response->streamedContent();
+        $content = base64_decode($response->json('data.file_content'));
         $this->assertStringContainsString('RAPPORT ANALYTICS ANTIGASPI', $content);
     }
 
@@ -206,7 +213,7 @@ class AdminAnalyticsExportTest extends TestCase
 
         $response->assertOk();
 
-        $content = $response->streamedContent();
+        $content = base64_decode($response->json('data.file_content'));
         $this->assertStringContainsString('Test Bakery', $content);
         $this->assertStringContainsString('merchant@test.com', $content);
     }
@@ -223,7 +230,7 @@ class AdminAnalyticsExportTest extends TestCase
 
         $response->assertOk();
 
-        $content = $response->streamedContent();
+        $content = base64_decode($response->json('data.file_content'));
         $this->assertStringContainsString('CATÉGORIES POPULAIRES', $content);
         $this->assertStringContainsString('Bakery', $content);
     }

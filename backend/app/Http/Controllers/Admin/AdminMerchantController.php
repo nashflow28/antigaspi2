@@ -311,6 +311,7 @@ class AdminMerchantController extends Controller
             // Mettre à jour le produit avec la raison du rejet
             $product->is_active = false;
             $product->rejection_reason = $data['reason'];
+            $product->quantity_available = 0;
 
             // Mettre à jour le statut de modération si le champ existe
             if ($product->getConnection()->getSchemaBuilder()->hasColumn('products', 'moderation_status')) {

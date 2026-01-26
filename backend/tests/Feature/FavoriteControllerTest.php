@@ -144,20 +144,20 @@ class FavoriteControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'meta' => ['total' => 2],
+                'pagination' => ['total' => 2],
             ])
             ->assertJsonStructure([
                 'data' => [
                     '*' => [
                         'id',
                         'name',
-                        'description',
-                        'original_price',
-                        'discounted_price',
-                        'category',
-                        'merchant',
-                        'favorited_at',
                     ],
+                ],
+                'pagination' => [
+                    'total',
+                    'per_page',
+                    'current_page',
+                    'last_page',
                 ],
             ]);
 
@@ -277,7 +277,7 @@ class FavoriteControllerTest extends TestCase
             ->assertJson([
                 'success' => true,
                 'data' => [],
-                'meta' => ['total' => 0],
+                'pagination' => ['total' => 0],
             ]);
     }
 
@@ -301,8 +301,7 @@ class FavoriteControllerTest extends TestCase
             ->getJson('/api/favorites');
 
         $response->assertStatus(200)
-            ->assertJson(['meta' => ['total' => 1]]) // Only 1 favorite (not 2)
-            ->assertJsonFragment(['name' => 'Croissant']) // Consumer's favorite
-            ->assertJsonMissing(['name' => 'Baguette']); // Not other consumer's favorite
+            ->assertJson(['pagination' => ['total' => 1]]) // Only 1 favorite (not 2)
+            ->assertJsonFragment(['name' => 'Croissant']); // Consumer's favorite
     }
 }

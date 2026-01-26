@@ -147,8 +147,11 @@ class PaymentController extends Controller
 
         $statusBreakdown = $statusBreakdownCollection
             ->mapWithKeys(function ($row) {
+                // Convert enum to string value for use as array key
+                $statusKey = $row->status instanceof PaymentStatus ? $row->status->value : (string) $row->status;
+
                 return [
-                    $row->status => [
+                    $statusKey => [
                         'count' => (int) $row->count,
                         'total_amount' => $row->total_amount !== null ? (float) $row->total_amount : 0.0,
                     ],
@@ -163,8 +166,11 @@ class PaymentController extends Controller
 
         $methodBreakdown = $methodBreakdownCollection
             ->mapWithKeys(function ($row) {
+                // Convert enum to string value for use as array key
+                $methodKey = $row->payment_method instanceof PaymentMethod ? $row->payment_method->value : (string) $row->payment_method;
+
                 return [
-                    $row->payment_method => [
+                    $methodKey => [
                         'count' => (int) $row->count,
                         'total_amount' => $row->total_amount !== null ? (float) $row->total_amount : 0.0,
                     ],

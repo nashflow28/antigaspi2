@@ -55,6 +55,10 @@ class MerchantControllerTest extends TestCase
      */
     public function test_valid_jpeg_merchant_photo_succeeds(): void
     {
+        if (! function_exists('imagecreatetruecolor')) {
+            $this->markTestSkipped('GD extension is not installed.');
+        }
+
         $token = auth('api')->login($this->merchantUser);
 
         // Create valid JPEG test image (800x800px)
@@ -86,6 +90,10 @@ class MerchantControllerTest extends TestCase
      */
     public function test_valid_png_merchant_photo_succeeds(): void
     {
+        if (! function_exists('imagecreatetruecolor')) {
+            $this->markTestSkipped('GD extension is not installed.');
+        }
+
         $token = auth('api')->login($this->merchantUser);
 
         // Create valid PNG test image (500x500px)
@@ -141,6 +149,10 @@ class MerchantControllerTest extends TestCase
      */
     public function test_oversized_dimensions_merchant_photo_rejected(): void
     {
+        if (! function_exists('imagecreatetruecolor')) {
+            $this->markTestSkipped('GD extension is not installed.');
+        }
+
         $token = auth('api')->login($this->merchantUser);
 
         // Create image exceeding max dimensions (1500x1500px > 1000x1000px limit)
@@ -194,6 +206,10 @@ class MerchantControllerTest extends TestCase
      */
     public function test_old_photo_deleted_on_new_upload(): void
     {
+        if (! function_exists('imagecreatetruecolor')) {
+            $this->markTestSkipped('GD extension is not installed.');
+        }
+
         $token = auth('api')->login($this->merchantUser);
 
         // Upload first photo

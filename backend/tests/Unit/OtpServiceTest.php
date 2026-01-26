@@ -93,10 +93,11 @@ class OtpServiceTest extends TestCase
     public function test_verify_otp_succeeds_with_correct_code(): void
     {
         // Create OTP directly in database with known value
+        // Use same hashing as the service: hash('sha256', $otp.config('app.key'))
         $plainOtp = '123456';
         OtpVerification::create([
             'phone' => '22891000000',
-            'otp' => hash('sha256', $plainOtp),
+            'otp' => hash('sha256', $plainOtp.config('app.key')),
             'purpose' => 'registration',
             'expires_at' => now()->addMinutes(10),
             'attempts' => 0,
@@ -112,7 +113,7 @@ class OtpServiceTest extends TestCase
         $plainOtp = '123456';
         OtpVerification::create([
             'phone' => '22891000000',
-            'otp' => hash('sha256', $plainOtp),
+            'otp' => hash('sha256', $plainOtp.config('app.key')),
             'purpose' => 'registration',
             'expires_at' => now()->addMinutes(10),
             'attempts' => 0,
@@ -129,7 +130,7 @@ class OtpServiceTest extends TestCase
         $plainOtp = '123456';
         OtpVerification::create([
             'phone' => '22891000000',
-            'otp' => hash('sha256', $plainOtp),
+            'otp' => hash('sha256', $plainOtp.config('app.key')),
             'purpose' => 'registration',
             'expires_at' => now()->subMinutes(1), // Already expired
             'attempts' => 0,
@@ -146,7 +147,7 @@ class OtpServiceTest extends TestCase
         $plainOtp = '123456';
         OtpVerification::create([
             'phone' => '22891000000',
-            'otp' => hash('sha256', $plainOtp),
+            'otp' => hash('sha256', $plainOtp.config('app.key')),
             'purpose' => 'registration',
             'expires_at' => now()->addMinutes(10),
             'attempts' => 0,
@@ -164,7 +165,7 @@ class OtpServiceTest extends TestCase
         $plainOtp = '123456';
         OtpVerification::create([
             'phone' => '22891000000',
-            'otp' => hash('sha256', $plainOtp),
+            'otp' => hash('sha256', $plainOtp.config('app.key')),
             'purpose' => 'registration',
             'expires_at' => now()->addMinutes(10),
             'attempts' => 3, // Max attempts reached
@@ -181,7 +182,7 @@ class OtpServiceTest extends TestCase
         $plainOtp = '123456';
         OtpVerification::create([
             'phone' => '22891000000',
-            'otp' => hash('sha256', $plainOtp),
+            'otp' => hash('sha256', $plainOtp.config('app.key')),
             'purpose' => 'registration',
             'expires_at' => now()->addMinutes(10),
             'attempts' => 0,
@@ -200,7 +201,7 @@ class OtpServiceTest extends TestCase
         $plainOtp = '123456';
         OtpVerification::create([
             'phone' => '22891000000',
-            'otp' => hash('sha256', $plainOtp),
+            'otp' => hash('sha256', $plainOtp.config('app.key')),
             'purpose' => 'registration',
             'expires_at' => now()->addMinutes(10),
             'attempts' => 0,

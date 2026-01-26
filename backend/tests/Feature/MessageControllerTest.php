@@ -6,22 +6,37 @@ use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MessageControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
+        config(['jwt.secret' => Str::random(32)]);
+    }
+
+    protected function actingAsJwt(User $user): array
+    {
+        $token = JWTAuth::fromUser($user);
+
+        return ['Authorization' => 'Bearer '.$token];
+    }
 
     public function test_consumer_can_create_conversation_and_send_message(): void
     {
         $consumer = User::factory()->create(['role' => 'consumer']);
         $merchant = User::factory()->merchant()->create();
 
-        $this->actingAs($consumer, 'api');
-
         $response = $this->postJson('/api/messaging/conversations', [
             'merchant_id' => $merchant->id,
-        ]);
+        ], $this->actingAsJwt($consumer));
 
         $response
             ->assertCreated()
@@ -34,7 +49,7 @@ class MessageControllerTest extends TestCase
 
         $messageResponse = $this->postJson("/api/messaging/conversations/{$conversationId}/messages", [
             'content' => 'Bonjour, avez-vous des paniers disponibles demain ?',
-        ]);
+        ], $this->actingAsJwt($consumer));
 
         $messageResponse
             ->assertCreated()
@@ -69,14 +84,12 @@ class MessageControllerTest extends TestCase
             'content' => 'Bonjour !',
         ]);
 
-        $this->actingAs($merchant, 'api');
-
-        $response = $this->getJson('/api/messaging/conversations');
+        $response = $this->getJson('/api/messaging/conversations', $this->actingAsJwt($merchant));
 
         $response
             ->assertOk()
             ->assertJsonPath('success', true)
-            ->assertJson(fn ($json) => count($json['data']['conversations']) === 1)
+            ->assertJsonCount(1, 'data.conversations')
             ->assertJsonPath('data.conversations.0.id', $conversation->id);
     }
 
@@ -91,9 +104,7 @@ class MessageControllerTest extends TestCase
             'merchant_id' => $merchant->id,
         ]);
 
-        $this->actingAs($intruder, 'api');
-
-        $this->getJson("/api/messaging/conversations/{$conversation->id}")
+        $this->getJson("/api/messaging/conversations/{$conversation->id}", $this->actingAsJwt($intruder))
             ->assertStatus(403)
             ->assertJsonPath('success', false);
     }
@@ -114,13 +125,13 @@ class MessageControllerTest extends TestCase
             'content' => 'Message initial',
         ]);
 
-        $this->actingAs($consumer, 'api');
+        $headers = $this->actingAsJwt($consumer);
 
         $this->putJson("/api/messaging/messages/{$message->id}", [
             'content' => 'Message mis à jour',
-        ])->assertOk()->assertJsonPath('data.message.content', 'Message mis à jour');
+        ], $headers)->assertOk()->assertJsonPath('data.message.content', 'Message mis à jour');
 
-        $this->deleteJson("/api/messaging/messages/{$message->id}")
+        $this->deleteJson("/api/messaging/messages/{$message->id}", [], $headers)
             ->assertOk()
             ->assertJsonPath('success', true);
 

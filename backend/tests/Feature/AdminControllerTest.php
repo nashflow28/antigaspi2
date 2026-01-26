@@ -154,10 +154,7 @@ class AdminControllerTest extends TestCase
             ->getJson('/api/admin/dashboard');
 
         $response->assertStatus(403)
-            ->assertJson([
-                'success' => false,
-                'message' => 'Accès réservé aux administrateurs',
-            ]);
+            ->assertJsonPath('message', 'This action is unauthorized.');
     }
 
     /**

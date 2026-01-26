@@ -214,7 +214,7 @@ class ReviewControllerTest extends TestCase
         $response->assertStatus(409)
             ->assertJson([
                 'success' => false,
-                'message' => 'Vous avez déjà donné un avis pour ce commerçant/produit',
+                'message' => 'Vous avez déjà donné un avis pour ce commerçant',
             ]);
     }
 

@@ -44,6 +44,10 @@ class PaymentControllerTest extends TestCase
             $table->string('phone')->nullable();
             $table->string('role')->nullable();
             $table->string('name')->nullable();
+            // Referral system columns (required by User model boot method)
+            $table->string('referral_code', 10)->unique()->nullable();
+            $table->unsignedBigInteger('referred_by')->nullable();
+            $table->boolean('referral_bonus_awarded')->default(false);
             $table->timestamps();
         });
 

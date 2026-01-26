@@ -46,7 +46,8 @@ class Conversation extends Model
 
     public function latestMessage(): HasOne
     {
-        return $this->hasOne(Message::class)->latestOfMany();
+        // Use orderByDesc instead of latestOfMany for SQLite compatibility
+        return $this->hasOne(Message::class)->orderByDesc('id');
     }
 
     public function scopeForUser($query, User $user)

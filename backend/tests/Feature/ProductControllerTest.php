@@ -51,6 +51,10 @@ class ProductControllerTest extends TestCase
      */
     public function test_valid_jpeg_upload_succeeds(): void
     {
+        if (! function_exists('imagecreatetruecolor')) {
+            $this->markTestSkipped('GD extension is not installed.');
+        }
+
         $token = auth('api')->login($this->merchantUser);
 
         // Create valid JPEG test image (100x100px)
@@ -81,6 +85,10 @@ class ProductControllerTest extends TestCase
      */
     public function test_valid_png_upload_succeeds(): void
     {
+        if (! function_exists('imagecreatetruecolor')) {
+            $this->markTestSkipped('GD extension is not installed.');
+        }
+
         $token = auth('api')->login($this->merchantUser);
 
         // Create valid PNG test image (500x500px)
@@ -135,6 +143,10 @@ class ProductControllerTest extends TestCase
      */
     public function test_oversized_dimensions_are_rejected(): void
     {
+        if (! function_exists('imagecreatetruecolor')) {
+            $this->markTestSkipped('GD extension is not installed.');
+        }
+
         $token = auth('api')->login($this->merchantUser);
 
         // Create image exceeding max dimensions (2500x2500px > 2000x2000px limit)

@@ -44,6 +44,10 @@ class AdminMerchantControllerTest extends TestCase
             $table->string('city')->nullable();
             $table->string('address')->nullable();
             $table->boolean('is_active')->default(true);
+            // Referral system columns (required by User model boot method)
+            $table->string('referral_code', 10)->unique()->nullable();
+            $table->unsignedBigInteger('referred_by')->nullable();
+            $table->boolean('referral_bonus_awarded')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -79,6 +83,8 @@ class AdminMerchantControllerTest extends TestCase
             $table->date('expiration_date')->nullable();
             $table->string('image_url')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->text('rejection_reason')->nullable();
+            $table->string('moderation_status')->nullable();
             $table->timestamps();
         });
 
@@ -98,11 +104,28 @@ class AdminMerchantControllerTest extends TestCase
             $table->text('notes')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('admin_audit_logs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
+            $table->string('action', 100);
+            $table->string('entity_type', 50);
+            $table->unsignedBigInteger('entity_id')->nullable();
+            $table->string('entity_name')->nullable();
+            $table->text('reason')->nullable();
+            $table->json('old_values')->nullable();
+            $table->json('new_values')->nullable();
+            $table->json('metadata')->nullable();
+            $table->string('ip_address', 45)->nullable();
+            $table->string('user_agent')->nullable();
+            $table->timestamps();
+        });
     }
 
     protected function tearDown(): void
     {
         Schema::disableForeignKeyConstraints();
+        Schema::dropIfExists('admin_audit_logs');
         Schema::dropIfExists('reservations');
         Schema::dropIfExists('products');
         Schema::dropIfExists('categories');
@@ -274,7 +297,9 @@ class AdminMerchantControllerTest extends TestCase
 
         $this->authenticateAdmin();
 
-        $response = $this->postJson("/api/admin/products/{$product->id}/reject");
+        $response = $this->postJson("/api/admin/products/{$product->id}/reject", [
+            'reason' => 'Produit non conforme aux standards',
+        ]);
 
         $response->assertOk()
             ->assertJsonPath('success', true);
