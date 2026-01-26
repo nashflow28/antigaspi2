@@ -25,6 +25,10 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_login_at')->nullable();
+            // Referral system columns (for SQLite test compatibility)
+            $table->string('referral_code', 10)->unique()->nullable();
+            $table->unsignedBigInteger('referred_by')->nullable();
+            $table->boolean('referral_bonus_awarded')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

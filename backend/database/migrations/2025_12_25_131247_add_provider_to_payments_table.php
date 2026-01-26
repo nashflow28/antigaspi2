@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('payments', function (Blueprint $table) {
-            $table->string('provider')->nullable()->after('status');
-        });
+        // Only add column if it doesn't exist (may have been added by earlier migration)
+        if (! Schema::hasColumn('payments', 'provider')) {
+            Schema::table('payments', function (Blueprint $table) {
+                $table->string('provider')->nullable()->after('status');
+            });
+        }
     }
 
     /**

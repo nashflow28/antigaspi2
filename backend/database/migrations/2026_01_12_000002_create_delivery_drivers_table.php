@@ -2,14 +2,18 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        // Add driver role to users table
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('consumer', 'merchant', 'admin', 'driver') DEFAULT 'consumer'");
+        // Add driver role to users table (MySQL only - SQLite doesn't support ENUM)
+        $driver = DB::connection()->getDriverName();
+        if ($driver !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('consumer', 'merchant', 'admin', 'driver') DEFAULT 'consumer'");
+        }
 
         Schema::create('delivery_drivers', function (Blueprint $table) {
             $table->id();
@@ -57,7 +61,10 @@ return new class extends Migration
     {
         Schema::dropIfExists('delivery_drivers');
 
-        // Revert users role enum
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('consumer', 'merchant', 'admin') DEFAULT 'consumer'");
+        // Revert users role enum (MySQL only)
+        $driver = DB::connection()->getDriverName();
+        if ($driver !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('consumer', 'merchant', 'admin') DEFAULT 'consumer'");
+        }
     }
 };
