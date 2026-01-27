@@ -1,6 +1,6 @@
 <template>
   <Modal
-    v-model="isOpen"
+    v-model="isOpenModel"
     :title="title"
     :description="message"
     size="sm"
@@ -72,6 +72,12 @@ const emit = defineEmits<{
   'confirm': []
   'cancel': []
 }>()
+
+// Computed ref to bridge prop to v-model
+const isOpenModel = computed({
+  get: () => props.isOpen,
+  set: (value) => emit('update:isOpen', value)
+})
 
 const variantMapping: Record<ConfirmDialogType, 'default' | 'alert'> = {
   danger: 'alert',

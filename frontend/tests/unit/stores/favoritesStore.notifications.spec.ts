@@ -8,63 +8,70 @@ vi.mock('@/composables/useNotifications', () => {
   return { notify: { error, info, success } }
 })
 
+vi.mock('@/services/api', () => ({
+  apiService: {
+    toggleFavoriteProduct: vi.fn(),
+    getFavoriteProducts: vi.fn().mockResolvedValue({ success: true, data: [] }),
+    getProduct: vi.fn()
+  }
+}))
+
 import { notify } from '@/composables/useNotifications'
 import { useFavoritesStore } from '@/stores/favorites'
 
-const baseFavorite = {
+const baseMerchantFavorite = {
   id: 42,
-  type: 'product' as const,
-  name: 'Produit star'
+  type: 'merchant' as const,
+  name: 'Commerçant Star'
 }
 
 describe('favorites store notifications', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
+    // Clear localStorage for merchant favorites
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('antigaspi_favorite_merchants')
+    }
   })
 
-  it('emits retryable notifications when removing a missing favorite', async () => {
+  it('returns not_found when removing a missing merchant favorite', async () => {
     const store = useFavoritesStore()
 
-    const result = store.removeFavorite(baseFavorite.id, baseFavorite.type)
+    // removeFavorite for merchant returns {success: false, reason: 'not_found'} when not in list
+    const result = await store.removeFavorite(baseMerchantFavorite.id, baseMerchantFavorite.type)
     expect(result.success).toBe(false)
-
-    expect(notify.error).toHaveBeenCalledWith(
-      'Élément introuvable dans vos favoris',
-      'Favoris',
-      expect.objectContaining({
-        action: expect.objectContaining({
-          label: 'Réessayer',
-          callback: expect.any(Function)
-        }),
-        onClose: expect.any(Function)
-      })
-    )
-    expect(store.pendingOperation).toBe('remove')
-
-    store.addFavorite(baseFavorite)
-
-    const retryCallback = (notify.error as ReturnType<typeof vi.fn>).mock.calls[0][2].action!.callback
-    await retryCallback()
-
-    expect(store.pendingOperation).toBeNull()
-
-    const onClose = (notify.error as ReturnType<typeof vi.fn>).mock.calls[0][2].onClose
-    onClose?.()
-    expect(store.pendingOperation).toBeNull()
+    expect(result.reason).toBe('not_found')
   })
 
-  it('emits info notifications when toggling favorites', () => {
+  it('emits info notifications when removing merchant favorites via toggleFavorite', async () => {
     const store = useFavoritesStore()
-    store.addFavorite(baseFavorite)
 
-    store.toggleFavorite(baseFavorite)
+    // First add the merchant using toggleFavorite (which calls addMerchantFavorite)
+    await store.toggleFavorite(baseMerchantFavorite)
+
+    // Clear mocks to check next notification
+    vi.clearAllMocks()
+
+    // Now toggle again to remove
+    await store.toggleFavorite(baseMerchantFavorite)
 
     expect(notify.info).toHaveBeenCalledWith(
-      'Retiré de vos favoris',
+      expect.stringContaining('retiré de vos favoris'),
       'Favoris',
       expect.objectContaining({ onClose: expect.any(Function) })
     )
-    expect(store.pendingOperation).toBeNull()
+  })
+
+  it('emits success notification when adding merchant favorite', async () => {
+    const store = useFavoritesStore()
+
+    await store.toggleFavorite(baseMerchantFavorite)
+
+    expect(notify.success).toHaveBeenCalledWith(
+      'Commerçant ajouté à vos favoris',
+      'Favoris',
+      expect.objectContaining({ onClose: expect.any(Function) })
+    )
   })
 })

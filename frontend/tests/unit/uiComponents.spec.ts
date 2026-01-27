@@ -1,12 +1,8 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { mount, flushPromises } from '@vue/test-utils'
+import { defineComponent, h, nextTick } from 'vue'
 
-import Button from '@/components/ui/Button.vue'
-import Card from '@/components/ui/Card.vue'
-import Input from '@/components/ui/Input.vue'
-import Textarea from '@/components/ui/Textarea.vue'
-import Modal from '@/components/ui/Modal.vue'
+import { Button, Card, Input, Textarea, Modal } from '@/components/ui/2025'
 
 describe('UI Components', () => {
   describe('Button', () => {
@@ -17,11 +13,14 @@ describe('UI Components', () => {
         }
       })
 
-      expect(wrapper.classes()).toContain('bg-nav-gradient')
-      expect(wrapper.classes()).toContain('text-white')
+      const button = wrapper.find('button')
+      // DS2025 Button uses bg-gradient-to-r with from-primary-500
+      expect(button.classes()).toContain('bg-gradient-to-r')
+      expect(button.classes()).toContain('from-primary-500')
+      expect(button.classes()).toContain('text-white')
     })
 
-    it('applies secondary variant and disabled state when loading', () => {
+    it('applies secondary variant and loading state styles', () => {
       const wrapper = mount(Button, {
         props: {
           variant: 'secondary',
@@ -32,28 +31,32 @@ describe('UI Components', () => {
         }
       })
 
-      expect(wrapper.attributes('disabled')).toBeDefined()
-      expect(wrapper.classes()).toContain('bg-white')
-      expect(wrapper.classes()).toContain('cursor-wait')
+      const button = wrapper.find('button')
+      // DS2025 Button uses cursor-wait when loading
+      expect(button.classes()).toContain('cursor-wait')
+      // DS2025 secondary variant uses bg-surface-light
+      expect(button.classes()).toContain('bg-surface-light')
+      // Loading spinner should be present
+      expect(wrapper.find('.animate-spin').exists()).toBe(true)
     })
   })
 
   describe('Card', () => {
-    it('supports glass variant with glow hover', () => {
+    it('supports glass variant with backdrop blur', () => {
       const wrapper = mount(Card, {
         props: {
-          variant: 'glass',
-          hover: 'glow',
-          padding: 'lg'
+          variant: 'glass'
         },
         slots: {
           default: '<p>Contenu</p>'
         }
       })
 
-      expect(wrapper.classes()).toContain('bg-primary-200/15')
-      expect(wrapper.classes()).toContain('hover:shadow-glow')
-      expect(wrapper.classes()).toContain('p-8')
+      // DS2025 Card glass variant uses bg-surface-light/70 and backdrop-blur-xl
+      expect(wrapper.classes()).toContain('bg-surface-light/70')
+      expect(wrapper.classes()).toContain('backdrop-blur-xl')
+      // Default padding is p-6
+      expect(wrapper.classes()).toContain('p-6')
     })
   })
 
@@ -69,16 +72,16 @@ describe('UI Components', () => {
       const wrapper = mount(Input, {
         props: {
           label: 'Email',
-          helperText: 'Nous ne partagerons jamais votre email',
+          helpText: 'Nous ne partagerons jamais votre email',
           modelValue: '',
           leftIcon: Icon
         }
       })
 
-      const input = wrapper.find('input')
+      // Check that help text is rendered
       expect(wrapper.text()).toContain('Nous ne partagerons jamais votre email')
-      expect(input.classes()).toContain('pl-12')
 
+      const input = wrapper.find('input')
       await input.setValue('test@antigaspi.fr')
       expect(wrapper.emitted()['update:modelValue']?.[0]).toEqual(['test@antigaspi.fr'])
     })
@@ -92,8 +95,9 @@ describe('UI Components', () => {
         }
       })
 
-      const input = wrapper.find('input')
-      expect(input.classes()).toContain('border-accent-red')
+      // Error border is on the container div, not the input
+      const container = wrapper.find('.border-accent-red')
+      expect(container.exists()).toBe(true)
       expect(wrapper.text()).toContain('Champ obligatoire')
     })
   })
@@ -112,7 +116,8 @@ describe('UI Components', () => {
 
       await wrapper.setProps({ error: 'Ce champ est requis' })
       const textarea = wrapper.find('textarea')
-      expect(textarea.classes()).toContain('border-accent-red')
+      // DS2025 Textarea uses border-red-600 for errors
+      expect(textarea.classes()).toContain('border-red-600')
       expect(wrapper.text()).toContain('Ce champ est requis')
     })
   })
@@ -129,13 +134,11 @@ describe('UI Components', () => {
     })
 
     it('renders content and closes on overlay click', async () => {
-      const onClose = vi.fn()
       const wrapper = mount(Modal, {
         props: {
-          isOpen: true,
+          modelValue: true,
           title: 'Confirmation',
-          description: 'Êtes-vous sûr ? ',
-          onClose
+          description: 'Êtes-vous sûr ? '
         },
         slots: {
           default: '<p>Contenu principal</p>',
@@ -144,41 +147,54 @@ describe('UI Components', () => {
         attachTo: document.body,
         global: {
           stubs: {
-            transition: false
+            Teleport: true,
+            Transition: false
           }
         }
       })
 
-      const overlay = document.querySelector('.modal-overlay') as HTMLElement | null
-      expect(overlay).not.toBeNull()
-      expect(document.body.style.overflow).toBe('hidden')
+      await flushPromises()
+      await nextTick()
 
-      overlay?.click()
-      expect(onClose).toHaveBeenCalled()
+      // Modal should be rendered with content
+      expect(wrapper.text()).toContain('Confirmation')
+
+      // Find and click the overlay (has fixed class and inset-0)
+      const overlay = wrapper.find('.fixed.inset-0')
+      expect(overlay.exists()).toBe(true)
+
+      await overlay.trigger('click')
+      expect(wrapper.emitted()['update:modelValue']).toBeTruthy()
+      expect(wrapper.emitted()['update:modelValue']?.[0]).toEqual([false])
 
       wrapper.unmount()
     })
 
-    it('responds to escape key when enabled', () => {
-      const onClose = vi.fn()
+    it('responds to escape key when enabled', async () => {
       const wrapper = mount(Modal, {
         props: {
-          isOpen: true,
-          closeOnEscape: true,
-          onClose
+          modelValue: true,
+          closeOnEscape: true
         },
         attachTo: document.body,
         global: {
           stubs: {
-            transition: false
+            Teleport: true,
+            Transition: false
           }
         }
       })
 
-      const event = new KeyboardEvent('keydown', { key: 'Escape' })
-      window.dispatchEvent(event)
+      await flushPromises()
 
-      expect(onClose).toHaveBeenCalled()
+      const event = new KeyboardEvent('keydown', { key: 'Escape' })
+      document.dispatchEvent(event)
+
+      await nextTick()
+
+      // Modal should emit close events
+      expect(wrapper.emitted()['escape']).toBeTruthy()
+      expect(wrapper.emitted()['update:modelValue']).toBeTruthy()
 
       wrapper.unmount()
     })

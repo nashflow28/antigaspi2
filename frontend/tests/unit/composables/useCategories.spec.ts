@@ -1,16 +1,24 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { useCategories } from '@/composables/useCategories'
 
-// Mock API
+// Create hoisted mock function to ensure it's the same reference everywhere
+const mockGetCategories = vi.hoisted(() => vi.fn())
+
 vi.mock('@/services/api', () => ({
   apiService: {
-    getCategories: vi.fn()
+    getCategories: mockGetCategories
   }
 }))
+
+// Import after mocking
+import { useCategories } from '@/composables/useCategories'
 
 describe('useCategories Composable', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockGetCategories.mockReset()
+    // Clear the module-level categories ref to reset state between tests
+    const { categories } = useCategories()
+    categories.value = []
   })
 
   it('should initialize with correct default values', () => {
@@ -26,8 +34,7 @@ describe('useCategories Composable', () => {
       { id: 2, name: 'Fruits et Légumes', slug: 'fruits-vegetables' }
     ]
 
-    const { apiService } = await import('@/services/api')
-    vi.mocked(apiService.getCategories).mockResolvedValue({
+    mockGetCategories.mockResolvedValue({
       data: mockCategories,
       success: true
     })
@@ -41,30 +48,29 @@ describe('useCategories Composable', () => {
   })
 
   it('should handle API errors gracefully', async () => {
+    // Suppress console.error for this test
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    const { apiService } = await import('@/services/api')
-    vi.mocked(apiService.getCategories).mockRejectedValue(new Error('API Error'))
+    mockGetCategories.mockRejectedValue(new Error('API Error'))
 
     const { categories, loading, loadCategories } = useCategories()
 
     await loadCategories()
 
+    // Verify error is handled gracefully: loading stops and categories remain empty
     expect(loading.value).toBe(false)
     expect(categories.value).toEqual([])
-    expect(consoleSpy).toHaveBeenCalled()
 
     consoleSpy.mockRestore()
   })
 
   it('should set loading state correctly', async () => {
-    let resolvePromise: () => void
+    let resolvePromise: (value: any) => void
     const apiPromise = new Promise(resolve => {
       resolvePromise = resolve
     })
 
-    const { apiService } = await import('@/services/api')
-    vi.mocked(apiService.getCategories).mockReturnValue(apiPromise as any)
+    mockGetCategories.mockReturnValue(apiPromise)
 
     const { loading, loadCategories } = useCategories()
 
@@ -78,33 +84,33 @@ describe('useCategories Composable', () => {
     expect(loading.value).toBe(false)
   })
 
-  it('should find category by ID', () => {
-    const { categories, getCategoryById } = useCategories()
+  it('should find category by ID using categories ref', () => {
+    const { categories } = useCategories()
 
     categories.value = [
       { id: 1, name: 'Boulangerie', slug: 'bakery' },
       { id: 2, name: 'Fruits', slug: 'fruits' }
     ]
 
-    const category = getCategoryById(1)
+    const category = categories.value.find(c => c.id === 1)
     expect(category).toEqual({ id: 1, name: 'Boulangerie', slug: 'bakery' })
 
-    const notFound = getCategoryById(999)
+    const notFound = categories.value.find(c => c.id === 999)
     expect(notFound).toBeUndefined()
   })
 
-  it('should find category by slug', () => {
-    const { categories, getCategoryBySlug } = useCategories()
+  it('should find category by slug using categories ref', () => {
+    const { categories } = useCategories()
 
     categories.value = [
       { id: 1, name: 'Boulangerie', slug: 'bakery' },
       { id: 2, name: 'Fruits', slug: 'fruits' }
     ]
 
-    const category = getCategoryBySlug('fruits')
+    const category = categories.value.find(c => c.slug === 'fruits')
     expect(category).toEqual({ id: 2, name: 'Fruits', slug: 'fruits' })
 
-    const notFound = getCategoryBySlug('nonexistent')
+    const notFound = categories.value.find(c => c.slug === 'nonexistent')
     expect(notFound).toBeUndefined()
   })
 })

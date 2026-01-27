@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
+import { nextTick } from 'vue'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
 
@@ -50,11 +51,11 @@ describe('Cart Integration', () => {
   }
 
   beforeEach(() => {
+    localStorageMock.clear()
+    vi.clearAllMocks()
     setActivePinia(createPinia())
     cartStore = useCartStore()
     authStore = useAuthStore()
-    localStorageMock.clear()
-    vi.clearAllMocks()
   })
 
   describe('Cart Operations', () => {
@@ -62,7 +63,10 @@ describe('Cart Integration', () => {
       cartStore.addItem(mockProduct)
 
       expect(cartStore.items).toHaveLength(1)
-      expect(cartStore.items[0]).toEqual(mockProduct)
+      // Cart store adds 'type' field
+      expect(cartStore.items[0].id).toBe(mockProduct.id)
+      expect(cartStore.items[0].name).toBe(mockProduct.name)
+      expect(cartStore.items[0].type).toBe('product')
       expect(cartStore.totalQuantity).toBe(1)
       expect(cartStore.totalPrice).toBe(250)
     })
@@ -93,13 +97,21 @@ describe('Cart Integration', () => {
       expect(cartStore.totalSavings).toBe(550)
     })
 
-    it('should handle cart persistence', () => {
+    it('should handle cart persistence', async () => {
       cartStore.addItem(mockProduct)
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'antigaspi_cart_items',
-        JSON.stringify([mockProduct])
-      )
+      // Wait for Vue's watcher to trigger persist()
+      await nextTick()
+
+      // Verify setItem was called with cart data containing the item
+      expect(localStorageMock.setItem).toHaveBeenCalled()
+      const calls = localStorageMock.setItem.mock.calls
+      const lastCall = calls[calls.length - 1]
+      expect(lastCall[0]).toBe('antigaspi_cart_items')
+
+      const savedData = JSON.parse(lastCall[1])
+      expect(savedData).toHaveLength(1)
+      expect(savedData[0].id).toBe(mockProduct.id)
     })
 
     it('should remove item from cart', () => {
@@ -150,12 +162,16 @@ describe('Cart Integration', () => {
       // Add item to first store instance
       cartStore.addItem(mockProduct)
 
+      // Simulate saved cart with type field
+      const savedItem = { ...mockProduct, type: 'product' }
+      localStorageMock.getItem.mockReturnValue(JSON.stringify([savedItem]))
+
       // Create new store instance (simulating page refresh)
-      localStorageMock.getItem.mockReturnValue(JSON.stringify([mockProduct]))
       setActivePinia(createPinia())
       const newCartStore = useCartStore()
 
-      expect(newCartStore.items).toEqual([mockProduct])
+      expect(newCartStore.items).toHaveLength(1)
+      expect(newCartStore.items[0].id).toBe(mockProduct.id)
       expect(newCartStore.totalQuantity).toBe(1)
     })
 
@@ -184,7 +200,7 @@ describe('Cart Integration', () => {
         name: 'John Doe',
         email: 'john@example.com',
         role: 'consumer'
-      }
+      } as any
       authStore.token = 'test-token'
 
       // Cart should be preserved
@@ -199,7 +215,7 @@ describe('Cart Integration', () => {
         name: 'John Doe',
         email: 'john@example.com',
         role: 'consumer'
-      }
+      } as any
       authStore.token = 'test-token'
 
       cartStore.addItem(mockProduct)
@@ -225,9 +241,9 @@ describe('Cart Integration', () => {
 
       cartStore.addItem(invalidItem)
 
-      // Should handle gracefully or validate input
+      // Should handle gracefully - price should be resolved to 0 for invalid values
       expect(cartStore.items).toHaveLength(1)
-      expect(cartStore.items[0].price).toBe(0) // Assuming price validation
+      expect(cartStore.items[0].price).toBe(0) // Invalid price resolved to 0
     })
 
     it('should prevent duplicate items from different merchants', () => {
@@ -237,7 +253,7 @@ describe('Cart Integration', () => {
       cartStore.addItem(item1)
       cartStore.addItem(item2)
 
-      // Depending on business rules, this might be allowed or prevented
+      // Items with different merchantId are treated as different items
       expect(cartStore.items).toHaveLength(2)
     })
   })

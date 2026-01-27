@@ -30,11 +30,15 @@ describe('Reservations Store', () => {
     productId: 1,
     merchantId: 1,
     quantity: 2,
+    quantity_reserved: 2,
     totalPrice: 500,
+    discounted_price: 250,
+    original_price: 500,
     status: 'pending' as const,
     pickupDate: '2025-01-02T10:00:00Z',
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-01T00:00:00Z',
+    latest_payment: null,
     product: {
       id: 1,
       name: 'Pain artisanal',
@@ -112,7 +116,10 @@ describe('Reservations Store', () => {
       const result = await reservationsStore.createReservation(reservationData)
 
       expect(result.success).toBe(true)
-      expect(reservationsStore.reservations).toContain(mockReservation)
+      // Check that reservation was added (normalized with extra fields)
+      expect(reservationsStore.reservations).toHaveLength(1)
+      expect(reservationsStore.reservations[0].id).toBe(mockReservation.id)
+      expect(reservationsStore.reservations[0].status).toBe(mockReservation.status)
     })
 
     it('should update reservation status', async () => {
@@ -139,18 +146,22 @@ describe('Reservations Store', () => {
 
       await reservationsStore.cancelReservation(1)
 
-      expect(reservationsStore.reservations).toHaveLength(0)
+      // cancelReservation changes status to 'cancelled' instead of removing
+      expect(reservationsStore.reservations).toHaveLength(1)
+      expect(reservationsStore.reservations[0].status).toBe('cancelled')
     })
   })
 
   describe('Reservation Filtering', () => {
     beforeEach(() => {
-      reservationsStore.reservations = [
-        mockReservation,
+      // Use array mutation instead of assignment for reactive updates
+      reservationsStore.reservations.length = 0
+      reservationsStore.reservations.push(
+        { ...mockReservation, status: 'pending' },
         { ...mockReservation, id: 2, status: 'confirmed' },
         { ...mockReservation, id: 3, status: 'completed' },
         { ...mockReservation, id: 4, status: 'cancelled' }
-      ]
+      )
     })
 
     it('should get pending reservations', () => {

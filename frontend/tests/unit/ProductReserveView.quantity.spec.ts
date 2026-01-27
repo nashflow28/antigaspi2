@@ -12,7 +12,7 @@ const notifyErrorMock = vi.hoisted(() => vi.fn())
 const notifyInfoMock = vi.hoisted(() => vi.fn())
 
 vi.mock('vue-router', () => ({
-  useRoute: () => ({ params: { id: '1' } }),
+  useRoute: () => ({ params: { id: '1' }, query: { quantity: '1' } }),
   useRouter: () => ({ push: routerPushMock, go: routerGoMock })
 }))
 

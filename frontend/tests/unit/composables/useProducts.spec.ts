@@ -1,16 +1,24 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { useProducts } from '@/composables/useProducts'
 
-// Mock API service
+// Create hoisted mock function to ensure it's the same reference everywhere
+const mockGetMerchantProducts = vi.hoisted(() => vi.fn())
+
 vi.mock('@/services/api', () => ({
   apiService: {
-    getMerchantProducts: vi.fn()
+    getMerchantProducts: mockGetMerchantProducts
   }
 }))
+
+// Import after mocking
+import { useProducts } from '@/composables/useProducts'
 
 describe('useProducts Composable', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockGetMerchantProducts.mockReset()
+    // Clear the module-level merchantProducts ref to reset state between tests
+    const { merchantProducts } = useProducts()
+    merchantProducts.value = []
   })
 
   it('should initialize with correct default values', () => {
@@ -26,8 +34,7 @@ describe('useProducts Composable', () => {
       { id: 2, name: 'Product 2', price: 200 }
     ]
 
-    const { apiService } = await import('@/services/api')
-    vi.mocked(apiService.getMerchantProducts).mockResolvedValue({
+    mockGetMerchantProducts.mockResolvedValue({
       success: true,
       data: mockProducts
     })
@@ -41,30 +48,29 @@ describe('useProducts Composable', () => {
   })
 
   it('should handle API errors gracefully', async () => {
+    // Suppress console.error for this test
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    const { apiService } = await import('@/services/api')
-    vi.mocked(apiService.getMerchantProducts).mockRejectedValue(new Error('API Error'))
+    mockGetMerchantProducts.mockRejectedValue(new Error('API Error'))
 
-    const { loading, loadMerchantProducts } = useProducts()
+    const { merchantProducts, loading, loadMerchantProducts } = useProducts()
 
     await loadMerchantProducts()
 
+    // Verify error is handled gracefully: loading stops and products remain empty
     expect(loading.value).toBe(false)
-    expect(consoleSpy).toHaveBeenCalledWith('Error loading merchant products:', expect.any(Error))
+    expect(merchantProducts.value).toEqual([])
 
     consoleSpy.mockRestore()
   })
 
   it('should set loading state correctly during API call', async () => {
-
     let resolvePromise: (value: unknown) => void
     const apiPromise = new Promise(resolve => {
       resolvePromise = resolve
     })
 
-    const { apiService } = await import('@/services/api')
-    vi.mocked(apiService.getMerchantProducts).mockReturnValue(apiPromise as any)
+    mockGetMerchantProducts.mockReturnValue(apiPromise)
 
     const { loading, loadMerchantProducts } = useProducts()
 

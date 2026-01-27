@@ -55,7 +55,7 @@ describe('API Service', () => {
       const result = await apiService.login(credentials)
 
       expect(fetch).toHaveBeenCalledWith(
-        'http://localhost:8000/api/auth/login',
+        '/api/auth/login',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -83,7 +83,7 @@ describe('API Service', () => {
       await apiService.getCurrentUser()
 
       expect(fetch).toHaveBeenCalledWith(
-        'http://localhost:8000/api/auth/me',
+        '/api/auth/me',
         expect.objectContaining({
           headers: expect.objectContaining({
             'Authorization': `Bearer ${mockToken}`

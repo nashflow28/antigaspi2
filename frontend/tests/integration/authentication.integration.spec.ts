@@ -2,12 +2,41 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {}
+  return {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key]
+    }),
+    clear: vi.fn(() => {
+      store = {}
+    })
+  }
+})()
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock
+})
+
 // Mock API
 vi.mock('@/services/api', () => ({
   apiService: {
     login: vi.fn(),
     register: vi.fn(),
-    getCurrentUser: vi.fn()
+    getCurrentUser: vi.fn(),
+    logout: vi.fn().mockResolvedValue(null)
+  }
+}))
+
+// Mock device service
+vi.mock('@/services/deviceService', () => ({
+  deviceService: {
+    logout: vi.fn().mockResolvedValue(null)
   }
 }))
 
@@ -24,9 +53,10 @@ describe('Authentication Integration', () => {
   let authStore: ReturnType<typeof useAuthStore>
 
   beforeEach(() => {
+    localStorageMock.clear()
+    vi.clearAllMocks()
     setActivePinia(createPinia())
     authStore = useAuthStore()
-    vi.clearAllMocks()
   })
 
   it('should handle complete login flow', async () => {
@@ -62,14 +92,13 @@ describe('Authentication Integration', () => {
     expect(authStore.isAuthenticated).toBe(false)
     expect(authStore.user).toBeNull()
 
-    // Set user and token
-    authStore.user = {
+    // Set user and token using setAuth method (proper way)
+    authStore.setAuth('test-token', {
       id: 1,
       name: 'Test User',
       email: 'test@example.com',
       role: 'merchant'
-    }
-    authStore.token = 'test-token'
+    } as any)
 
     // Should be authenticated
     expect(authStore.isAuthenticated).toBe(true)
@@ -78,14 +107,13 @@ describe('Authentication Integration', () => {
   })
 
   it('should handle logout flow', async () => {
-    // Set initial authenticated state
-    authStore.user = {
+    // Set initial authenticated state using setAuth
+    authStore.setAuth('test-token', {
       id: 1,
       name: 'Test User',
       email: 'test@example.com',
       role: 'consumer'
-    }
-    authStore.token = 'test-token'
+    } as any)
 
     expect(authStore.isAuthenticated).toBe(true)
 
@@ -149,9 +177,12 @@ describe('Authentication Integration', () => {
       role: 'consumer' as const
     }
 
-    // Set token but no user (simulating page refresh)
-    authStore.token = 'existing-token'
-    authStore.user = null
+    // Set token in localStorage (simulating page refresh with stored token)
+    localStorageMock.setItem('auth_token', 'existing-token')
+
+    // Recreate store to pick up token from localStorage
+    setActivePinia(createPinia())
+    authStore = useAuthStore()
 
     const { apiService } = await import('@/services/api')
     vi.mocked(apiService.getCurrentUser).mockResolvedValue({

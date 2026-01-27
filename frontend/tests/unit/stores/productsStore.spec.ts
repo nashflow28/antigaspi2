@@ -130,7 +130,10 @@ describe('Products Store', () => {
       const result = await productsStore.addProduct(newProduct)
 
       expect(result.success).toBe(true)
-      expect(productsStore.products).toContain(mockProduct)
+      // Product is added at the beginning of the list (unshift)
+      expect(productsStore.products).toHaveLength(1)
+      expect(productsStore.products[0].id).toBe(mockProduct.id)
+      expect(productsStore.products[0].name).toBe(mockProduct.name)
     })
   })
 

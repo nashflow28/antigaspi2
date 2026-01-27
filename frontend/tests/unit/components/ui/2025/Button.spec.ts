@@ -34,7 +34,8 @@ describe('Button Component 2025', () => {
 
     const button = wrapper.find('button')
     expect(button.classes()).toContain('bg-gradient-to-r')
-    expect(button.classes()).toContain('from-primary-600')
+    // Button uses from-primary-500 in DS2025
+    expect(button.classes()).toContain('from-primary-500')
   })
 
   it('should apply correct size classes', () => {
@@ -48,8 +49,9 @@ describe('Button Component 2025', () => {
     })
 
     const button = wrapper.find('button')
-    expect(button.classes()).toContain('px-6')
-    expect(button.classes()).toContain('py-3')
+    // DS2025 uses custom spacing tokens: px-lg, py-lg
+    expect(button.classes()).toContain('px-lg')
+    expect(button.classes()).toContain('py-lg')
   })
 
   it('should handle disabled state correctly', () => {
@@ -143,6 +145,7 @@ describe('Button Component 2025', () => {
       }
     })
 
-    expect(secondaryWrapper.find('button').classes()).toContain('bg-white')
+    // DS2025 uses bg-surface-light for secondary variant
+    expect(secondaryWrapper.find('button').classes()).toContain('bg-surface-light')
   })
 })

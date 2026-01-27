@@ -9,7 +9,7 @@ const walletFetchMock = vi.hoisted(() => vi.fn())
 const apiGetProductMock = vi.hoisted(() => vi.fn())
 
 vi.mock('vue-router', () => ({
-  useRoute: () => ({ params: { id: '1' } }),
+  useRoute: () => ({ params: { id: '1' }, query: { quantity: '1' } }),
   useRouter: () => ({ push: routerPushMock, go: vi.fn() })
 }))
 

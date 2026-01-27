@@ -48,10 +48,12 @@ describe('Cart Store', () => {
   }
 
   beforeEach(() => {
-    setActivePinia(createPinia())
-    cartStore = useCartStore()
+    // Clear localStorage BEFORE creating Pinia and store
+    // so hydration starts with empty cart
     localStorageMock.clear()
     vi.clearAllMocks()
+    setActivePinia(createPinia())
+    cartStore = useCartStore()
   })
 
   describe('Initial State', () => {
@@ -70,7 +72,9 @@ describe('Cart Store', () => {
 
   describe('Computed Properties', () => {
     beforeEach(() => {
-      cartStore.items = [mockCartItem, { ...mockCartItem, id: 2, quantity: 1, price: 150 }]
+      // Use addItem action instead of direct assignment
+      cartStore.addItem(mockCartItem)
+      cartStore.addItem({ ...mockCartItem, id: 2, quantity: 1, price: 150 })
     })
 
     it('should calculate total quantity correctly', () => {

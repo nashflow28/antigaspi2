@@ -61,7 +61,8 @@ describe('DashboardView (Design System 2025)', () => {
     expect(wrapper.findAllComponents(Badge).length).toBeGreaterThan(0)
     expect(wrapper.findAllComponents(Button).length).toBeGreaterThan(0)
 
-    expect(wrapper.find('.container-2025').exists()).toBe(true)
+    // DashboardView uses standard container class
+    expect(wrapper.find('.container').exists()).toBe(true)
     expect(wrapper.find('.surface-panel').exists()).toBe(true)
     expect(wrapper.html()).not.toContain('class="card')
     expect(wrapper.html()).not.toContain('class="btn')

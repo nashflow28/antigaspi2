@@ -10,35 +10,44 @@ const mockGeolocation = {
 
 Object.defineProperty(global.navigator, 'geolocation', {
   value: mockGeolocation,
-  writable: true
+  writable: true,
+  configurable: true
 })
 
 describe('useGeolocation Composable', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Reset geolocation mock
+    Object.defineProperty(global.navigator, 'geolocation', {
+      value: mockGeolocation,
+      writable: true,
+      configurable: true
+    })
   })
 
   it('should initialize with default values', () => {
-    const { coords, error, isSupported, isLoading } = useGeolocation()
+    const { position, error, isSupported, isLoading } = useGeolocation()
 
-    expect(coords.value).toBeNull()
+    expect(position.value).toBeNull()
     expect(error.value).toBeNull()
-    expect(isSupported.value).toBe(true) // navigator.geolocation is mocked
+    expect(isSupported).toBe(true) // navigator.geolocation is mocked - plain boolean
     expect(isLoading.value).toBe(false)
   })
 
   it('should detect if geolocation is not supported', () => {
-    // Temporarily remove geolocation support
+    // Temporarily remove geolocation support entirely (not just set to undefined)
+    // We need to delete it because 'geolocation' in navigator checks property existence
     const originalGeolocation = global.navigator.geolocation
     delete (global.navigator as any).geolocation
 
     const { isSupported } = useGeolocation()
-    expect(isSupported.value).toBe(false)
+    expect(isSupported).toBe(false)
 
     // Restore geolocation
     Object.defineProperty(global.navigator, 'geolocation', {
       value: originalGeolocation,
-      writable: true
+      writable: true,
+      configurable: true
     })
   })
 
@@ -60,22 +69,27 @@ describe('useGeolocation Composable', () => {
       success(mockPosition)
     })
 
-    const { coords, getCurrentPosition, isLoading } = useGeolocation()
+    const { position, getCurrentPosition, isLoading } = useGeolocation()
 
-    const positionPromise = getCurrentPosition()
-    expect(isLoading.value).toBe(true)
-
-    const result = await positionPromise
+    const result = await getCurrentPosition()
 
     expect(isLoading.value).toBe(false)
-    expect(coords.value).toEqual(mockPosition.coords)
-    expect(result).toEqual(mockPosition.coords)
+    expect(position.value).toEqual({
+      latitude: mockPosition.coords.latitude,
+      longitude: mockPosition.coords.longitude,
+      accuracy: mockPosition.coords.accuracy,
+      timestamp: mockPosition.timestamp
+    })
+    expect(result?.latitude).toBe(mockPosition.coords.latitude)
   })
 
   it('should handle geolocation errors', async () => {
     const mockError = {
       code: 1,
-      message: 'User denied the request for Geolocation.'
+      message: 'User denied the request for Geolocation.',
+      PERMISSION_DENIED: 1,
+      POSITION_UNAVAILABLE: 2,
+      TIMEOUT: 3
     }
 
     mockGeolocation.getCurrentPosition.mockImplementation((success, error) => {
@@ -84,15 +98,13 @@ describe('useGeolocation Composable', () => {
 
     const { error, getCurrentPosition, isLoading } = useGeolocation()
 
-    const positionPromise = getCurrentPosition()
-    expect(isLoading.value).toBe(true)
-
     try {
-      await positionPromise
-    } catch (err) {
+      await getCurrentPosition()
+    } catch (err: any) {
       expect(isLoading.value).toBe(false)
-      expect(error.value).toEqual(mockError)
-      expect(err).toEqual(mockError)
+      expect(error.value).toBeTruthy()
+      expect(error.value?.code).toBe(1)
+      expect(error.value?.type).toBe('PERMISSION_DENIED')
     }
   })
 
@@ -121,15 +133,15 @@ describe('useGeolocation Composable', () => {
   it('should calculate distance between coordinates', () => {
     const { calculateDistance } = useGeolocation()
 
-    // Distance between Paris and Lyon (approx 463km)
+    // Distance between Paris and Lyon (approx 392km by Haversine)
     const paris = { latitude: 48.8566, longitude: 2.3522 }
     const lyon = { latitude: 45.7640, longitude: 4.8357 }
 
     const distance = calculateDistance(paris, lyon)
 
-    // Should be approximately 463km (allow some tolerance)
-    expect(distance).toBeGreaterThan(450)
-    expect(distance).toBeLessThan(480)
+    // Haversine formula gives ~392km for this route
+    expect(distance).toBeGreaterThan(380)
+    expect(distance).toBeLessThan(420)
   })
 
   it('should handle position options correctly', async () => {
@@ -141,7 +153,7 @@ describe('useGeolocation Composable', () => {
 
     mockGeolocation.getCurrentPosition.mockImplementation((success) => {
       success({
-        coords: { latitude: 0, longitude: 0 },
+        coords: { latitude: 0, longitude: 0, accuracy: 10 },
         timestamp: Date.now()
       })
     })
@@ -153,33 +165,37 @@ describe('useGeolocation Composable', () => {
     expect(mockGeolocation.getCurrentPosition).toHaveBeenCalledWith(
       expect.any(Function),
       expect.any(Function),
-      options
+      expect.objectContaining(options)
     )
   })
 
-  it('should format coordinates correctly', () => {
-    const { formatCoordinates } = useGeolocation()
+  it('should format distance correctly', () => {
+    const { formatDistance } = useGeolocation()
 
-    const coords = { latitude: 48.8566, longitude: 2.3522 }
-    const formatted = formatCoordinates(coords)
+    // Less than 1km - should show in meters
+    expect(formatDistance(0.5)).toBe('500 m')
 
-    expect(formatted).toBe('48.8566, 2.3522')
+    // Between 1-10km - should show with 1 decimal
+    expect(formatDistance(5.5)).toBe('5.5 km')
+
+    // More than 10km - should show rounded
+    expect(formatDistance(15.7)).toBe('16 km')
   })
 
-  it('should determine if coordinates are within bounds', () => {
-    const { isWithinBounds } = useGeolocation()
+  it('should determine if coordinates are within radius', () => {
+    const { isWithinRadius } = useGeolocation()
 
-    const coords = { latitude: 48.8566, longitude: 2.3522 }
-    const bounds = {
-      north: 49.0,
-      south: 48.0,
-      east: 3.0,
-      west: 2.0
-    }
+    const center = { latitude: 48.8566, longitude: 2.3522 } // Paris
+    const nearPoint = { latitude: 48.8600, longitude: 2.3550 } // ~500m away
+    const farPoint = { latitude: 45.7640, longitude: 4.8357 } // Lyon, ~390km away
 
-    expect(isWithinBounds(coords, bounds)).toBe(true)
+    // Near point should be within 1km radius
+    expect(isWithinRadius(center, nearPoint, 1)).toBe(true)
 
-    const outsideCoords = { latitude: 50.0, longitude: 2.3522 }
-    expect(isWithinBounds(outsideCoords, bounds)).toBe(false)
+    // Far point should not be within 1km radius
+    expect(isWithinRadius(center, farPoint, 1)).toBe(false)
+
+    // Far point should be within 500km radius
+    expect(isWithinRadius(center, farPoint, 500)).toBe(true)
   })
 })

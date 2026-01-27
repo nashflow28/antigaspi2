@@ -10,6 +10,11 @@ const getReservationMock = vi.hoisted(() => vi.fn())
 vi.mock('vue-router', () => ({
   useRoute: () => ({
     params: { id: '42' }
+  }),
+  useRouter: () => ({
+    push: vi.fn(),
+    go: vi.fn(),
+    back: vi.fn()
   })
 }))
 
@@ -87,10 +92,11 @@ describe('ReservationDetailView2025 (Design System 2025)', () => {
     expect(wrapper.findComponent(Button).exists()).toBe(true)
     expect(wrapper.findComponent(Badge).exists()).toBe(true)
 
-    expect(wrapper.find('.container-2025').exists()).toBe(true)
+    // Check that DS2025 Card component renders with surface-panel class
+    expect(wrapper.find('.surface-panel').exists()).toBe(true)
+    // Verify no legacy class naming patterns
     expect(wrapper.html()).not.toContain('class="card')
     expect(wrapper.html()).not.toContain('class="btn')
-    expect(wrapper.findAll('.surface-panel').length).toBeGreaterThan(0)
 
     expect(getReservationMock).toHaveBeenCalledWith(42)
     expect(wrapper.text()).toContain('Panier surprise bio')
