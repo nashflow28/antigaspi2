@@ -18,7 +18,9 @@ import {
   ClipboardDocumentCheckIcon,
   TruckIcon,
   MapIcon,
-  UserCircleIcon
+  UserCircleIcon,
+  InboxIcon,
+  BellIcon
 } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import type { User } from '@/types'
@@ -125,6 +127,18 @@ const navigationByRole: Record<Role, NavigationConfig[]> = {
       href: '/merchant/reviews/dashboard',
       icon: ChatBubbleLeftRightIcon,
       routes: ['merchant-reviews-dashboard', 'merchant-reviews']
+    },
+    {
+      label: 'Messagerie',
+      href: '/merchant/messaging',
+      icon: InboxIcon,
+      routes: ['merchant-messaging', 'merchant-messaging-conversation']
+    },
+    {
+      label: 'Notifications',
+      href: '/merchant/notifications',
+      icon: BellIcon,
+      routes: ['merchant-notifications']
     },
     {
       label: 'Paniers surprise',
@@ -256,6 +270,38 @@ const formatUserName = (user: User | null) => {
   return [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.email
 }
 
+// Mobile bottom navigation configuration (5 main tabs per role, like mobile app)
+const mobileNavByRole: Record<Role, NavigationConfig[]> = {
+  consumer: [
+    { label: 'Accueil', href: '/dashboard', icon: HomeIcon, routes: ['dashboard'] },
+    { label: 'Découvrir', href: '/discover', icon: MagnifyingGlassIcon, routes: ['discover'] },
+    { label: 'Favoris', href: '/favorites', icon: HeartIcon, routes: ['favorites'] },
+    { label: 'Commandes', href: '/reservations', icon: CalendarDaysIcon, routes: ['reservations', 'reservation-detail'] },
+    { label: 'Compte', href: '/profile', icon: UserCircleIcon, routes: ['profile', 'profile-edit', 'wallet', 'consumer-loyalty'] }
+  ],
+  merchant: [
+    { label: 'Accueil', href: '/merchant/dashboard', icon: HomeIcon, routes: ['merchant-dashboard'] },
+    { label: 'Produits', href: '/merchant/products', icon: Squares2X2Icon, routes: ['merchant-products', 'merchant-product-create', 'merchant-product-edit'] },
+    { label: 'Commandes', href: '/merchant/reservations', icon: ClipboardDocumentCheckIcon, routes: ['merchant-reservations'] },
+    { label: 'Fidélité', href: '/merchant/loyalty', icon: SparklesIcon, routes: ['merchant-loyalty'] },
+    { label: 'Compte', href: '/merchant/profile', icon: UserCircleIcon, routes: ['merchant-profile', 'merchant-profile-edit'] }
+  ],
+  admin: [
+    { label: 'Accueil', href: '/admin/dashboard', icon: HomeIcon, routes: ['admin-dashboard'] },
+    { label: 'Utilisateurs', href: '/admin/users', icon: UsersIcon, routes: ['admin-users'] },
+    { label: 'Commerçants', href: '/admin/merchants', icon: BuildingStorefrontIcon, routes: ['admin-merchants'] },
+    { label: 'Avis', href: '/admin/reviews', icon: ChatBubbleLeftRightIcon, routes: ['admin-reviews'] },
+    { label: 'Plus', href: '/admin/plus', icon: Cog6ToothIcon, routes: ['admin-plus', 'admin-settings', 'admin-categories'] }
+  ],
+  driver: [
+    { label: 'Accueil', href: '/driver/dashboard', icon: HomeIcon, routes: ['driver-dashboard'] },
+    { label: 'Carte', href: '/driver/map', icon: MapIcon, routes: ['driver-map'] },
+    { label: 'Livraisons', href: '/driver/deliveries/available', icon: TruckIcon, routes: ['driver-deliveries-available', 'driver-deliveries-active'] },
+    { label: 'Historique', href: '/driver/history', icon: ClipboardDocumentCheckIcon, routes: ['driver-history'] },
+    { label: 'Compte', href: '/driver/profile', icon: UserCircleIcon, routes: ['driver-profile', 'driver-earnings'] }
+  ]
+}
+
 export const useDashboardLayout = (role: Role) => {
   const route = useRoute()
   const authStore = useAuthStore()
@@ -288,8 +334,19 @@ export const useDashboardLayout = (role: Role) => {
     }
   })
 
+  // Mobile bottom navigation (5 tabs like mobile app)
+  const mobileNav = computed(() => {
+    return mobileNavByRole[role].map((entry) => ({
+      label: entry.label,
+      href: entry.href,
+      icon: entry.icon,
+      activeRoutes: entry.routes
+    }))
+  })
+
   return {
     sidebar,
-    header
+    header,
+    mobileNav
   }
 }

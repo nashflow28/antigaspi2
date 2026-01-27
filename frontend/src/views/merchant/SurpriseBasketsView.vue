@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-purple-50 to-pink-50"
   >
     <div class="p-6">
@@ -319,7 +320,7 @@ const currentView = ref<ViewType>('list')
 const editingBasket = ref<SurpriseBasket | null>(null)
 const selectedBasket = ref<SurpriseBasket | null>(null)
 const error = ref('')
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 const {
   merchantBaskets,
   loading,

@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-green-50 to-primary-50"
   >
     <div class="p-6">
@@ -575,7 +576,7 @@ const showDeleteConfirmModal = ref(false)
 const productToDelete = ref<any>(null)
 const isSubmitting = ref(false)
 
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 
 // Product form
 const productForm = ref({

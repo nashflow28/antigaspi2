@@ -195,28 +195,16 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="space-y-2">
+                <div class="space-y-3">
                   <Button
-                    size="lg"
-                    full-width
-                    :disabled="availableQuantity === 0"
-                    @click="goToReservation"
-                  >
-                    <ShoppingCart class="h-4 w-4 mr-2" />
-                    Commencer la réservation
-                  </Button>
-
-                  <Button
-                    variant="secondary"
                     size="lg"
                     full-width
                     data-testid="add-to-cart"
-                    :disabled="availableQuantity === 0 || reservationLoading"
-                    :loading="reservationLoading"
-                    @click="handleReservation"
+                    :disabled="availableQuantity === 0"
+                    @click="addToCart"
                   >
-                    <ShoppingCart class="h-4 w-4 mr-2" />
-                    {{ reservationLoading ? 'Réservation...' : 'Réserver en 1 clic' }}
+                    <ShoppingCart class="h-5 w-5 mr-2" />
+                    Ajouter au panier
                   </Button>
 
                   <Button
@@ -226,8 +214,8 @@
                     :disabled="loading"
                     @click="addToWishlist"
                   >
-                    <Heart :class="['h-4 w-4 mr-2', isInWishlist && 'fill-current text-accent-red']" />
-                    {{ isInWishlist ? 'Retiré des favoris' : 'Ajouter aux favoris' }}
+                    <Heart :class="['h-5 w-5 mr-2', isInWishlist && 'fill-current text-accent-red']" />
+                    {{ isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
                   </Button>
                 </div>
               </div>
@@ -307,9 +295,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useDesignSystem2025 } from '@/composables/useDesignSystem2025'
 import { apiService } from '@/services/api'
 import { notify } from '@/composables/useNotifications'
-import { useAuthStore } from '@/stores/auth'
-import { useReservationsStore } from '@/stores/reservations'
-import { usePaymentsStore } from '@/stores/payments'
+import { useCartStore } from '@/stores/cart'
 
 // Import 2025 components
 import Button from '@/components/ui/2025/Button.vue'
@@ -326,9 +312,7 @@ import {
 const route = useRoute()
 const router = useRouter()
 const { logMigration } = useDesignSystem2025()
-const authStore = useAuthStore()
-const reservationsStore = useReservationsStore()
-const paymentsStore = usePaymentsStore()
+const cartStore = useCartStore()
 
 // Log migration usage - ProductDetailView successfully migrated to 2025 Design System
 logMigration('ProductDetailView', 'Using 2025 components', {
@@ -348,7 +332,7 @@ interface ProductDetail {
   image_url?: string | null
   discount_percentage: number
   category?: { id?: number; name?: string }
-  merchant?: { business_name?: string; address?: string | null; phone?: string | null }
+  merchant?: { id?: number; business_name?: string; address?: string | null; phone?: string | null }
   is_surprise_basket?: boolean
   is_expired?: boolean
   is_expiring_soon?: boolean
@@ -368,7 +352,6 @@ const error = ref('')
 const product = ref<ProductDetail | null>(null)
 const relatedProducts = ref<RelatedProduct[]>([])
 const reservationQuantity = ref(1)
-const reservationLoading = ref(false)
 const isInWishlist = ref(false)
 
 const availableQuantity = computed(() => product.value?.quantity_available ?? 0)
@@ -505,77 +488,33 @@ const decreaseQuantity = () => {
   }
 }
 
-const goToReservation = () => {
+const addToCart = () => {
   if (!product.value) return
 
   if (availableQuantity.value === 0) {
-    reservationQuantity.value = minReservationQuantity.value
-    notify.info('Ce produit est actuellement en rupture de stock.', 'Réservation')
+    notify.info('Ce produit est actuellement en rupture de stock.', 'Panier')
     return
   }
 
   const quantity = sanitizedReservationQuantity.value
-  const targetRoute = {
-    name: 'product-reserve' as const,
-    params: { id: product.value.id },
-    query: quantity > 0 ? { quantity: String(quantity) } : undefined
-  }
 
-  if (!authStore.isAuthenticated) {
-    notify.info('Connectez-vous pour réserver ce produit.', 'Connexion requise')
-    const resolved = router.resolve(targetRoute)
-    router.push({ name: 'login', query: { redirect: resolved.href } })
-    return
-  }
+  cartStore.addItem({
+    id: product.value.id,
+    name: product.value.name,
+    price: product.value.discounted_price,
+    originalPrice: product.value.original_price,
+    quantity,
+    imageUrl: product.value.image_url,
+    merchantId: product.value.merchant?.id ?? null,
+    merchantName: product.value.merchant?.business_name ?? null,
+    expiryDate: product.value.expiration_date,
+    maxQuantity: product.value.quantity_available
+  })
 
-  router.push(targetRoute)
-}
-
-const handleReservation = async () => {
-  if (!product.value) return
-
-  if (availableQuantity.value === 0) {
-    notify.info('Ce produit est actuellement en rupture de stock.', 'Réservation')
-    return
-  }
-
-  if (!authStore.isAuthenticated) {
-    notify.info('Connectez-vous pour réserver ce produit.', 'Connexion requise')
-    router.push({ name: 'login', query: { redirect: `/products/${product.value.id}` } })
-    return
-  }
-
-  reservationLoading.value = true
-
-  try {
-    const response = await reservationsStore.createReservation({
-      productId: product.value.id,
-      quantity: sanitizedReservationQuantity.value,
-      paymentMethod: 'paystack',
-      customerPhone: authStore.user?.phone || undefined,
-      customerEmail: authStore.user?.email || undefined
-    })
-
-    if (!response.success) {
-      notify.error(response.error || 'Impossible de créer la réservation pour le moment.', 'Réservation')
-      return
-    }
-
-    if (response.payment) {
-      paymentsStore.recordPayment(response.payment)
-      if (response.payment.checkout_url) {
-        window.open(response.payment.checkout_url, '_blank', 'noopener')
-      }
-    }
-
-    notify.success('Votre réservation a bien été enregistrée.', 'Réservation')
-    router.push({ name: 'reservations' })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Erreur inattendue lors de la réservation.'
-    notify.error(message, 'Réservation')
-  } finally {
-    reservationLoading.value = false
-  }
+  logMigration('ProductDetailView', 'Product added to cart', {
+    productId: product.value.id,
+    quantity
+  })
 }
 
 const addToWishlist = () => {
@@ -623,6 +562,7 @@ const hydrateProduct = (apiProduct: any): ProductDetail | null => {
     discount_percentage: Number(apiProduct.discount_percentage ?? 0),
     category: apiProduct.category,
     merchant: apiProduct.merchant ? {
+      id: apiProduct.merchant.id ?? undefined,
       business_name: apiProduct.merchant.business_name ?? apiProduct.merchant.name,
       address: apiProduct.merchant.address ?? apiProduct.merchant.city ?? null,
       phone: apiProduct.merchant.phone ?? null

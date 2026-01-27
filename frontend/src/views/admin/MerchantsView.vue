@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
     <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
@@ -377,15 +378,14 @@
     <Teleport to="body">
       <div class="fixed top-4 right-4 z-[110] space-y-3">
         <TransitionGroup name="toast">
-          <Toast
+          <Alert
             v-for="notification in notifications"
             :key="notification.id"
-            :is-open="true"
-            :tone="mapNotificationType(notification.type)"
+            :variant="notification.type"
             :title="notification.title"
             :description="notification.message"
-            position="stacked"
-            @close="removeNotification(notification.id)"
+            dismissible
+            @dismiss="removeNotification(notification.id)"
           />
         </TransitionGroup>
       </div>
@@ -394,7 +394,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, Teleport, TransitionGroup } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
   ArrowPathIcon,
   BuildingStorefrontIcon,
@@ -416,8 +416,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import apiService from '@/services/api'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
-import Toast from '@/components/ui/Toast.vue'
-import { Button, Card, Badge, EmptyState, Grid, Loading, ConfirmDialog } from '@/components/ui/2025'
+import { Button, Card, Badge, EmptyState, Grid, Loading, ConfirmDialog, Alert } from '@/components/ui/2025'
 import {
   DashboardHeader,
   StatCard,
@@ -507,7 +506,7 @@ const confirmModal = ref<ConfirmModalData>({
   onConfirm: () => {}
 })
 
-const { sidebar, header } = useDashboardLayout('admin')
+const { sidebar, header, mobileNav } = useDashboardLayout('admin')
 
 const pendingMerchants = ref<PendingMerchant[]>([])
 const productsToModerate = ref<ProductToModerate[]>([])
@@ -639,16 +638,6 @@ const showNotification = (type: Notification['type'], title: string, message: st
     message
   }
   notifications.value.push(notification)
-}
-
-const mapNotificationType = (type: Notification['type']): 'success' | 'info' | 'warning' | 'error' => {
-  const mapping: Record<Notification['type'], 'success' | 'info' | 'warning' | 'error'> = {
-    success: 'success',
-    error: 'error',
-    warning: 'warning',
-    info: 'info'
-  }
-  return mapping[type]
 }
 
 const removeNotification = (id: string) => {

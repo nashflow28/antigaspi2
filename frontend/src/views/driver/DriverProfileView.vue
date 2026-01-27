@@ -1,5 +1,10 @@
 <template>
-  <DashboardLayout :sidebar="sidebar" :header="header" class="bg-gradient-to-br from-neutral-50 via-sky-50/40 to-primary-50">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    :mobile-nav="mobileNav"
+    class="bg-gradient-to-br from-neutral-50 via-sky-50/40 to-primary-50"
+  >
     <div class="space-y-6">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -61,7 +66,7 @@ import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 const driverStore = useDriverStore()
 const { profile } = storeToRefs(driverStore)
-const { sidebar, header } = useDashboardLayout('driver')
+const { sidebar, header, mobileNav } = useDashboardLayout('driver')
 
 const vehicleLabel = (type: string) => {
   const labels: Record<string, string> = {

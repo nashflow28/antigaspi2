@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-surface-light via-neutral-50 to-neutral-100 dark:from-surface-dark dark:via-neutral-900 dark:to-surface-darker">
-    <div class="border-b border-neutral-200/70 bg-white/80 backdrop-blur">
+    <div class="border-b border-neutral-200/70 dark:border-neutral-700/70 bg-white/80 dark:bg-neutral-900/80 backdrop-blur">
       <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-4 py-12">
         <div class="flex flex-col gap-3 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div class="max-w-full sm:max-w-80">
@@ -15,7 +15,7 @@
               Filtrez par catégorie, distance ou ambiance pour découvrir de nouveaux partenaires GÊLADAL et suivre vos coups de cœur.
             </p>
           </div>
-          <Card class="w-full max-w-xl bg-white/90">
+          <Card class="w-full max-w-xl bg-white/90 dark:bg-neutral-800/90">
             <template #header>
               <h2 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Recherche intelligente</h2>
               <p class="text-sm text-neutral-500 dark:text-neutral-400">Affinez vos résultats en direct grâce aux filtres dynamiques.</p>
@@ -78,7 +78,7 @@
           </div>
 
           <div v-if="merchantsLoading" class="grid gap-3 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            <Card v-for="n in 6" :key="n" class="bg-white/80">
+            <Card v-for="n in 6" :key="n" class="bg-white/80 dark:bg-neutral-800/80">
               <Loading type="skeleton" class="h-32 w-full rounded" />
               <div class="mt-4 space-y-4">
                 <Loading type="skeleton" class="h-4 w-3/4" />
@@ -88,9 +88,9 @@
             </Card>
           </div>
 
-          <div v-else-if="filteredMerchants.length === 0" class="rounded border border-dashed border-neutral-300 bg-white/70 p-6 sm:p-12 lg:p-12 text-left sm:text-center shadow-sm">
+          <div v-else-if="filteredMerchants.length === 0" class="rounded border border-dashed border-neutral-300 dark:border-neutral-600 bg-white/70 dark:bg-neutral-800/70 p-6 sm:p-12 lg:p-12 text-left sm:text-center shadow-sm">
             <Compass class="mx-auto h-6 w-6 text-neutral-500 dark:text-neutral-400" />
-            <h3 class="mt-4 text-xl font-semibold text-neutral-800 dark:text-neutral-100">Aucun résultat pour le moment</h3>
+            <h3 class="mt-4 text-xl font-semibold text-neutral-800 dark:text-neutral-100">Aucun resultat pour le moment</h3>
             <p class="mt-2 text-neutral-500 dark:text-neutral-400">Essayez d'élargir vos filtres ou consultez les suggestions à droite.</p>
           </div>
 
@@ -98,7 +98,7 @@
             <Card
               v-for="merchant in filteredMerchants"
               :key="merchant.id"
-              class="bg-white/80"
+              class="bg-white/80 dark:bg-neutral-800/80"
             >
               <template #header>
                 <div class="flex items-center justify-between">
@@ -150,7 +150,7 @@
         </section>
 
         <aside class="space-y-8">
-          <Card class="bg-white/90">
+          <Card class="bg-white/90 dark:bg-neutral-800/90">
             <template #header>
               <h2 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Tendances de la semaine</h2>
               <p class="text-sm text-neutral-500 dark:text-neutral-400">Basées sur les paniers les plus réservés.</p>

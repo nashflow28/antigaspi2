@@ -129,6 +129,22 @@ export const useDriverStore = defineStore('driver', () => {
     }
   }
 
+  const fetchDeliveryById = async (deliveryId: number) => {
+    loading.value = true
+    clearError()
+    try {
+      const response = await driverService.getDeliveryById(deliveryId)
+      return response.data
+    } catch (err: any) {
+      const message = err?.message || 'Impossible de charger les détails de la livraison'
+      setError(message)
+      notify.error(message)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
   const fetchHistory = async () => {
     loading.value = true
     clearError()
@@ -245,6 +261,7 @@ export const useDriverStore = defineStore('driver', () => {
     updateLocation,
     fetchAvailableDeliveries,
     fetchActiveDelivery,
+    fetchDeliveryById,
     fetchHistory,
     fetchEarnings,
     acceptDelivery,

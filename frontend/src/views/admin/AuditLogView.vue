@@ -215,7 +215,7 @@
           <div v-if="selectedLog" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="text-xs font-medium uppercase text-neutral-500">Action</label>
+                <label class="text-xs font-medium uppercase text-neutral-500 dark:text-neutral-400">Action</label>
                 <p class="mt-1">
                   <Badge :variant="getActionVariant(selectedLog.action)" size="sm">
                     {{ getActionLabel(selectedLog.action) }}
@@ -223,7 +223,7 @@
                 </p>
               </div>
               <div>
-                <label class="text-xs font-medium uppercase text-neutral-500">Date</label>
+                <label class="text-xs font-medium uppercase text-neutral-500 dark:text-neutral-400">Date</label>
                 <p class="mt-1 text-neutral-900 dark:text-neutral-50">
                   {{ formatDate(selectedLog.created_at) }} à {{ formatTime(selectedLog.created_at) }}
                 </p>
@@ -232,13 +232,13 @@
 
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="text-xs font-medium uppercase text-neutral-500">Administrateur</label>
+                <label class="text-xs font-medium uppercase text-neutral-500 dark:text-neutral-400">Administrateur</label>
                 <p class="mt-1 text-neutral-900 dark:text-neutral-50">
                   {{ selectedLog.admin?.name || 'Inconnu' }}
                 </p>
               </div>
               <div>
-                <label class="text-xs font-medium uppercase text-neutral-500">Entité</label>
+                <label class="text-xs font-medium uppercase text-neutral-500 dark:text-neutral-400">Entité</label>
                 <p class="mt-1 text-neutral-900 dark:text-neutral-50">
                   {{ selectedLog.entity_type }} #{{ selectedLog.entity_id }}
                 </p>
@@ -246,7 +246,7 @@
             </div>
 
             <div v-if="selectedLog.reason">
-              <label class="text-xs font-medium uppercase text-neutral-500">Raison</label>
+              <label class="text-xs font-medium uppercase text-neutral-500 dark:text-neutral-400">Raison</label>
               <p class="mt-1 text-neutral-900 dark:text-neutral-50">
                 {{ selectedLog.reason }}
               </p>
@@ -254,13 +254,13 @@
 
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="text-xs font-medium uppercase text-neutral-500">Adresse IP</label>
+                <label class="text-xs font-medium uppercase text-neutral-500 dark:text-neutral-400">Adresse IP</label>
                 <code class="mt-1 block rounded bg-neutral-100 px-2 py-1 text-sm dark:bg-neutral-700">
                   {{ selectedLog.ip_address || 'Non enregistrée' }}
                 </code>
               </div>
               <div>
-                <label class="text-xs font-medium uppercase text-neutral-500">User Agent</label>
+                <label class="text-xs font-medium uppercase text-neutral-500 dark:text-neutral-400">User Agent</label>
                 <p class="mt-1 truncate text-sm text-neutral-600 dark:text-neutral-300" :title="selectedLog.user_agent ?? undefined">
                   {{ selectedLog.user_agent || 'Non enregistré' }}
                 </p>
@@ -269,11 +269,11 @@
 
             <div v-if="selectedLog.old_values || selectedLog.new_values" class="space-y-3">
               <div v-if="selectedLog.old_values">
-                <label class="text-xs font-medium uppercase text-neutral-500">Anciennes valeurs</label>
+                <label class="text-xs font-medium uppercase text-neutral-500 dark:text-neutral-400">Anciennes valeurs</label>
                 <pre class="mt-1 overflow-x-auto rounded bg-red-50 p-3 text-xs text-red-800 dark:bg-red-900/20 dark:text-red-200">{{ JSON.stringify(selectedLog.old_values, null, 2) }}</pre>
               </div>
               <div v-if="selectedLog.new_values">
-                <label class="text-xs font-medium uppercase text-neutral-500">Nouvelles valeurs</label>
+                <label class="text-xs font-medium uppercase text-neutral-500 dark:text-neutral-400">Nouvelles valeurs</label>
                 <pre class="mt-1 overflow-x-auto rounded bg-green-50 p-3 text-xs text-green-800 dark:bg-green-900/20 dark:text-green-200">{{ JSON.stringify(selectedLog.new_values, null, 2) }}</pre>
               </div>
             </div>
@@ -292,15 +292,14 @@
     <Teleport to="body">
       <div class="fixed top-4 right-4 z-[110] space-y-3">
         <TransitionGroup name="toast">
-          <Toast
+          <Alert
             v-for="notification in notifications"
             :key="notification.id"
-            :is-open="true"
-            :tone="notification.type"
+            :variant="notification.type"
             :title="notification.title"
             :description="notification.message"
-            position="stacked"
-            @close="removeNotification(notification.id)"
+            dismissible
+            @dismiss="removeNotification(notification.id)"
           />
         </TransitionGroup>
       </div>
@@ -309,7 +308,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, Teleport, TransitionGroup } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import {
   ArrowPathIcon,
   ClipboardDocumentListIcon,
@@ -320,9 +319,8 @@ import {
   XMarkIcon
 } from '@heroicons/vue/24/outline'
 import apiService from '@/services/api'
-import Toast from '@/components/ui/Toast.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
-import { Button, Badge, Pagination } from '@/components/ui/2025'
+import { Button, Badge, Pagination, Alert } from '@/components/ui/2025'
 import {
   DashboardHeader,
   StatCard,

@@ -1,14 +1,14 @@
 <template>
-  <div class="min-h-screen bg-surface-light">
-    <header class="sticky top-0 z-40 border-b border-neutral-200/70 bg-surface-light/80 backdrop-blur-xl">
+  <div class="min-h-screen bg-surface-light dark:bg-surface-dark">
+    <header class="sticky top-0 z-40 border-b border-neutral-200/70 dark:border-neutral-700/70 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-xl">
       <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-6">
         <div class="flex items-center gap-3">
           <div class="flex h-14 w-14 items-center justify-center rounded bg-gradient-to-r from-primary-600 to-primary-700 text-surface-light shadow-lg">
             <span class="text-h2 font-semibold">🌱</span>
           </div>
           <div class="space-y-4">
-            <p class="text-sm font-medium text-neutral-500">Bienvenue</p>
-            <h1 class="text-h2 font-semibold text-neutral-900">GÊLADAL</h1>
+            <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Bienvenue</p>
+            <h1 class="text-h2 font-semibold text-neutral-900 dark:text-white">GÊLADAL</h1>
           </div>
         </div>
 
@@ -16,7 +16,7 @@
           <Button
             variant="ghost"
             size="icon"
-            class="text-neutral-500 hover:text-primary-600"
+            class="text-neutral-500 dark:text-neutral-400 hover:text-primary-600"
             aria-label="Rechercher"
             @click="handleSearch"
           >
@@ -109,7 +109,7 @@
         <Card padding="lg" class="space-y-8">
           <template #header>
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h3 class="text-lg font-semibold text-neutral-900">Catégories populaires</h3>
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Catégories populaires</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -131,7 +131,7 @@
               @click="selectCategory(category)"
             >
               <span class="text-3xl" aria-hidden="true">{{ category.emoji }}</span>
-              <p class="text-sm font-medium text-neutral-800">{{ category.name }}</p>
+              <p class="text-sm font-medium text-neutral-800 dark:text-neutral-100">{{ category.name }}</p>
             </Card>
           </div>
         </Card>
@@ -139,7 +139,7 @@
 
       <section class="mx-auto max-w-5xl px-4">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 class="text-lg font-semibold text-neutral-900">Produits disponibles</h3>
+          <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Produits disponibles</h3>
           <Button
             variant="ghost"
             size="sm"
@@ -189,12 +189,12 @@
             class="flex cursor-pointer flex-col"
             @click="viewProduct(product)"
           >
-            <div class="flex aspect-square items-center justify-center rounded bg-neutral-100 text-3xl">
+            <div class="flex aspect-square items-center justify-center rounded bg-neutral-100 dark:bg-neutral-800 text-3xl">
               <span aria-hidden="true">{{ product.emoji }}</span>
             </div>
             <div class="mt-4 space-y-4">
-              <h4 class="text-h4 font-semibold text-neutral-900">{{ product.name }}</h4>
-              <p class="text-sm text-neutral-500">{{ product.merchant }}</p>
+              <h4 class="text-h4 font-semibold text-neutral-900 dark:text-white">{{ product.name }}</h4>
+              <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ product.merchant }}</p>
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2 text-primary-600">
                   <span class="text-h4 font-semibold">{{ product.price }} XOF</span>
@@ -219,7 +219,7 @@
       </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 border-t border-neutral-200/70 bg-surface-light/90 backdrop-blur-lg">
+    <nav class="fixed bottom-0 left-0 right-0 border-t border-neutral-200/70 dark:border-neutral-700/70 bg-surface-light/90 dark:bg-surface-dark/90 backdrop-blur-lg">
       <div class="mx-auto flex max-w-5xl items-center justify-around px-4 py-4">
         <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-primary-600" @click="goToHome">
           <span aria-hidden="true" class="text-lg">🏠</span>
@@ -240,24 +240,25 @@
       </div>
     </nav>
 
-    <Toast
-      :is-open="toast.open"
-      :tone="toast.tone"
-      :title="toast.title"
-      :description="toast.description"
-      :on-close="closeToast"
-    />
+    <Teleport to="body">
+      <div v-if="toast.open" class="fixed top-4 right-4 z-[110]">
+        <Alert
+          :variant="toast.tone === 'warning' ? 'warning' : toast.tone === 'info' ? 'info' : 'success'"
+          :title="toast.title"
+          :description="toast.description"
+          dismissible
+          @dismiss="closeToast"
+        />
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import Button from '@/components/ui/Button.vue'
-import Card from '@/components/ui/Card.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
+import { Button, Card, EmptyState, Alert } from '@/components/ui/2025'
 import Skeleton from '@/components/ui/Skeleton.vue'
-import Toast from '@/components/ui/Toast.vue'
 import { useCartStore } from '@/stores/cart'
 
 const router = useRouter()

@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-neutral-50 to-neutral-100"
   >
     <!-- Header -->
@@ -276,7 +277,7 @@ interface Pagination {
 }
 
 const authStore = useAuthStore()
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 const reviews = ref<Review[]>([])
 const products = ref<Product[]>([])
 const pagination = ref<Pagination | null>(null)

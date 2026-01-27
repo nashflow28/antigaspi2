@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-neutral-50 to-neutral-100"
   >
     <!-- Header -->
@@ -350,7 +351,7 @@ const awardForm = ref<{
   expires_at: ''
 })
 
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 
 // Computed
 const filteredCustomers = computed(() => {

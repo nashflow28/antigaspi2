@@ -1,5 +1,5 @@
 <template>
-  <DashboardLayout :sidebar="sidebar" :header="header">
+  <DashboardLayout :sidebar="sidebar" :header="header" :mobile-nav="mobileNav">
     <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
       <DashboardHeader
         eyebrow="Commerçant"
@@ -401,7 +401,7 @@ ChartJS.register(
   BarController
 )
 
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 const authStore = useAuthStore()
 
 const chartPeriod = ref<ChartPeriod>('month')

@@ -28,6 +28,8 @@ interface AddItemPayload {
   imageUrl?: string | null
   merchantId?: number | null
   merchantName?: string | null
+  expiryDate?: string | null
+  maxQuantity?: number | null
   silent?: boolean
 }
 
@@ -153,7 +155,9 @@ export const useCartStore = defineStore('cart', () => {
             ...item,
             price: resolvePrice(item.price),
             originalPrice: item.originalPrice ? resolvePrice(item.originalPrice) : null,
-            quantity: Number.isFinite(item.quantity) && item.quantity > 0 ? item.quantity : 1
+            quantity: Number.isFinite(item.quantity) && item.quantity > 0 ? item.quantity : 1,
+            // Backfill productId for legacy items saved before the fix
+            productId: item.productId ?? (item.type === 'product' ? item.id : undefined)
           }))
         }
       }
@@ -222,17 +226,26 @@ export const useCartStore = defineStore('cart', () => {
       existing.merchantId = normalizedMerchantId
       existing.merchantName = payload.merchantName ?? existing.merchantName
       existing.name = normalizedName
+      existing.expiryDate = payload.expiryDate ?? existing.expiryDate
+      existing.maxQuantity = payload.maxQuantity ?? existing.maxQuantity
+      // Ensure productId is set for checkout compatibility
+      if (!existing.productId && existing.type === 'product') {
+        existing.productId = payload.id
+      }
     } else {
       items.value.push({
         id: payload.id,
         type: 'product',
+        productId: payload.id, // Required for checkout to process the item
         name: normalizedName,
         price: resolvePrice(payload.price),
         originalPrice: payload.originalPrice ? resolvePrice(payload.originalPrice) : null,
         quantity,
         imageUrl: payload.imageUrl ?? null,
         merchantId: normalizedMerchantId,
-        merchantName: payload.merchantName ?? null
+        merchantName: payload.merchantName ?? null,
+        expiryDate: payload.expiryDate ?? null,
+        maxQuantity: payload.maxQuantity ?? null
       })
     }
 

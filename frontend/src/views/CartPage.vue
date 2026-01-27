@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50">
-    <div class="border-b border-neutral-200/70 bg-white/80 backdrop-blur">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950">
+    <div class="border-b border-neutral-200/70 dark:border-neutral-700/70 bg-white/80 dark:bg-neutral-800/80 backdrop-blur">
       <div class="container px-3 sm:px-4 lg:px-6 mx-auto py-12">
         <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -8,8 +8,8 @@
               <ShoppingCart class="h-4 w-4" />
               Mon panier GÊLADAL
             </p>
-            <h1 class="mt-3 text-3xl font-semibold tracking-tight text-neutral-900">{{ headline }}</h1>
-            <p class="mt-2 max-w-full sm:max-w-80 text-neutral-700">
+            <h1 class="mt-3 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-white">{{ headline }}</h1>
+            <p class="mt-2 max-w-full sm:max-w-80 text-neutral-700 dark:text-neutral-300">
               Ajustez vos quantités et finalisez votre réservation en toute sécurité.
             </p>
           </div>
@@ -27,13 +27,13 @@
     <main class="container px-3 sm:px-4 lg:px-6 mx-auto px-4 py-8 sm:py-12 lg:py-16">
       <!-- Empty State -->
       <div v-if="!hasItems" class="max-w-2xl mx-auto">
-        <Card class="bg-white/90">
+        <Card class="bg-white/90 dark:bg-neutral-800/90">
           <div class="py-12 text-center">
-            <div class="mx-auto flex icon-xl items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
+            <div class="mx-auto flex icon-xl items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400">
               <ShoppingCart class="h-12 w-12" />
             </div>
-            <h3 class="mt-4 text-xl font-semibold text-neutral-800">Votre panier est vide</h3>
-            <p class="mt-2 text-neutral-500">
+            <h3 class="mt-4 text-xl font-semibold text-neutral-800 dark:text-neutral-100">Votre panier est vide</h3>
+            <p class="mt-2 text-neutral-500 dark:text-neutral-400">
               Découvrez les produits anti-gaspi près de chez vous et ajoutez-les à votre panier.
             </p>
             <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
@@ -53,7 +53,7 @@
         <!-- Items List -->
         <section class="space-y-4">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-semibold text-neutral-900">
+            <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">
               Articles ({{ itemsCount }})
             </h2>
             <Button
@@ -78,14 +78,14 @@
 
         <!-- Summary Sidebar -->
         <aside class="lg:sticky lg:top-4 h-fit">
-          <Card class="bg-white/90">
+          <Card class="bg-white/90 dark:bg-neutral-800/90">
             <template #header>
-              <h2 class="text-xl font-semibold text-neutral-900">Récapitulatif</h2>
+              <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">Récapitulatif</h2>
             </template>
 
             <div class="space-y-4">
               <!-- Subtotal -->
-              <div class="flex justify-between text-neutral-700">
+              <div class="flex justify-between text-neutral-700 dark:text-neutral-300">
                 <span>Sous-total</span>
                 <span class="font-semibold">{{ formatPrice(totalAmount) }}</span>
               </div>
@@ -97,21 +97,21 @@
               </div>
 
               <!-- Divider -->
-              <div class="border-t border-neutral-200" />
+              <div class="border-t border-neutral-200 dark:border-neutral-700" />
 
               <!-- Total -->
-              <div class="flex justify-between text-xl font-bold text-neutral-900">
+              <div class="flex justify-between text-xl font-bold text-neutral-900 dark:text-white">
                 <span>Total</span>
                 <span>{{ formatPrice(totalAmount) }}</span>
               </div>
 
               <!-- Impact Info -->
-              <div class="p-3 bg-green-50 rounded-lg border border-green-200">
-                <div class="flex items-center gap-2 text-green-800 text-sm font-medium mb-1">
+              <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <div class="flex items-center gap-2 text-green-800 dark:text-green-200 text-sm font-medium mb-1">
                   <Leaf class="h-4 w-4" />
                   <span>Votre impact</span>
                 </div>
-                <p class="text-xs text-green-700">
+                <p class="text-xs text-green-700 dark:text-green-300">
                   En réservant ces produits, vous contribuez à réduire le gaspillage alimentaire
                   et soutenez les commerçants locaux.
                 </p>
@@ -139,7 +139,7 @@
               </Button>
 
               <!-- Trust Indicators -->
-              <div class="pt-4 border-t border-neutral-200 space-y-2 text-xs text-neutral-600">
+              <div class="pt-4 border-t border-neutral-200 dark:border-neutral-700 space-y-2 text-xs text-neutral-600 dark:text-neutral-400">
                 <div class="flex items-center gap-2">
                   <ShieldCheck class="h-4 w-4 text-green-600" />
                   <span>Paiement 100% sécurisé</span>

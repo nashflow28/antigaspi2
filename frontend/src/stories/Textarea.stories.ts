@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
-import Textarea from '@/components/ui/Textarea.vue'
+import Textarea from '@/components/ui/2025/Textarea.vue'
 
 
 const meta: Meta<any> = {

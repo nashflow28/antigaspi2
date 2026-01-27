@@ -66,6 +66,16 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/auth/change-pin',
+      name: 'change-pin',
+      component: () => import('@/views/auth/ChangePinView.vue'),
+      meta: {
+        requiresAuth: true,
+        title: 'Modifier le code PIN',
+        breadcrumb: ['Compte', 'Modifier PIN']
+      }
+    },
+    {
       path: '/products',
       name: 'products',
       component: () => import('@/views/ProductsView2025.vue'),
@@ -395,6 +405,39 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {
+      path: '/merchant/messaging',
+      name: 'merchant-messaging',
+      component: () => import('@/views/merchant/MessagingView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['merchant'],
+        title: 'Messagerie clients',
+        breadcrumb: ['Espace commerçant', 'Messagerie']
+      }
+    },
+    {
+      path: '/merchant/messaging/:id',
+      name: 'merchant-messaging-conversation',
+      component: () => import('@/views/merchant/MessagingView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['merchant'],
+        title: 'Conversation client',
+        breadcrumb: ['Espace commerçant', 'Messagerie', 'Conversation']
+      }
+    },
+    {
+      path: '/merchant/notifications',
+      name: 'merchant-notifications',
+      component: () => import('@/views/merchant/NotificationsView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['merchant'],
+        title: 'Notifications',
+        breadcrumb: ['Espace commerçant', 'Notifications']
+      }
+    },
+    {
       path: '/driver',
       name: 'driver',
       redirect: '/driver/dashboard'
@@ -440,6 +483,28 @@ const router = createRouter({
       name: 'driver-profile-edit',
       component: () => import('@/views/driver/DriverProfileEditView.vue'),
       meta: { requiresAuth: true, roles: ['driver'] }
+    },
+    {
+      path: '/driver/map',
+      name: 'driver-map',
+      component: () => import('@/views/driver/DeliveryMapView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['driver'],
+        title: 'Carte de livraison',
+        breadcrumb: ['Espace livreur', 'Carte']
+      }
+    },
+    {
+      path: '/driver/deliveries/:id',
+      name: 'driver-delivery-details',
+      component: () => import('@/views/driver/DeliveryDetailsView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['driver'],
+        title: 'Détails de livraison',
+        breadcrumb: ['Espace livreur', 'Livraisons', 'Détails']
+      }
     },
     {
       path: '/admin',
@@ -505,6 +570,17 @@ const router = createRouter({
       name: 'admin-audit',
       component: () => import('@/views/admin/AuditLogView.vue'),
       meta: { requiresAuth: true, roles: ['admin'] }
+    },
+    {
+      path: '/admin/broadcast',
+      name: 'admin-broadcast',
+      component: () => import('@/views/admin/BroadcastView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['admin'],
+        title: 'Notifications broadcast',
+        breadcrumb: ['Administration', 'Broadcast']
+      }
     },
     {
       path: '/gaspiz-demo',

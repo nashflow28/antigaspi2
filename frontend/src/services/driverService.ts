@@ -89,6 +89,10 @@ class DriverService {
     return apiService.get<ApiResponse<Delivery[]>>(`${this.deliveriesUrl}/history`)
   }
 
+  async getDeliveryById(deliveryId: number): Promise<ApiResponse<Delivery>> {
+    return apiService.get<ApiResponse<Delivery>>(`${this.deliveriesUrl}/${deliveryId}`)
+  }
+
   async acceptDelivery(deliveryId: number): Promise<ApiResponse<Delivery>> {
     return apiService.post<ApiResponse<Delivery>>(`${this.deliveriesUrl}/${deliveryId}/accept`, {})
   }

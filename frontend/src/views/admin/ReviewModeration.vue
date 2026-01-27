@@ -2,17 +2,18 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-purple-50 to-indigo-50"
+    :mobile-nav="mobileNav"
+    class="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-surface-dark dark:to-primary-950"
   >
     <div class="p-6">
       <!-- Header -->
       <div class="mt-4 sm:mb-3xl">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-6">
           <div>
-            <h1 class="text-xl lg:text-3xl font-semibold text-neutral-900 mt-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-neutral-900 dark:text-white mt-2">
               Modération des Avis
             </h1>
-            <p class="text-neutral-700 text-lg">
+            <p class="text-neutral-700 dark:text-neutral-300 text-lg">
               Gérez les avis en attente et les signalements
             </p>
           </div>
@@ -95,19 +96,19 @@
 
       <!-- Tabs Navigation -->
       <div class="mt-4 sm:mb-3xl">
-        <div class="border-b border-neutral-200">
+        <div class="border-b border-neutral-200 dark:border-neutral-700">
           <nav class="-mb-px flex space-y-8 sm:space-x-8">
             <button
               :class="[
                 'py-3 px-1 border-b-2 font-medium text-sm',
                 activeTab === 'pending'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-800 hover:border-neutral-300'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-100 hover:border-neutral-300 dark:hover:border-neutral-600'
               ]"
               @click="activeTab = 'pending'"
             >
               Avis en attente
-              <span v-if="stats?.pending_reviews" class="ml-2 px-3 py-3 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+              <span v-if="stats?.pending_reviews" class="ml-2 px-3 py-3 text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 rounded-full">
                 {{ stats.pending_reviews }}
               </span>
             </button>
@@ -115,13 +116,13 @@
               :class="[
                 'py-3 px-1 border-b-2 font-medium text-sm',
                 activeTab === 'reported'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-800 hover:border-neutral-300'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-100 hover:border-neutral-300 dark:hover:border-neutral-600'
               ]"
               @click="activeTab = 'reported'"
             >
               Avis signalés
-              <span v-if="stats?.pending_reports" class="ml-2 px-3 py-3 text-xs bg-red-100 text-red-800 rounded-full">
+              <span v-if="stats?.pending_reports" class="ml-2 px-3 py-3 text-xs bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 rounded-full">
                 {{ stats.pending_reports }}
               </span>
             </button>
@@ -177,7 +178,7 @@ interface ModerationStats {
 }
 
 const authStore = useAuthStore()
-const { sidebar, header } = useDashboardLayout('admin')
+const { sidebar, header, mobileNav } = useDashboardLayout('admin')
 const stats = ref<ModerationStats | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)

@@ -10,6 +10,13 @@ export interface ServerNotification {
   sent_via?: string | null
   sent_at?: string | null
   created_at?: string | null
+  data?: {
+    reservation_id?: number
+    review_id?: number
+    product_id?: number
+    order_id?: number
+    [key: string]: unknown
+  } | null
 }
 
 interface NotificationListResponse {

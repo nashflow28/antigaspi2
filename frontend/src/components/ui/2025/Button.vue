@@ -40,13 +40,14 @@ export type ButtonVariant =
   | 'secondary'
   | 'ghost'
   | 'outline'
+  | 'link'
   | 'promo'
   | 'destructive'
   | 'error'
   | 'success'
   | 'warning'
 
-export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'icon'
 
 // Props
 interface Props {
@@ -107,12 +108,13 @@ const computedClasses = computed(() => {
 })
 
 const sizeClasses = computed(() => {
-  const sizes = {
+  const sizes: Record<ButtonSize, string> = {
     xs: 'px-xs py-xs text-xs gap-2 rounded-lg',
     sm: 'px-sm py-sm text-sm gap-2 rounded-lg',
     md: 'px-md py-md text-sm gap-2 rounded-lg',
     lg: 'px-lg py-lg text-base gap-3 rounded-xl',
-    xl: 'px-xl py-xl text-lg gap-3 rounded-xl'
+    xl: 'px-xl py-xl text-lg gap-3 rounded-xl',
+    icon: 'p-2 rounded-lg'
   }
   return sizes[props.size]
 })
@@ -147,6 +149,13 @@ const variantClasses = computed(() => {
       'border border-primary-400/70 dark:border-primary-500/60',
       'hover:bg-primary-500/10 hover:text-primary-700',
       'dark:hover:bg-primary-500/20'
+    ].join(' '),
+
+    link: [
+      'bg-transparent text-primary-600 dark:text-primary-400',
+      'hover:text-primary-700 dark:hover:text-primary-300',
+      'underline-offset-2 hover:underline',
+      'shadow-none p-0'
     ].join(' '),
 
     promo: [
@@ -194,12 +203,13 @@ const contentClasses = computed(() => {
 })
 
 const iconSize = computed(() => {
-  const sizes = {
+  const sizes: Record<ButtonSize, number> = {
     xs: 12,
     sm: 14,
     md: 16,
     lg: 18,
-    xl: 20
+    xl: 20,
+    icon: 18
   }
   return sizes[props.size]
 })

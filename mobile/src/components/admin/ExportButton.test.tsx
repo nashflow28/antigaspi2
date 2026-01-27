@@ -64,7 +64,7 @@ describe('ExportButton', () => {
     consoleErrorSpy?.mockRestore()
   })
 
-  test('renders CSV and PDF buttons', () => {
+  test('renders CSV and Rapport buttons', () => {
     render(
       <>
         <ExportButton format="csv" />
@@ -72,7 +72,7 @@ describe('ExportButton', () => {
       </>
     )
     expect(screen.getByText('CSV')).toBeTruthy()
-    expect(screen.getByText('PDF')).toBeTruthy()
+    expect(screen.getByText('Rapport')).toBeTruthy()
   })
 
   test('calls API with correct format and filters', async () => {

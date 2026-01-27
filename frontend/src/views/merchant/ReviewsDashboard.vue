@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-neutral-50 to-neutral-100"
   >
     <!-- Header -->
@@ -359,7 +360,7 @@ interface DashboardData {
 }
 
 const authStore = useAuthStore()
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 const dashboardData = ref<DashboardData | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)

@@ -68,7 +68,7 @@ class SurpriseBasket extends Product
      */
     public function getDiscountPercentageAttribute(): int
     {
-        if (!$this->original_price || $this->original_price <= 0) {
+        if (! $this->original_price || $this->original_price <= 0) {
             return 0;
         }
 

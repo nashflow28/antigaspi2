@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
     <div class="mx-auto w-full max-w-5xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
@@ -181,7 +182,7 @@ const authStore = useAuthStore()
 const user = computed(() => authStore.user)
 
 // Sidebar et header from composable
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 
 interface DayHours {
   is_open: boolean

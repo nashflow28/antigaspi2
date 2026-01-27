@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
     <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
@@ -305,7 +306,7 @@ import { notify } from '@/composables/useNotifications'
 import { apiService } from '@/services/api'
 import type { ApiResponse, Product, Reservation } from '@/types'
 
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 
 type WithOptionalMeta<T> = T & {
   meta?: Record<string, unknown>

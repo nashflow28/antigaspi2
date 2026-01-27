@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
-import DashboardView from '@/views/DashboardView.vue'
+import DashboardView from '@/views/DashboardView2025.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
 import Button from '@/components/ui/2025/Button.vue'

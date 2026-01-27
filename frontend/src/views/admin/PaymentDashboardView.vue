@@ -274,15 +274,14 @@
     <Teleport to="body">
       <div class="fixed top-4 right-4 z-[110] space-y-3">
         <TransitionGroup name="toast">
-          <Toast
+          <Alert
             v-for="notification in notifications"
             :key="notification.id"
-            :is-open="true"
-            :tone="notification.type"
+            :variant="notification.type"
             :title="notification.title"
             :description="notification.message"
-            position="stacked"
-            @close="removeNotification(notification.id)"
+            dismissible
+            @dismiss="removeNotification(notification.id)"
           />
         </TransitionGroup>
       </div>
@@ -291,7 +290,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, Teleport, TransitionGroup } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import {
   ArrowPathIcon,
   BanknotesIcon,
@@ -302,9 +301,8 @@ import {
   EyeIcon
 } from '@heroicons/vue/24/outline'
 import apiService from '@/services/api'
-import Toast from '@/components/ui/Toast.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
-import { Button, Badge, Modal, Pagination } from '@/components/ui/2025'
+import { Button, Badge, Modal, Pagination, Alert } from '@/components/ui/2025'
 import {
   DashboardHeader,
   StatCard,

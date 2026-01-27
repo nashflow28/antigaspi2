@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-neutral-50 via-sky-50/40 to-primary-50"
   >
     <header class="sticky top-20 z-40 border-b border-white/60 bg-white/80 backdrop-blur-xl">
@@ -374,7 +375,7 @@ const layoutRole: 'consumer' | 'merchant' = ((route.meta.roles as string[] | und
   ? 'merchant'
   : 'consumer'
 
-const { sidebar, header } = useDashboardLayout(layoutRole)
+const { sidebar, header, mobileNav } = useDashboardLayout(layoutRole)
 const isMerchant = computed(() => layoutRole === 'merchant')
 const pageTitle = computed(() => (isMerchant.value ? 'Paiements & Portefeuille' : 'Portefeuille électronique 💳'))
 const pageSubtitle = computed(() => (isMerchant.value

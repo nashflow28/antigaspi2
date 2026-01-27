@@ -160,17 +160,22 @@ describe('ProductDetailsScreen', () => {
   })
 
   it('shows payment options and switches selection', () => {
-    const { getByText, getAllByText, queryByText } = renderScreen()
+    const { getByText, queryByText } = renderScreen()
 
     expect(getByText('Portefeuille GÊLADAL')).toBeTruthy()
     expect(getByText(/Total à payer/i)).toBeTruthy()
 
-    fireEvent.press(getByText('Mobile Money'))
-    expect(getByText(/op.rateur mobile/i)).toBeTruthy()
+    // Select Flooz (Moov) payment option
+    fireEvent.press(getByText('Flooz (Moov)'))
+    expect(getByText(/Numéro Mobile Money/i)).toBeTruthy()
 
-    fireEvent.press(getByText('Carte bancaire'))
-    expect(getAllByText(/Paystack/i).length).toBeGreaterThan(0)
-    expect(queryByText(/op.rateur mobile/i)).toBeNull()
+    // Switch to Mixx by Yas
+    fireEvent.press(getByText('Mixx by Yas'))
+    expect(getByText(/Numéro Mobile Money/i)).toBeTruthy()
+
+    // Switch back to wallet - should hide Mobile Money input
+    fireEvent.press(getByText('Portefeuille GÊLADAL'))
+    expect(queryByText(/Numéro Mobile Money/i)).toBeNull()
   })
 
   it('updates quantity within available bounds', () => {

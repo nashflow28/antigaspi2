@@ -239,15 +239,22 @@
       </div>
     </main>
 
-    <Toast
-      :is-open="toast.open"
-      :tone="toast.tone"
-      :title="toast.title"
-      :description="toast.description"
-      :on-close="closeToast"
-    />
+    <!-- Toast notification area -->
+    <div
+      v-if="toast.open"
+      class="fixed bottom-4 right-4 z-50 max-w-sm"
+    >
+      <Alert
+        :variant="toast.tone === 'success' ? 'success' : toast.tone === 'warning' ? 'warning' : 'info'"
+        :title="toast.title"
+        dismissible
+        @dismiss="closeToast"
+      >
+        {{ toast.description }}
+      </Alert>
+    </div>
 
-    <ConfirmModal
+    <ConfirmDialog
       :is-open="showCancelModal"
       type="danger"
       title="Annuler la réservation"
@@ -264,9 +271,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
-import { Button, Card, EmptyState, Loading, Select } from '@/components/ui/2025'
-import Toast from '@/components/ui/Toast.vue'
-import ConfirmModal from '@/components/ui/ConfirmModal.vue'
+import { Button, Card, EmptyState, Loading, Select, ConfirmDialog, Alert } from '@/components/ui/2025'
 import ReservationCard from '@/components/reservation/ReservationCard.vue'
 import { formatPrice } from '@/utils/currency'
 import { notify } from '@/composables/useNotifications'

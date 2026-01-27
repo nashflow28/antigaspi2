@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-primary-50 to-accent-blue/10"
   >
     <div class="container px-3 sm:px-4 lg:px-6 py-6">
@@ -351,7 +352,7 @@ import Input from '@/components/ui/2025/Input.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 
 // State
 type EditableProduct = {

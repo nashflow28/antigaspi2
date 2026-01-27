@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
     <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
@@ -215,15 +216,14 @@
     <Teleport to="body">
       <div class="fixed top-4 right-4 z-[110] space-y-3">
         <TransitionGroup name="toast">
-          <Toast
+          <Alert
             v-for="notification in notifications"
             :key="notification.id"
-            :is-open="true"
-            :tone="mapNotificationType(notification.type)"
+            :variant="notification.type"
             :title="notification.title"
             :description="notification.message"
-            position="stacked"
-            @close="removeNotification(notification.id)"
+            dismissible
+            @dismiss="removeNotification(notification.id)"
           />
         </TransitionGroup>
       </div>
@@ -232,7 +232,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch, Teleport, TransitionGroup } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import {
   ArrowPathIcon,
   UserGroupIcon,
@@ -245,8 +245,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import apiService from '@/services/api'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
-import Toast from '@/components/ui/Toast.vue'
-import { Button, Badge, Pagination, ConfirmDialog } from '@/components/ui/2025'
+import { Button, Badge, Pagination, ConfirmDialog, Alert } from '@/components/ui/2025'
 import {
   DashboardHeader,
   StatCard,
@@ -361,7 +360,7 @@ const userTableColumns: DataTableColumn[] = [
   { key: 'actions', title: 'Actions', align: 'right', width: '140px' }
 ]
 
-const { sidebar, header } = useDashboardLayout('admin')
+const { sidebar, header, mobileNav } = useDashboardLayout('admin')
 
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -423,16 +422,6 @@ const getStatusLabel = (status: string): string => {
     pending: 'En attente'
   }
   return labels[status] || status
-}
-
-const mapNotificationType = (type: Notification['type']): 'success' | 'info' | 'warning' => {
-  const mapping: Record<Notification['type'], 'success' | 'info' | 'warning'> = {
-    success: 'success',
-    error: 'warning',
-    warning: 'warning',
-    info: 'info'
-  }
-  return mapping[type]
 }
 
 const formatDate = (dateString?: string | null): string => {

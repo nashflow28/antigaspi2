@@ -28,7 +28,7 @@ class SurpriseBasketFactory extends Factory
         return [
             'merchant_id' => Merchant::factory(),
             'category_id' => Category::factory(),
-            'name' => 'Panier Surprise ' . $this->faker->word(),
+            'name' => 'Panier Surprise '.$this->faker->word(),
             'description' => $this->faker->sentence(10),
             'original_price' => $originalPrice,
             'discounted_price' => $discountedPrice,
@@ -66,6 +66,7 @@ class SurpriseBasketFactory extends Factory
     {
         return $this->state(function (array $attributes) use ($percentage) {
             $originalPrice = $attributes['original_price'] ?? 10000;
+
             return [
                 'discounted_price' => (int) ($originalPrice * (1 - $percentage / 100)),
             ];

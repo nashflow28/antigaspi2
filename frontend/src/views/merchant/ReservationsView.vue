@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-green-50 to-primary-50"
   >
     <div class="p-6">
@@ -496,7 +497,7 @@ const showDetailsModal = ref(false)
 const selectedReservation = ref<any>(null)
 const loading = ref(false)
 const openDropdown = ref<number | null>(null)
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 
 // Filters
 const filters = computed(() => [

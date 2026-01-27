@@ -89,7 +89,7 @@ describe('AdminBroadcastScreen', () => {
     pressLastTextButton('Envoyer')
 
     await waitFor(() => {
-      expect(apiService.post).toHaveBeenCalledWith('/admin/notifications/broadcast', {
+      expect(apiService.post).toHaveBeenCalledWith('/notifications/broadcast', {
         title: 'Test Titre',
         message: 'Test Message',
         channels: ['database', 'mail'],

@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-neutral-50 via-primary-50/40 to-emerald-50/30"
   >
     <div class="space-y-6 px-4 py-6 lg:px-8">
@@ -270,7 +271,7 @@ import type {
   PaymentWithRelations
 } from '@/types'
 
-const { sidebar, header } = useDashboardLayout('merchant')
+const { sidebar, header, mobileNav } = useDashboardLayout('merchant')
 
 const payments = ref<PaymentWithRelations[]>([])
 const summary = ref<PaymentSummaryMeta | null>(null)

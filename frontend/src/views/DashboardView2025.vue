@@ -2,6 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
+    :mobile-nav="mobileNav"
     class="bg-gradient-to-br from-surface-light to-primary-50 dark:from-surface-dark dark:to-surface-darker"
   >
     <!-- Page Header -->
@@ -368,7 +369,7 @@ import Badge from '@/components/ui/2025/Badge.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 const walletStore = useWalletStore()
-const { sidebar, header } = useDashboardLayout('consumer')
+const { sidebar, header, mobileNav } = useDashboardLayout('consumer')
 
 // État des données utilisateur
 const userStats = ref({

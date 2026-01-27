@@ -5,115 +5,54 @@
   >
     <Navigation
       :brand="navigationBrand"
-      :items="navigationItems"
-      :show-theme-toggle="true"
-      @item-click="handleNavItemClick"
-      @toggle="handleNavigationToggle"
+      :main-links="mainLinks"
+      :secondary-links="secondaryLinks"
+      :auth-cta="authCta"
+      @link-click="handleLinkClick"
+      @cta-click="handleCtaClick"
     >
-      <template #actions>
-        <div class="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            class="relative hidden sm:block md:inline-flex"
-            data-testid="cart-button"
-            @click="handleCartClick"
+      <template #utilities>
+        <button
+          type="button"
+          class="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/50 bg-white/70 text-neutral-700 shadow-sm transition-all duration-300 focus-2025 hover:-translate-y-0.5 hover:bg-white dark:border-dark-600/60 dark:bg-dark-800/80 dark:text-dark-100"
+          data-testid="cart-button"
+          aria-label="Mon panier"
+          @click="handleCartClick"
+        >
+          <ShoppingCartIcon class="h-5 w-5" />
+          <span
+            v-if="cartItemsCount > 0"
+            class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-500 px-1.5 text-xs font-bold text-white"
+            data-testid="cart-count"
           >
-            <span>Mon panier</span>
-            <Badge
-              v-if="cartItemsCount > 0"
-              variant="primary"
-              size="xs"
-              data-testid="cart-count"
-              class="relative sm:absolute -top-2 -right-2 min-w-4 justify-center px-2 py-0.5 text-[10px]"
-            >
-              {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
-            </Badge>
-          </Button>
-
-          <template v-if="isAuthenticated">
-            <Button
-              variant="ghost"
-              data-testid="user-profile"
-              @click="goToDashboard"
-            >
-              Mon espace
-            </Button>
-            <Button
-              variant="primary"
-              @click="handleLogout"
-            >
-              Se déconnecter
-            </Button>
-          </template>
-          <template v-else>
-            <Button
-              variant="ghost"
-              data-testid="login-button"
-              @click="handleLoginClick"
-            >
-              Connexion
-            </Button>
-            <Button
-              variant="primary"
-              @click="handleRegisterClick"
-            >
-              Inscription
-            </Button>
-          </template>
-        </div>
+            {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
+          </span>
+        </button>
       </template>
 
-      <template #mobile-actions>
+      <template #mobile-footer>
         <div class="flex flex-col gap-2">
-          <Button
-            variant="ghost"
-            class="relative justify-start sm:justify-between"
+          <button
+            type="button"
+            class="flex items-center justify-between rounded-2xl border border-white/60 bg-white/60 px-4 py-3 text-sm font-medium text-neutral-800 transition-all duration-300 focus-2025 hover:bg-white dark:border-dark-600/60 dark:bg-dark-800/70 dark:text-dark-50"
             @click="handleCartClick"
           >
-            <span>Mon panier</span>
-            <Badge
+            <div class="flex items-center gap-3">
+              <ShoppingCartIcon class="h-4 w-4 text-primary-500" />
+              <span>Mon panier</span>
+            </div>
+            <span
               v-if="cartItemsCount > 0"
-              variant="primary"
-              size="sm"
-              class="flex min-w-[1.5rem] justify-center px-3"
+              class="rounded-full bg-primary-500/10 px-2 py-0.5 text-xs font-semibold text-primary-600"
             >
               {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
-            </Badge>
-          </Button>
-
-          <template v-if="isAuthenticated">
-            <Button
-              variant="ghost"
-              @click="goToDashboard"
-            >
-              Mon espace
-            </Button>
-            <Button
-              variant="primary"
-              @click="handleLogout"
-            >
-              Se déconnecter
-            </Button>
-          </template>
-          <template v-else>
-            <Button
-              variant="ghost"
-              @click="handleLoginClick"
-            >
-              Connexion
-            </Button>
-            <Button
-              variant="primary"
-              @click="handleRegisterClick"
-            >
-              Inscription
-            </Button>
-          </template>
+            </span>
+          </button>
         </div>
       </template>
     </Navigation>
 
-    <main class="pt-24 sm:pt-32">
+    <main id="main-content" class="pt-20 sm:pt-24">
       <router-view v-slot="{ Component: CurrentComponent }">
         <PageTransition>
           <component :is="CurrentComponent" />
@@ -121,41 +60,36 @@
       </router-view>
     </main>
 
-    <Footer class="border-t border-primary-500/10 bg-primary-800 text-neutral-50" />
+    <Footer
+      :brand="footerBrand"
+      :quick-links="footerLinks"
+      :networks="socialNetworks"
+    />
 
     <NotificationContainer />
-
-    <!-- TEMPORARILY DISABLED - Network Status -->
-    <!-- <NetworkStatus /> -->
-
-    <!-- TEMPORARILY DISABLED - PWA Prompts -->
-    <!-- <PWAPrompt /> -->
-
-    <!-- TEMPORARILY DISABLED - Dev Tools -->
-    <!-- <OnboardingReset /> -->
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, type Component } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   HomeIcon,
   MapIcon,
   Squares2X2Icon,
   ChatBubbleLeftRightIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  ShoppingCartIcon,
+  UserCircleIcon,
+  ArrowRightStartOnRectangleIcon
 } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import { useProductsStore } from '@/stores/products'
 import { useMerchantsStore } from '@/stores/merchants'
 import { useCartStore } from '@/stores/cart'
-import Navigation from '@/components/ui/Navigation.vue'
-import Footer from '@/components/ui/Footer.vue'
+import { Navigation, Footer, type NavigationLink, type NavigationCta, type FooterLink, type SocialNetwork } from '@/components/ui/2025'
 import PageTransition from '@/components/ui/PageTransition.vue'
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
-import Button from '@/components/ui/2025/Button.vue'
-import Badge from '@/components/ui/2025/Badge.vue'
 
 const authStore = useAuthStore()
 const productsStore = useProductsStore()
@@ -164,16 +98,16 @@ const cartStore = useCartStore()
 const route = useRoute()
 const router = useRouter()
 
-interface NavigationEntry {
-  label: string
-  href: string
-  icon?: Component
-  routes: string[]
-}
-
 const navigationBrand = computed(() => ({
-  name: 'GÊLADAL',
-  href: '/'
+  name: 'GELADAL',
+  to: '/',
+  tagline: 'Anti-gaspillage'
+}))
+
+const footerBrand = computed(() => ({
+  name: 'GELADAL',
+  to: '/',
+  tagline: 'Ton panier n\'attend que toi'
 }))
 
 const dashboardTarget = computed(() => {
@@ -183,6 +117,8 @@ const dashboardTarget = computed(() => {
       return '/admin/dashboard'
     case 'merchant':
       return '/merchant/dashboard'
+    case 'driver':
+      return '/driver/dashboard'
     case 'consumer':
     default:
       return '/dashboard'
@@ -221,6 +157,17 @@ const dashboardRouteNames = computed(() => {
       'merchant-profile'
     ]
   }
+  if (role === 'driver') {
+    return [
+      'driver-dashboard',
+      'driver-deliveries-available',
+      'driver-deliveries-active',
+      'driver-history',
+      'driver-earnings',
+      'driver-profile',
+      'driver-profile-edit'
+    ]
+  }
   return [
     'dashboard',
     'discover',
@@ -242,79 +189,126 @@ const dashboardRouteNames = computed(() => {
   ]
 })
 
-const baseNavigation = computed<NavigationEntry[]>(() => {
-  const entries: NavigationEntry[] = [
-    { label: 'Accueil', href: '/', icon: HomeIcon, routes: ['home'] },
+const mainLinks = computed<NavigationLink[]>(() => {
+  const currentName = route.name?.toString()
+
+  const links: NavigationLink[] = [
     {
-      label: 'Découvrir',
-      href: '/discover',
+      id: 'home',
+      label: 'Accueil',
+      to: '/',
+      icon: HomeIcon,
+      active: currentName === 'home'
+    },
+    {
+      id: 'discover',
+      label: 'Decouvrir',
+      to: '/discover',
       icon: MapIcon,
-      routes: ['discover', 'surprise-baskets', 'surprise-basket-reserve', 'merchant-detail', 'merchants-map']
+      active: ['discover', 'surprise-baskets', 'surprise-basket-reserve', 'merchant-detail', 'merchants-map'].includes(currentName || '')
     },
     {
+      id: 'products',
       label: 'Produits',
-      href: '/products',
+      to: '/products',
       icon: Squares2X2Icon,
-      routes: ['products', 'product-detail', 'product-reserve']
+      active: ['products', 'product-detail', 'product-reserve'].includes(currentName || '')
     },
     {
+      id: 'reviews',
       label: 'Avis',
-      href: '/reviews',
+      to: '/reviews',
       icon: ChatBubbleLeftRightIcon,
-      routes: ['reviews', 'public-reviews']
+      active: ['reviews', 'public-reviews'].includes(currentName || '')
     }
   ]
 
   if (isAuthenticated.value) {
-    entries.push({
+    links.push({
+      id: 'dashboard',
       label: 'Tableau de bord',
-      href: dashboardTarget.value,
+      to: dashboardTarget.value,
       icon: ChartBarIcon,
-      routes: dashboardRouteNames.value
+      active: dashboardRouteNames.value.includes(currentName || '')
     })
   }
 
-  return entries
+  return links
 })
 
-const navigationItems = computed(() => {
-  const currentName = route.name?.toString()
+const secondaryLinks = computed<NavigationLink[]>(() => {
+  if (!isAuthenticated.value) {
+    return []
+  }
 
-  return baseNavigation.value.map((item) => ({
-    label: item.label,
-    href: item.href,
-    icon: item.icon,
-    active: currentName ? item.routes.includes(currentName) : false
-  }))
+  return [
+    {
+      id: 'profile',
+      label: 'Mon espace',
+      to: dashboardTarget.value,
+      icon: UserCircleIcon
+    }
+  ]
 })
+
+const authCta = computed<{ login?: NavigationLink; primary?: NavigationCta } | null>(() => {
+  if (isAuthenticated.value) {
+    return {
+      primary: {
+        label: 'Deconnexion',
+        icon: ArrowRightStartOnRectangleIcon,
+        variant: 'outline'
+      }
+    }
+  }
+
+  return {
+    login: {
+      id: 'login',
+      label: 'Connexion',
+      to: '/login'
+    },
+    primary: {
+      label: 'Inscription',
+      to: '/register',
+      variant: 'primary'
+    }
+  }
+})
+
+const footerLinks = computed<FooterLink[]>(() => [
+  { id: 'products', label: 'Produits', to: '/products' },
+  { id: 'discover', label: 'Decouvrir', to: '/discover' },
+  { id: 'reviews', label: 'Avis', to: '/reviews' }
+])
+
+const socialNetworks = computed<SocialNetwork[]>(() => [
+  { name: 'Twitter', href: 'https://twitter.com' },
+  { name: 'Facebook', href: 'https://facebook.com' },
+  { name: 'Instagram', href: 'https://instagram.com' }
+])
 
 const cartItemsCount = computed(() => cartStore.itemsCount)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
-const handleNavItemClick = (item: { href: string }) => {
-  if (item.href) {
-    router.push(item.href)
+const handleLinkClick = (link: NavigationLink) => {
+  if (link.to) {
+    router.push(link.to)
+  } else if (link.href) {
+    window.location.href = link.href
   }
 }
 
-const handleNavigationToggle = () => {
-  /* emitted for analytics or future integrations */
+const handleCtaClick = (cta: NavigationCta) => {
+  if (cta.label === 'Deconnexion') {
+    handleLogout()
+  } else if (cta.to) {
+    router.push(cta.to)
+  }
 }
 
 const handleCartClick = () => {
   router.push('/cart')
-}
-
-const handleLoginClick = () => {
-  router.push('/login')
-}
-
-const handleRegisterClick = () => {
-  router.push('/register')
-}
-
-const goToDashboard = () => {
-  router.push(dashboardTarget.value)
 }
 
 const handleLogout = async () => {
@@ -331,10 +325,8 @@ onMounted(async () => {
       productsStore.fetchProducts(),
       merchantsStore.fetchMerchants()
     ])
-
-    // Stores initialized successfully
   } catch {
-    // Error initializing stores
+    // Error initializing stores - silent failure
   }
 })
 </script>

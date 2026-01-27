@@ -125,13 +125,22 @@
 
       <Motion
         tag="main"
-        class="flex-1 px-3 py-6 sm:px-4 lg:px-6"
+        :class="[
+          'flex-1 px-3 py-6 sm:px-4 lg:px-6',
+          mobileNav?.length ? 'pb-24 lg:pb-6' : ''
+        ]"
         :initial="{ opacity: 0, y: 24 }"
         :enter="{ opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.1 } }"
       >
         <slot />
       </Motion>
     </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <MobileBottomNav
+      v-if="mobileNav?.length"
+      :items="mobileNav"
+    />
   </div>
 </template>
 
@@ -139,6 +148,7 @@
 import { computed, ref, useSlots, watch, type Component } from 'vue'
 import { MotionComponent as Motion } from '@vueuse/motion'
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+import MobileBottomNav from '@/components/ui/2025/MobileBottomNav.vue'
 
 type NavigationEntry = {
   label: string
@@ -146,6 +156,14 @@ type NavigationEntry = {
   icon?: Component
   active?: boolean
   badge?: string
+}
+
+type MobileNavItem = {
+  label: string
+  href: string
+  icon?: Component
+  badge?: number
+  activeRoutes?: string[]
 }
 
 type SidebarDefinition = {
@@ -170,6 +188,7 @@ type HeaderDefinition = {
 const props = defineProps<{
   sidebar: SidebarDefinition
   header: HeaderDefinition
+  mobileNav?: MobileNavItem[]
   class?: string
 }>()
 

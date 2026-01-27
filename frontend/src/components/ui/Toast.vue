@@ -105,7 +105,7 @@
 
 <script setup lang="ts">
 import { computed, toRefs } from 'vue'
-import Button from './Button.vue'
+import { Button } from './2025'
 
 type ToastTone = 'success' | 'info' | 'warning' | 'error';
 type ToastPosition = 'global' | 'stacked';

@@ -337,16 +337,20 @@ export interface Reservation {
     image_url?: string | null
     original_price?: number
     discounted_price?: number
+    price?: number
     discount_percentage?: number
     expiration_date?: string
     merchant: {
       id?: number
       name: string
+      business_name?: string
       business_type?: string
       address?: string
       city?: string
       phone?: string
       distance?: number
+      latitude?: number
+      longitude?: number
     }
     category?: Category | null
   }
@@ -424,12 +428,21 @@ export interface Delivery {
   delivery_notes?: string | null
   delivery_fee?: number
   driver_commission?: number
+  platform_commission?: number
+  distance_km?: number | null
   estimated_delivery_at?: string | null
+  assigned_at?: string | null
+  picking_up_at?: string | null
+  picked_up_at?: string | null
+  delivering_at?: string | null
+  delivered_at?: string | null
   cancelled_at?: string | null
   completed_at?: string | null
   can_cancel?: boolean
   consumer_rating?: number | null
   consumer_feedback?: string | null
+  recipient_name?: string | null
+  recipient_phone?: string | null
   driver?: DeliveryDriverProfile | null
   zone?: DeliveryZone | null
   reservation?: Reservation | null
@@ -523,10 +536,11 @@ export interface Conversation {
   archived_by_merchant: boolean
   last_message_at: string | null
   last_message_preview: string | null
+  last_message_sender_id?: number | null
   created_at: string
   updated_at: string
-  consumer?: Pick<User, 'id' | 'first_name' | 'last_name' | 'photo_url' | 'phone' | 'role'>
-  merchant?: Pick<User, 'id' | 'first_name' | 'last_name' | 'photo_url' | 'phone' | 'role'> & {
+  consumer?: Pick<User, 'id' | 'first_name' | 'last_name' | 'photo_url' | 'phone' | 'role' | 'email'>
+  merchant?: Pick<User, 'id' | 'first_name' | 'last_name' | 'photo_url' | 'phone' | 'role' | 'email'> & {
     merchant?: {
       business_name?: string | null
       business_type?: string | null
