@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-01-28T17:09:23.826Z",
+  "timestamp": "2026-01-28T21:23:53.225Z",
   "scores": {
-    "overall": 48,
+    "overall": 64,
     "breakdown": {
       "legacyClasses": 100,
-      "componentCoverage": 20,
+      "componentCoverage": 100,
       "testsCoverage": 0,
       "performance": 60,
       "accessibility": 60
@@ -30,25 +30,25 @@
       }
     },
     "componentCoverage": {
-      "status": "FAIL",
-      "message": "1/5 required components found",
-      "score": 20,
+      "status": "PASS",
+      "message": "5/5 required components found",
+      "score": 100,
       "details": [
         {
           "component": "Button.vue",
-          "exists": false
+          "exists": true
         },
         {
           "component": "Card.vue",
-          "exists": false
+          "exists": true
         },
         {
           "component": "Input.vue",
-          "exists": false
+          "exists": true
         },
         {
           "component": "Modal.vue",
-          "exists": false
+          "exists": true
         },
         {
           "component": "Toast.vue",
@@ -89,7 +89,6 @@
   },
   "errors": [],
   "warnings": [
-    "Missing UI components: Button.vue, Card.vue, Input.vue, Modal.vue",
     "Could not determine test coverage",
     "Production build failed – falling back to dev server for audits",
     "Lighthouse performance audit skipped due to missing browser dependencies",
