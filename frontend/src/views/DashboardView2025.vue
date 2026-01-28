@@ -358,7 +358,7 @@ import {
   TrendingUp, DollarSign, Package, ShoppingBag, Leaf, TreePine,
   Clock, Calendar, ArrowRight, Search, User, Lightbulb, Wallet
 } from 'lucide-vue-next'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 // Import 2025 Design System components

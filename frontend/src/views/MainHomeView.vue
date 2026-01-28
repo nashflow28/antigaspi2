@@ -257,8 +257,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Button, Card, EmptyState, Alert } from '@/components/ui/2025'
-import Skeleton from '@/components/ui/Skeleton.vue'
+import { Button, Card, EmptyState, Alert, Skeleton } from '@/components/ui/2025'
 import { useCartStore } from '@/stores/cart'
 
 const router = useRouter()

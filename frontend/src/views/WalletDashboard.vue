@@ -345,7 +345,7 @@ import {
   Shield,
   X
 } from 'lucide-vue-next'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import WalletCard from '@/components/wallet/WalletCard.vue'

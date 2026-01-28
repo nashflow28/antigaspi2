@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import Skeleton from '@/components/ui/Skeleton.vue'
+import { Skeleton } from '@/components/ui/2025'
 
 
 const meta: Meta<any> = {

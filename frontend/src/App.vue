@@ -87,9 +87,16 @@ import { useAuthStore } from '@/stores/auth'
 import { useProductsStore } from '@/stores/products'
 import { useMerchantsStore } from '@/stores/merchants'
 import { useCartStore } from '@/stores/cart'
-import { Navigation, Footer, type NavigationLink, type NavigationCta, type FooterLink, type SocialNetwork } from '@/components/ui/2025'
-import PageTransition from '@/components/ui/PageTransition.vue'
-import NotificationContainer from '@/components/ui/NotificationContainer.vue'
+import {
+  Navigation,
+  Footer,
+  PageTransition,
+  NotificationContainer,
+  type NavigationLink,
+  type NavigationCta,
+  type FooterLink,
+  type SocialNetwork
+} from '@/components/ui/2025'
 
 const authStore = useAuthStore()
 const productsStore = useProductsStore()

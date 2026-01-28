@@ -7,7 +7,7 @@ test.describe('Admin Broadcast Notifications', () => {
     page = await browser.newPage()
 
     // Login as admin
-    await page.goto('http://localhost:5173/auth/login')
+    await page.goto('http://localhost:3000/auth/login')
     await page.fill('input[name="email"]', 'admin@antigaspi.com')
     await page.fill('input[name="password"]', 'password')
     await page.click('button[type="submit"]')
@@ -16,7 +16,7 @@ test.describe('Admin Broadcast Notifications', () => {
     await page.waitForURL('**/admin/**', { timeout: 10000 })
 
     // Navigate to Broadcast page
-    await page.goto('http://localhost:5173/admin/broadcast')
+    await page.goto('http://localhost:3000/admin/broadcast')
     await page.waitForLoadState('networkidle')
   })
 

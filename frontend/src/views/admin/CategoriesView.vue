@@ -293,8 +293,8 @@
 import { ref, computed, onMounted } from 'vue'
 import apiService from '@/services/api'
 import { notify } from '@/composables/useNotifications'
-import AdminModal from '@/components/ui/AdminModal.vue'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import AdminModal from '@/components/ui/2025/AdminModal.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import {
   DashboardHeader,

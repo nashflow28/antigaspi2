@@ -226,12 +226,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import { Card } from '@/components/2025/Card'
-import { Button } from '@/components/2025/Button'
-import { Input } from '@/components/2025/Input'
-import { Textarea } from '@/components/2025/Textarea'
-import { Label } from '@/components/2025/Label'
-import { Alert } from '@/components/2025/Alert'
+import { Card, Button, Input, Textarea, Label, Alert } from '@/components/ui/2025'
 import {
   MegaphoneIcon,
   ServerStackIcon,

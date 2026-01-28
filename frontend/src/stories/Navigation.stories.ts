@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import Navigation from '@/components/ui/2025/Navigation.vue'
-import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
+import ThemeToggle from '@/components/ui/2025/ThemeToggle.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import { LogIn, UserPlus, Package, Gift, MapPin, MessageSquare } from 'lucide-vue-next'
 
@@ -50,7 +50,7 @@ export const Default: Story = {
 
 export const WithSlots: Story = {
   render: () => ({
-    components: { Navigation, DarkModeToggle, Button },
+    components: { Navigation, ThemeToggle, Button },
     setup() {
       const mainLinks = [
         { id: 'products', label: 'Produits', to: '/products', icon: Package },
@@ -80,7 +80,7 @@ export const WithSlots: Story = {
           :auth-cta="authCta"
         >
           <template #secondary="{ closeMobile }">
-            <DarkModeToggle aria-label="Basculer le thème" />
+            <ThemeToggle aria-label="Basculer le thème" />
             <Button
               tag="router-link"
               :to="authCta.primary.to"
@@ -94,7 +94,7 @@ export const WithSlots: Story = {
           <template #mobile-secondary="{ closeMobile }">
             <div class="rounded-3xl border border-white/60 bg-white/70 px-4 py-3 text-sm font-medium text-neutral-700 shadow-sm">
               <span class="mr-auto">Thème</span>
-              <DarkModeToggle aria-label="Basculer le thème" />
+              <ThemeToggle aria-label="Basculer le thème" />
             </div>
             <Button
               tag="router-link"

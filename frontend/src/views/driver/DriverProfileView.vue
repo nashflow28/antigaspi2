@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { Badge, Button, Card } from '@/components/ui/2025'
 import { useDriverStore } from '@/stores/driver'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'

@@ -668,8 +668,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, nextTick, watch } from 'vue'
 import { formatPrice } from '@/utils/currency'
-import AdminModal from '@/components/ui/AdminModal.vue'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import AdminModal from '@/components/ui/2025/AdminModal.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   ArrowPathIcon,
