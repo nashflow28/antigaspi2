@@ -478,7 +478,7 @@ import {
   EllipsisVerticalIcon,
   ArrowDownTrayIcon
 } from '@heroicons/vue/24/outline'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'

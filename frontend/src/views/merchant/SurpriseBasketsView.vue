@@ -289,7 +289,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { formatPrice } from '@/utils/currency'
 import type { SurpriseBasket } from '@/services/surpriseBasketService'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'

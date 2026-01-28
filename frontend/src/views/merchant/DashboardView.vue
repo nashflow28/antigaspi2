@@ -285,7 +285,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import LocationManager from '@/components/merchant/LocationManager.vue'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   PlusIcon,

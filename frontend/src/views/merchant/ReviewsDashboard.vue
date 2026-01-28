@@ -306,7 +306,7 @@ import {
   RefreshCw,
   AlertTriangle
 } from 'lucide-vue-next'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import { notify } from '@/composables/useNotifications'
 import { apiService } from '@/services/api'

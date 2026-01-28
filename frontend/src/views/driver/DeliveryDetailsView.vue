@@ -417,7 +417,7 @@ import {
   CheckCircle,
   CircleCheck
 } from 'lucide-vue-next'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { Badge, Button, Card, Loading, Alert } from '@/components/ui/2025'
 import { useDriverStore } from '@/stores/driver'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'

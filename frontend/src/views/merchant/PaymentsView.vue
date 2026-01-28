@@ -259,7 +259,7 @@ import {
   ClipboardList
 } from 'lucide-vue-next'
 
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import { DataTableCard, StatCard, StatCardGrid } from '@/components/dashboard/2025'
 import { Badge, Button, Card, Input, Pagination, Select } from '@/components/ui/2025'

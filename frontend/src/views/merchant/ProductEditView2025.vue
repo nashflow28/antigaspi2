@@ -342,7 +342,7 @@ import {
   AlertCircleIcon,
   CloudUploadIcon
 } from 'lucide-vue-next'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 
 // Import 2025 Design System components
 import Card from '@/components/ui/2025/Card.vue'

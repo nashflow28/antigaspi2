@@ -313,7 +313,7 @@ import {
   Plus, RefreshCw, X, Loader2, Search, Users, TrendingUp, Star, Award
 } from 'lucide-vue-next'
 import { useLoyaltyPoints } from '@/composables/useLoyaltyPoints'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'

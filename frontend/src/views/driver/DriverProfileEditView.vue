@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { Button, Card, Input } from '@/components/ui/2025'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import { useDriverStore } from '@/stores/driver'

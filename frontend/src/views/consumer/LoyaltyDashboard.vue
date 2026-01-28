@@ -372,7 +372,7 @@ import {
 } from 'lucide-vue-next'
 import { useLoyaltyPoints } from '@/composables/useLoyaltyPoints'
 import { rewardsService } from '@/services/rewardsService'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import Button from '@/components/ui/2025/Button.vue'

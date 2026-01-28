@@ -319,7 +319,7 @@ import {
   XMarkIcon
 } from '@heroicons/vue/24/outline'
 import apiService from '@/services/api'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { Button, Badge, Pagination, Alert } from '@/components/ui/2025'
 import {
   DashboardHeader,

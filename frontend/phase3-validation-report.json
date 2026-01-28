@@ -1,246 +1,103 @@
 {
-  "timestamp": "2026-01-28T10:45:08.649Z",
-  "summary": {
-    "totalFiles": 270,
-    "filesWithComponentImports": 116,
-    "filesWithLegacyImports": 29,
-    "totalLegacyImports": 29,
-    "totalDS2025Imports": 254,
-    "migrationPercentage": 90,
-    "intentionalLegacyCount": 29,
-    "unintentionalLegacyCount": 0
-  },
-  "scoring": {
-    "legacyClasses": 0,
-    "overall": 93
-  },
-  "intentionalLegacyComponents": {
-    "DashboardLayout": 27,
-    "Toast": 1,
-    "NotificationSystem": 1
-  },
-  "unintentionalLegacyComponents": {},
-  "filesWithLegacyImports": [
-    {
-      "file": "views\\merchant\\SurpriseBasketsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\ReviewsDashboard.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\ReservationsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\ProfileEditView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\ProductsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\ProductEditView2025.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\PaymentsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\OpeningHoursView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\LoyaltyManagement.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\DashboardView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\merchant\\AnalyticsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\driver\\DriverProfileEditView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\driver\\DriverHistoryView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\driver\\DriverEarningsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\driver\\DriverDashboardView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\driver\\DeliveryMapView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\driver\\DeliveryDetailsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\driver\\AvailableDeliveriesView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\driver\\ActiveDeliveryView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\consumer\\LoyaltyDashboard.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\admin\\UsersView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\admin\\SystemSettingsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\admin\\ReviewModeration.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\admin\\ProductsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\admin\\PaymentDashboardView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\admin\\MerchantsView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "views\\admin\\AuditLogView.vue",
-      "legacyCount": 1,
-      "components": [
-        "DashboardLayout"
-      ]
-    },
-    {
-      "file": "components\\ui\\NotificationSystem.vue",
-      "legacyCount": 1,
-      "components": [
-        "Toast"
-      ]
-    },
-    {
-      "file": "components\\ui\\NotificationContainer.vue",
-      "legacyCount": 1,
-      "components": [
-        "NotificationSystem"
-      ]
+  "timestamp": "2026-01-28T17:09:23.826Z",
+  "scores": {
+    "overall": 48,
+    "breakdown": {
+      "legacyClasses": 100,
+      "componentCoverage": 20,
+      "testsCoverage": 0,
+      "performance": 60,
+      "accessibility": 60
     }
+  },
+  "checks": {
+    "legacyClasses": {
+      "status": "PASS",
+      "message": "0 legacy class usages in 0 files",
+      "score": 100,
+      "details": {
+        "summary": {
+          "totalFiles": 146,
+          "filesWithLegacy": 0,
+          "totalLegacyUsages": 0,
+          "legacyClassCounts": {}
+        },
+        "recommendations": {
+          "highPriorityFiles": [],
+          "quickWins": [],
+          "complexMigrations": []
+        }
+      }
+    },
+    "componentCoverage": {
+      "status": "FAIL",
+      "message": "1/5 required components found",
+      "score": 20,
+      "details": [
+        {
+          "component": "Button.vue",
+          "exists": false
+        },
+        {
+          "component": "Card.vue",
+          "exists": false
+        },
+        {
+          "component": "Input.vue",
+          "exists": false
+        },
+        {
+          "component": "Modal.vue",
+          "exists": false
+        },
+        {
+          "component": "Toast.vue",
+          "exists": true
+        }
+      ]
+    },
+    "testsCoverage": {
+      "status": "ERROR",
+      "message": "Failed to run test coverage: npm run test:coverage exited with code null",
+      "score": 0
+    },
+    "performance": {
+      "status": "WARN",
+      "message": "Performance audit skipped – Lighthouse could not start in this environment",
+      "score": 60,
+      "details": {
+        "bundleSize": 0,
+        "bundleSizeMB": 0,
+        "environment": "dev",
+        "error": "spawn EINVAL",
+        "artifacts": {
+          "buildStats": "test-results\\build-stats.json",
+          "lighthouse": "test-results\\lighthouse-report.json"
+        }
+      }
+    },
+    "accessibility": {
+      "status": "WARN",
+      "message": "Accessibility audit skipped – Playwright browser unavailable in this environment",
+      "score": 60,
+      "details": {
+        "artifact": "test-results\\a11y-report.json",
+        "environment": "dev",
+        "error": "spawn EINVAL"
+      }
+    }
+  },
+  "errors": [],
+  "warnings": [
+    "Missing UI components: Button.vue, Card.vue, Input.vue, Modal.vue",
+    "Could not determine test coverage",
+    "Production build failed – falling back to dev server for audits",
+    "Lighthouse performance audit skipped due to missing browser dependencies",
+    "Accessibility audit skipped due to missing browser dependencies"
   ],
   "recommendations": [
-    {
-      "priority": "medium",
-      "message": "Refactor views\\merchant\\SurpriseBasketsView.vue (1 legacy imports)"
-    },
-    {
-      "priority": "medium",
-      "message": "Refactor views\\merchant\\ReviewsDashboard.vue (1 legacy imports)"
-    },
-    {
-      "priority": "medium",
-      "message": "Refactor views\\merchant\\ReservationsView.vue (1 legacy imports)"
-    },
-    {
-      "priority": "info",
-      "message": "All legacy usage is intentional. Migration complete!"
-    }
+    "Overall migration score is below target (90%). Review failed checks.",
+    "Improve test coverage for migrated components.",
+    "Optimize bundle size and performance metrics."
   ]
 }

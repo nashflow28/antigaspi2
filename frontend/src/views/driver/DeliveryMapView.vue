@@ -281,7 +281,7 @@ import {
   CheckCircle,
   Truck
 } from 'lucide-vue-next'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { Badge, Button, Card, EmptyState } from '@/components/ui/2025'
 import DeliveryMap from '@/components/maps/DeliveryMap.vue'
 import { useDriverStore } from '@/stores/driver'

@@ -382,7 +382,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ArrowPathIcon, CheckIcon } from '@heroicons/vue/24/outline'
 import apiService from '@/services/api'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { Button, Card, Alert } from '@/components/ui/2025'
 import { DashboardHeader } from '@/components/dashboard/2025'
 

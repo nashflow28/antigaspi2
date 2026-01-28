@@ -105,7 +105,7 @@
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { RefreshCw } from 'lucide-vue-next'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { Button, Card, Badge } from '@/components/ui/2025'
 import { useDriverStore } from '@/stores/driver'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'

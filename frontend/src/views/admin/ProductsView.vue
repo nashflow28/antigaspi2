@@ -119,7 +119,7 @@ import type { DashboardFilter } from '@/components/dashboard/2025/DashboardFilte
 import type { DataTableColumn } from '@/components/dashboard/2025/DataTableCard.vue'
 
 // UI Components
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { Button } from '@/components/ui/2025'
 import {
   DashboardHeader,

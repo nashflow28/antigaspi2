@@ -345,7 +345,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
-import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardLayout from '@/components/ui/2025/DashboardLayout.vue'
 import { DashboardHeader, StatCard, StatCardGrid } from '@/components/dashboard/2025'
 import { Button, Card, Badge, Select, Input } from '@/components/ui/2025'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
