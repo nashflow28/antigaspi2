@@ -17,6 +17,7 @@ import AdminBroadcastScreen from '../screens/admin/AdminBroadcastScreen'
 import AdminSettingsScreen from '../screens/admin/AdminSettingsScreen'
 import AdminPaymentDashboardScreen from '../screens/admin/AdminPaymentDashboardScreen'
 import AdminPlusScreen from '../screens/admin/AdminPlusScreen'
+import AdminAuditLogScreen from '../screens/admin/AdminAuditLogScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -35,6 +36,7 @@ const DashboardStack = () => (
     <Stack.Screen name="Users" component={AdminUsersScreen} />
     <Stack.Screen name="Merchants" component={AdminMerchantsScreen} />
     <Stack.Screen name="Products" component={AdminProductsScreen} />
+    <Stack.Screen name="AuditLog" component={AdminAuditLogScreen} />
   </Stack.Navigator>
 )
 
@@ -48,6 +50,7 @@ const PlusStack = () => (
     <Stack.Screen name="Analytics" component={AdminAnalyticsScreen} />
     <Stack.Screen name="Payments" component={AdminPaymentDashboardScreen} />
     <Stack.Screen name="Settings" component={AdminSettingsScreen} />
+    <Stack.Screen name="AuditLog" component={AdminAuditLogScreen} />
   </Stack.Navigator>
 )
 

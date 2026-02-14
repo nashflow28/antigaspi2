@@ -20,6 +20,7 @@ import AlertModal from '../../components/AlertModal'
 import { useTheme } from '../../theme'
 import { useAlert } from '../../hooks/useAlert'
 import { formatCurrency } from '../../utils/currencyHelpers'
+import { exportWalletTransactionsToExcel, shareExcelFile } from '../../services/excelExportService'
 import { TEST_IDS } from '../../utils/testIds'
 import type { AppDispatch, RootState } from '../../store'
 import {
@@ -94,6 +95,7 @@ const WalletScreen: React.FC = () => {
   const [showTestRechargeModal, setShowTestRechargeModal] = useState(false)
   const [testRechargeAmount, setTestRechargeAmount] = useState('5000')
   const [testRechargeLoading, setTestRechargeLoading] = useState(false)
+  const [exportLoading, setExportLoading] = useState(false)
 
   const dailySpent = useMemo(
     () => Math.max(0, (wallet?.daily_limit ?? 0) - (wallet?.remaining_daily_limit ?? 0)),
@@ -136,6 +138,30 @@ const WalletScreen: React.FC = () => {
   const handleFilterChange = async (nextFilter: 'all' | WalletTransactionType) => {
     setFilter(nextFilter)
     await dispatch(fetchWalletTransactions({ filters: nextFilter === 'all' ? undefined : { type: nextFilter }, page: 1 }))
+  }
+
+  const handleExportTransactions = async () => {
+    if (filteredTransactions.length === 0) {
+      showError('Aucune donnée', 'Il n\'y a aucune transaction à exporter.')
+      return
+    }
+
+    try {
+      setExportLoading(true)
+      const fileUri = await exportWalletTransactionsToExcel(filteredTransactions, {
+        walletBalance: wallet?.balance,
+        userName: undefined, // Could add user name if available
+      })
+      await shareExcelFile(
+        fileUri,
+        `Exporter ${filteredTransactions.length} transaction${filteredTransactions.length > 1 ? 's' : ''}`
+      )
+      showSuccess('Export réussi', `${filteredTransactions.length} transaction${filteredTransactions.length > 1 ? 's' : ''} exportée${filteredTransactions.length > 1 ? 's' : ''} avec succès.`)
+    } catch (error: any) {
+      showError('Export échoué', error?.message ?? 'Une erreur est survenue lors de l\'export.')
+    } finally {
+      setExportLoading(false)
+    }
   }
 
   const handleRechargeSubmit = async () => {
@@ -443,32 +469,57 @@ const WalletScreen: React.FC = () => {
         </Typography>
       </Card>
 
-      <View style={styles.filtersRow}>
-        {(['all', 'credit', 'debit'] as const).map((value) => (
-          <TouchableOpacity
-            key={value}
-            style={[
-              styles.filterChip,
-              {
-                backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
-                borderColor: theme.colors.border,
-              },
-              value === filter && {
-                backgroundColor: theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50],
-                borderColor: theme.colors.primary[400],
-              },
-            ]}
-            onPress={() => void handleFilterChange(value)}
-          >
-            <Typography
-              variant="caption"
-              weight="semibold"
-              style={{ color: value === filter ? theme.colors.primary[600] : theme.colors.text }}
+      <View style={styles.filtersSection}>
+        <View style={styles.filtersRow}>
+          {(['all', 'credit', 'debit'] as const).map((value) => (
+            <TouchableOpacity
+              key={value}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
+                  borderColor: theme.colors.border,
+                },
+                value === filter && {
+                  backgroundColor: theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50],
+                  borderColor: theme.colors.primary[400],
+                },
+              ]}
+              onPress={() => void handleFilterChange(value)}
             >
-              {value === 'all' ? 'Toutes' : value === 'credit' ? 'Crédits' : 'Débits'}
-            </Typography>
-          </TouchableOpacity>
-        ))}
+              <Typography
+                variant="caption"
+                weight="semibold"
+                style={{ color: value === filter ? theme.colors.primary[600] : theme.colors.text }}
+              >
+                {value === 'all' ? 'Toutes' : value === 'credit' ? 'Crédits' : 'Débits'}
+              </Typography>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <TouchableOpacity
+          style={[
+            styles.exportButton,
+            {
+              backgroundColor: filteredTransactions.length === 0 || exportLoading
+                ? theme.colors.neutral[200]
+                : theme.colors.success,
+            },
+          ]}
+          onPress={handleExportTransactions}
+          disabled={filteredTransactions.length === 0 || exportLoading}
+          testID="wallet-export-button"
+        >
+          {exportLoading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Ionicons name="download-outline" size={18} color="white" />
+          )}
+          <Typography variant="caption" weight="semibold" style={{ color: 'white', marginLeft: 6 }}>
+            {exportLoading ? 'Export...' : 'Excel'}
+          </Typography>
+        </TouchableOpacity>
       </View>
     </View>
   )
@@ -784,9 +835,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
   },
+  filtersSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+  },
   filtersRow: {
     flexDirection: 'row',
     gap: 10,
+    flex: 1,
+  },
+  exportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 24,
   },
   filterChip: {
     paddingHorizontal: 14,

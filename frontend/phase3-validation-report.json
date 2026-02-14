@@ -1,102 +1,52 @@
 {
-  "timestamp": "2026-01-28T21:23:53.225Z",
-  "scores": {
-    "overall": 64,
-    "breakdown": {
-      "legacyClasses": 100,
-      "componentCoverage": 100,
-      "testsCoverage": 0,
-      "performance": 60,
-      "accessibility": 60
-    }
+  "timestamp": "2026-01-28T23:05:16.065Z",
+  "summary": {
+    "totalFiles": 274,
+    "filesWithComponentImports": 116,
+    "filesWithLegacyImports": 2,
+    "totalLegacyImports": 2,
+    "totalDS2025Imports": 281,
+    "migrationPercentage": 99,
+    "intentionalLegacyCount": 2,
+    "unintentionalLegacyCount": 0
   },
-  "checks": {
-    "legacyClasses": {
-      "status": "PASS",
-      "message": "0 legacy class usages in 0 files",
-      "score": 100,
-      "details": {
-        "summary": {
-          "totalFiles": 146,
-          "filesWithLegacy": 0,
-          "totalLegacyUsages": 0,
-          "legacyClassCounts": {}
-        },
-        "recommendations": {
-          "highPriorityFiles": [],
-          "quickWins": [],
-          "complexMigrations": []
-        }
-      }
-    },
-    "componentCoverage": {
-      "status": "PASS",
-      "message": "5/5 required components found",
-      "score": 100,
-      "details": [
-        {
-          "component": "Button.vue",
-          "exists": true
-        },
-        {
-          "component": "Card.vue",
-          "exists": true
-        },
-        {
-          "component": "Input.vue",
-          "exists": true
-        },
-        {
-          "component": "Modal.vue",
-          "exists": true
-        },
-        {
-          "component": "Toast.vue",
-          "exists": true
-        }
+  "scoring": {
+    "legacyClasses": 0,
+    "overall": 99
+  },
+  "intentionalLegacyComponents": {
+    "Toast": 1,
+    "NotificationSystem": 1
+  },
+  "unintentionalLegacyComponents": {},
+  "filesWithLegacyImports": [
+    {
+      "file": "components\\ui\\NotificationSystem.vue",
+      "legacyCount": 1,
+      "components": [
+        "Toast"
       ]
     },
-    "testsCoverage": {
-      "status": "ERROR",
-      "message": "Failed to run test coverage: npm run test:coverage exited with code null",
-      "score": 0
-    },
-    "performance": {
-      "status": "WARN",
-      "message": "Performance audit skipped – Lighthouse could not start in this environment",
-      "score": 60,
-      "details": {
-        "bundleSize": 0,
-        "bundleSizeMB": 0,
-        "environment": "dev",
-        "error": "spawn EINVAL",
-        "artifacts": {
-          "buildStats": "test-results\\build-stats.json",
-          "lighthouse": "test-results\\lighthouse-report.json"
-        }
-      }
-    },
-    "accessibility": {
-      "status": "WARN",
-      "message": "Accessibility audit skipped – Playwright browser unavailable in this environment",
-      "score": 60,
-      "details": {
-        "artifact": "test-results\\a11y-report.json",
-        "environment": "dev",
-        "error": "spawn EINVAL"
-      }
+    {
+      "file": "components\\ui\\NotificationContainer.vue",
+      "legacyCount": 1,
+      "components": [
+        "NotificationSystem"
+      ]
     }
-  },
-  "errors": [],
-  "warnings": [
-    "Could not determine test coverage",
-    "Production build failed – falling back to dev server for audits",
-    "Lighthouse performance audit skipped due to missing browser dependencies",
-    "Accessibility audit skipped due to missing browser dependencies"
   ],
   "recommendations": [
-    "Overall migration score is below target (90%). Review failed checks.",
-    "Improve test coverage for migrated components.",
-    "Optimize bundle size and performance metrics."
+    {
+      "priority": "medium",
+      "message": "Refactor components\\ui\\NotificationSystem.vue (1 legacy imports)"
+    },
+    {
+      "priority": "medium",
+      "message": "Refactor components\\ui\\NotificationContainer.vue (1 legacy imports)"
+    },
+    {
+      "priority": "info",
+      "message": "All legacy usage is intentional. Migration complete!"
+    }
   ]
 }

@@ -165,6 +165,45 @@ export interface Payment {
   updated_at: string
 }
 
+// Merchant Payments types
+export interface PaymentWithRelations extends Payment {
+  reservation?: {
+    id: number
+    reservation_code: string
+    consumer?: {
+      id: number
+      name: string
+      phone?: string | null
+    } | null
+    product?: {
+      id: number
+      name: string
+    } | null
+  } | null
+}
+
+export interface PaymentSummaryMeta {
+  total_amount: number
+  total_count: number
+  status_breakdown: Record<string, {
+    count: number
+    total_amount: number
+  }>
+}
+
+export interface MerchantPaymentsResponse {
+  data: PaymentWithRelations[]
+  meta?: {
+    summary?: PaymentSummaryMeta | null
+  } | null
+  pagination?: {
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  } | null
+}
+
 export type WalletTransactionType = 'credit' | 'debit'
 
 export interface Wallet {
@@ -1195,4 +1234,63 @@ export interface DriverState {
 
   // Location tracking
   isTrackingLocation: boolean
+}
+
+// ==========================================
+// AUDIT LOG TYPES
+// ==========================================
+
+export interface AuditLog {
+  id: number
+  admin_id: number
+  action: string
+  entity_type: string
+  entity_id?: number | null
+  reason?: string | null
+  old_values?: Record<string, unknown> | null
+  new_values?: Record<string, unknown> | null
+  ip_address?: string | null
+  user_agent?: string | null
+  created_at: string
+  admin?: {
+    id: number
+    first_name: string
+    last_name: string
+    email?: string | null
+  } | null
+}
+
+export interface AuditLogFilters {
+  action?: string
+  entity_type?: string
+  admin_id?: number
+  start_date?: string
+  end_date?: string
+  search?: string
+  per_page?: number
+  page?: number
+}
+
+export interface AuditLogStats {
+  total_actions: number
+  today_actions: number
+  week_actions: number
+  active_admins: number
+  actions_by_type: Record<string, number>
+  actions_by_entity: Record<string, number>
+}
+
+export interface AuditLogActionsResponse {
+  actions: Array<{ value: string; label: string }>
+  entity_types: Array<{ value: string; label: string }>
+}
+
+export interface AuditLogListResponse {
+  data: AuditLog[]
+  meta: {
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  }
 }

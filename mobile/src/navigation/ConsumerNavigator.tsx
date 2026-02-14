@@ -26,6 +26,7 @@ import NotificationSettingsScreen from '../screens/merchant/NotificationSettings
 import NotificationsScreen from '../screens/main/NotificationsScreen'
 import CartScreen from '../screens/main/CartScreen'
 import WalletScreen from '../screens/main/WalletScreen'
+import WalletTopUpScreen from '../screens/main/WalletTopUpScreen'
 import MerchantMessagingScreen from '../screens/main/MerchantMessagingScreen'
 import PaymentStatusScreen from '../screens/main/PaymentStatusScreen'
 import MerchantMapScreen from '../screens/main/MerchantMapScreen'
@@ -111,6 +112,7 @@ const AccountStack = () => (
     <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
     <Stack.Screen name="ChangePin" component={ChangePinScreen} />
     <Stack.Screen name="Wallet" component={WalletScreen} />
+    <Stack.Screen name="WalletTopUp" component={WalletTopUpScreen} />
     <Stack.Screen name="NotificationsInbox" component={NotificationsScreen} />
     <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
     <Stack.Screen name="Loyalty" component={LoyaltyScreen} />

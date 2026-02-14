@@ -14,6 +14,7 @@ import { Typography, Card, Badge, DatePicker } from '../../components/2025'
 import { Pagination } from '../../components/admin'
 import RevenueChart from '../../components/admin/RevenueChart'
 import GeographicChart from '../../components/admin/GeographicChart'
+import TopProductsChart from '../../components/admin/TopProductsChart'
 import ExportButton from '../../components/admin/ExportButton'
 import AlertModal from '../../components/AlertModal'
 import apiService from '../../services/api'
@@ -24,7 +25,7 @@ import { useDebouncedEffect } from '../../hooks/useDebounce'
 import { useAlert } from '../../hooks/useAlert'
 
 type Period = '7d' | '30d' | '90d' | 'custom'
-type Tab = 'revenue' | 'geography' | 'merchants'
+type Tab = 'revenue' | 'geography' | 'products' | 'merchants'
 
 const MERCHANTS_PER_PAGE = 10
 
@@ -115,6 +116,7 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
   const TABS = [
     { id: 'revenue' as const, label: 'Revenus', icon: 'trending-up' },
     { id: 'geography' as const, label: 'Géographie', icon: 'map' },
+    { id: 'products' as const, label: 'Produits', icon: 'cube' },
     { id: 'merchants' as const, label: 'Commerçants', icon: 'storefront' },
   ]
 
@@ -276,6 +278,18 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                   par commande
                 </Typography>
               </Card>
+
+              <Card variant="elevated" style={styles.kpiCard}>
+                <Typography variant="caption" color="secondary">
+                  Produits sauvés
+                </Typography>
+                <Typography variant="h3" weight="bold" color="primary">
+                  {data.summary.products_saved || 0}
+                </Typography>
+                <Typography variant="caption" color="secondary">
+                  du gaspillage
+                </Typography>
+              </Card>
             </View>
 
             {/* Export Buttons */}
@@ -366,6 +380,14 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                 <GeographicChart
                   data={data.geographic_distribution}
                   title="Top 5 villes"
+                />
+              )}
+
+              {selectedTab === 'products' && (
+                <TopProductsChart
+                  data={data.top_products || []}
+                  title="Top 5 produits vendus"
+                  limit={5}
                 />
               )}
 

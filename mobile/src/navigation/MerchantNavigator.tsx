@@ -21,6 +21,7 @@ import NotificationSettingsScreen from '../screens/merchant/NotificationSettings
 import ProfileScreen from '../screens/main/ProfileScreen'
 import ProductFormScreen from '../screens/merchant/ProductFormScreen'
 import ChangePinScreen from '../screens/main/ChangePinScreen'
+import MerchantPaymentsScreen from '../screens/merchant/MerchantPaymentsScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -40,6 +41,7 @@ const DashboardStack = () => (
     <Stack.Screen name="DashboardMain" component={MerchantDashboardScreen} />
     <Stack.Screen name="Analytics" component={MerchantAnalyticsScreen} />
     <Stack.Screen name="Reviews" component={MerchantReviewsScreen} />
+    <Stack.Screen name="Payments" component={MerchantPaymentsScreen} />
   </Stack.Navigator>
 )
 
@@ -67,6 +69,7 @@ const AccountStack = () => (
     <Stack.Screen name="Reviews" component={MerchantReviewsScreen} />
     <Stack.Screen name="Notifications" component={MerchantNotificationsScreen} />
     <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+    <Stack.Screen name="Payments" component={MerchantPaymentsScreen} />
   </Stack.Navigator>
 )
 

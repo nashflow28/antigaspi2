@@ -8,7 +8,7 @@
 import * as XLSX from 'xlsx'
 import * as FileSystem from 'expo-file-system/legacy'
 import * as Sharing from 'expo-sharing'
-import { Reservation } from '../types'
+import { Reservation, WalletTransaction } from '../types'
 import { createLogger } from '../utils/logger'
 
 const logger = createLogger('ExcelExportService')
@@ -478,6 +478,139 @@ export const exportAnalyticsToExcel = async (
 }
 
 /**
+ * Exporter les transactions wallet en Excel
+ */
+export const exportWalletTransactionsToExcel = async (
+  transactions: WalletTransaction[],
+  options?: {
+    walletBalance?: number
+    userName?: string
+  }
+): Promise<string> => {
+  logger.info(`Generating wallet transactions Excel export for ${transactions.length} transactions`)
+
+  const wb = XLSX.utils.book_new()
+
+  // ===== FEUILLE 1: TRANSACTIONS =====
+  const wsData: any[][] = []
+
+  // Titre et métadonnées
+  const title = options?.userName
+    ? `Transactions Wallet - ${options.userName}`
+    : 'Export des Transactions Wallet'
+
+  wsData.push([title])
+  wsData.push([`Exporté le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`])
+  if (options?.walletBalance !== undefined) {
+    wsData.push([`Solde actuel: ${formatCurrency(options.walletBalance)} XOF`])
+  }
+  wsData.push([]) // Ligne vide
+
+  // En-têtes
+  const headers = [
+    'Référence',
+    'Type',
+    'Montant (XOF)',
+    'Description',
+    'Date',
+    'Heure',
+  ]
+  wsData.push(headers)
+
+  // Données
+  let totalCredits = 0
+  let totalDebits = 0
+
+  transactions.forEach((tx) => {
+    const typeLabel = tx.type === 'credit' ? 'Crédit' : 'Débit'
+    const amount = tx.amount || 0
+
+    if (tx.type === 'credit') {
+      totalCredits += amount
+    } else {
+      totalDebits += amount
+    }
+
+    wsData.push([
+      tx.reference || tx.id.toString(),
+      typeLabel,
+      tx.type === 'credit' ? `+${formatCurrency(amount)}` : `-${formatCurrency(amount)}`,
+      tx.description || '-',
+      formatDate(tx.created_at),
+      formatTime(tx.created_at),
+    ])
+  })
+
+  // Ligne de total
+  wsData.push([])
+  wsData.push(['', 'Total crédits', `+${formatCurrency(totalCredits)}`, '', '', ''])
+  wsData.push(['', 'Total débits', `-${formatCurrency(totalDebits)}`, '', '', ''])
+  wsData.push(['', 'Solde net', formatCurrency(totalCredits - totalDebits), '', '', ''])
+
+  // Créer la feuille
+  const ws = XLSX.utils.aoa_to_sheet(wsData)
+
+  // Définir les largeurs de colonnes
+  ws['!cols'] = [
+    { wch: 18 },  // Référence
+    { wch: 10 },  // Type
+    { wch: 14 },  // Montant
+    { wch: 35 },  // Description
+    { wch: 12 },  // Date
+    { wch: 8 },   // Heure
+  ]
+
+  // Fusionner les cellules du titre
+  ws['!merges'] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 5 } },
+    ...(options?.walletBalance !== undefined ? [{ s: { r: 2, c: 0 }, e: { r: 2, c: 5 } }] : []),
+  ]
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Transactions')
+
+  // ===== FEUILLE 2: RÉSUMÉ =====
+  const summaryData: any[][] = [
+    ['Résumé des Transactions'],
+    [],
+    ['Statistique', 'Valeur'],
+    ['Nombre de transactions', transactions.length],
+    ['Total des crédits (XOF)', formatCurrency(totalCredits)],
+    ['Total des débits (XOF)', formatCurrency(totalDebits)],
+    ['Solde net (XOF)', formatCurrency(totalCredits - totalDebits)],
+    [],
+    ['Répartition par type', ''],
+    [`  Crédits`, transactions.filter(t => t.type === 'credit').length],
+    [`  Débits`, transactions.filter(t => t.type === 'debit').length],
+  ]
+
+  if (options?.walletBalance !== undefined) {
+    summaryData.push([])
+    summaryData.push(['Solde actuel du wallet (XOF)', formatCurrency(options.walletBalance)])
+  }
+
+  const wsSummary = XLSX.utils.aoa_to_sheet(summaryData)
+  wsSummary['!cols'] = [{ wch: 30 }, { wch: 20 }]
+  wsSummary['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }]
+
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Résumé')
+
+  // Générer le fichier
+  const wbout = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' })
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
+  const filename = `wallet-transactions-${timestamp}.xlsx`
+  const fileUri = `${FileSystem.documentDirectory}${filename}`
+
+  await FileSystem.writeAsStringAsync(fileUri, wbout, {
+    encoding: FileSystem.EncodingType.Base64,
+  })
+
+  logger.info(`Wallet transactions Excel file saved to: ${fileUri}`)
+  return fileUri
+}
+
+/**
  * Partager un fichier Excel
  */
 export const shareExcelFile = async (fileUri: string, title?: string): Promise<void> => {
@@ -497,5 +630,6 @@ export const shareExcelFile = async (fileUri: string, title?: string): Promise<v
 export default {
   exportReservationsToExcel,
   exportAnalyticsToExcel,
+  exportWalletTransactionsToExcel,
   shareExcelFile,
 }

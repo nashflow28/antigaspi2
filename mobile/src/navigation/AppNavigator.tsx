@@ -2,30 +2,54 @@ import React, { useEffect, useRef, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { useDispatch } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { AppDispatch } from '../store'
 import { loadStoredAuth } from '../store/slices/authSlice'
 
 // Screens
 import SplashScreen from '../screens/SplashScreen'
+import OnboardingScreen from '../screens/auth/OnboardingScreen'
 import AuthNavigator from './AuthNavigator'
 import MainNavigator from './MainNavigator'
 import { navigationRef, flushPendingActions } from './NavigationRef'
 
 const Stack = createNativeStackNavigator()
+const ONBOARDING_KEY = 'antigaspi_onboarding_completed'
 
 const AppNavigator: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
   const [hydrated, setHydrated] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null)
   const previousRouteRef = useRef<string | undefined>(undefined)
 
   useEffect(() => {
-    // Charger l'etat d'auth local sans bloquer les ecrans pendant les requetes reseau
-    dispatch(loadStoredAuth())
-      .finally(() => setHydrated(true))
+    const initApp = async () => {
+      // Check onboarding status
+      try {
+        const onboardingCompleted = await AsyncStorage.getItem(ONBOARDING_KEY)
+        setShowOnboarding(onboardingCompleted !== 'true')
+      } catch {
+        setShowOnboarding(false) // Skip onboarding on error
+      }
+
+      // Charger l'etat d'auth local sans bloquer les ecrans pendant les requetes reseau
+      await dispatch(loadStoredAuth())
+      setHydrated(true)
+    }
+
+    initApp()
   }, [dispatch])
 
-  if (!hydrated) {
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false)
+  }
+
+  if (!hydrated || showOnboarding === null) {
     return <SplashScreen />
+  }
+
+  if (showOnboarding) {
+    return <OnboardingScreen navigation={null} onComplete={handleOnboardingComplete} />
   }
 
   return (

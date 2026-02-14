@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-10-10T21:45:38.547Z",
+  "summary": {
+    "totalFiles": 146,
+    "filesWithLegacy": 0,
+    "totalLegacyUsages": 0,
+    "legacyClassCounts": {}
+  },
+  "migrationPlan": [],
+  "recommendations": {
+    "highPriorityFiles": [],
+    "quickWins": [],
+    "complexMigrations": []
+  }
+}

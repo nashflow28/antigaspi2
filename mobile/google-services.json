@@ -1,30 +1,21 @@
 {
   "project_info": {
-    "project_number": "829708734355",
-    "project_id": "antigaspi-6d8e2",
-    "storage_bucket": "antigaspi-6d8e2.firebasestorage.app"
+    "project_number": "531985807673",
+    "project_id": "geladal",
+    "storage_bucket": "geladal.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:829708734355:android:9d7437c2b6410880796266",
+        "mobilesdk_app_id": "1:531985807673:android:9e937d821b4a2dea3a90e8",
         "android_client_info": {
-          "package_name": "com.antigaspi.app"
+          "package_name": "com.geladal.app"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "829708734355-4gf8tib0269e2kaiocfhpffvi1div2r1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.antigaspi.app",
-            "certificate_hash": "be3c417d7871847ea33470071ba319cc49f5b9d6"
-          }
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCGr2v6T5L0utIBgUfIMDUUy4clv5PoRdo"
+          "current_key": "AIzaSyCvw5_CLXY_8-7ViI7LNVTdY24NsTHjebY"
         }
       ],
       "services": {
