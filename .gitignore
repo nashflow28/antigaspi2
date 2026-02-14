@@ -36,6 +36,8 @@
 /frontend/npm-debug.log*
 /frontend/yarn-debug.log*
 /frontend/yarn-error.log*
+/frontend/test-results/*.json
+!frontend/test-results/legacy-classes-audit.json
 
 # OS generated files
 .DS_Store
@@ -85,6 +87,7 @@ storybook-static
 /mobile/android/.gradle
 /mobile/ios/Pods
 /mobile/ios/build
+/mobile/coverage
 
 # Debug and test scripts at root (keep tests/ folder)
 /debug-*.js
