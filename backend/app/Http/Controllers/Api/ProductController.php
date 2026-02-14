@@ -181,7 +181,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des produits',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -253,7 +253,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Produit non trouvé',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 404);
         }
     }
@@ -325,7 +325,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Produit non trouvé',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 404);
         }
     }
@@ -401,7 +401,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'ajout du produit',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -532,7 +532,7 @@ class ProductController extends Controller
             // 🐛 BUG FIX #4: Conditionner trace logs à environnement local
             \Log::error('PRODUCT UPDATE ERROR', [
                 'product_id' => $id,
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
@@ -541,7 +541,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -582,7 +582,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la suppression',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -703,7 +703,7 @@ class ProductController extends Controller
 
             // 🐛 BUG FIX #4: Conditionner trace logs à environnement local
             \Log::error('PRODUCT IMAGE UPLOAD ERROR', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
@@ -712,7 +712,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'upload',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -799,7 +799,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des produits',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -821,7 +821,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des catégories',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -897,7 +897,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des catégories',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

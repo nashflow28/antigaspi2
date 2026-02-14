@@ -241,7 +241,7 @@ class SurpriseBasketController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de base de données. Veuillez contacter l\'administrateur.',
-                'error' => config('app.debug') ? $e->getMessage() : 'Database error',
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e, 'Database error'),
             ], 500);
         } catch (\Exception $e) {
             \Log::error('SurpriseBasketController@store - General error: '.$e->getMessage());
@@ -249,7 +249,7 @@ class SurpriseBasketController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Une erreur est survenue lors de la création du panier.',
-                'error' => config('app.debug') ? $e->getMessage() : 'Server error',
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e, 'Server error'),
             ], 500);
         }
     }

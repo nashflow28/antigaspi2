@@ -130,7 +130,7 @@ class AdminMerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des données de modération',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -182,7 +182,7 @@ class AdminMerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'approbation du commerçant',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -231,7 +231,7 @@ class AdminMerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du rejet du commerçant',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -285,7 +285,7 @@ class AdminMerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'approbation du produit',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -342,7 +342,7 @@ class AdminMerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du rejet du produit',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -459,7 +459,7 @@ class AdminMerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des produits',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -524,7 +524,7 @@ class AdminMerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour du produit',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -583,7 +583,7 @@ class AdminMerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la résolution du signalement',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

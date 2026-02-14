@@ -173,7 +173,7 @@ class MerchantReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement du dashboard',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -299,7 +299,7 @@ class MerchantReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement des avis',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -375,7 +375,7 @@ class MerchantReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'ajout de la réponse',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -452,7 +452,7 @@ class MerchantReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour de la réponse',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -512,7 +512,7 @@ class MerchantReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la suppression de la réponse',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -559,7 +559,7 @@ class MerchantReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement des produits',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

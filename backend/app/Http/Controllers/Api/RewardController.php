@@ -220,7 +220,7 @@ class RewardController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de l\'échange: '.$e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur lors de l\'échange'),
             ], 500);
         }
     }

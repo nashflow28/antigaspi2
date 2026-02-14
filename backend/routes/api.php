@@ -244,7 +244,11 @@ Route::prefix('wallet')->middleware('jwt.auth')->group(function () {
         Route::post('/payment', [WalletController::class, 'processPayment']); // Effectuer paiement
         Route::post('/transfer', [WalletController::class, 'transfer']); // Transfert entre portefeuilles
         Route::post('/recharge', [WalletController::class, 'recharge']); // Recharger portefeuille
-        Route::post('/test-recharge', [WalletController::class, 'testRecharge']); // Recharge de test (dev only)
+
+        // SECURITY: Test-only route - disabled in production
+        if (app()->environment('local', 'testing')) {
+            Route::post('/test-recharge', [WalletController::class, 'testRecharge']);
+        }
     });
 });
 
@@ -543,10 +547,16 @@ Route::prefix('driver/deliveries')->middleware('jwt.auth')->group(function () {
 
 // Routes de test et informations
 Route::get('health', function () {
-    return response()->json([
+    $warnings = [];
+    if (config('app.debug') && config('app.env') === 'production') {
+        $warnings[] = 'APP_DEBUG is enabled in production!';
+    }
+
+    return response()->json(array_filter([
         'timestamp' => now(),
         'version' => '1.0.0',
-    ]);
+        'warnings' => $warnings ?: null,
+    ]));
 });
 
 // Route par défaut pour les endpoints non trouvés

@@ -10,6 +10,7 @@ use App\Services\Payments\Exceptions\PaymentException;
 use App\Services\Payments\PaymentGateway;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class CinetPayGateway implements PaymentGateway
@@ -125,6 +126,38 @@ class CinetPayGateway implements PaymentGateway
 
         if (! $payment) {
             return null;
+        }
+
+        // SECURITY: Re-verify transaction status from CinetPay API
+        $apiKey = $this->config['api_key'] ?? '';
+        $siteId = $this->config['site_id'] ?? '';
+        if ($apiKey && $siteId && $transactionId) {
+            try {
+                $verifyResponse = Http::acceptJson()
+                    ->post(rtrim($this->config['base_url'] ?? '', '/').'/payment/check', [
+                        'apikey' => $apiKey,
+                        'site_id' => $siteId,
+                        'transaction_id' => $transactionId,
+                    ]);
+
+                if ($verifyResponse->successful()) {
+                    $verifiedData = $verifyResponse->json();
+                    $verifiedStatus = $verifiedData['data']['status'] ?? $verifiedData['status'] ?? null;
+                    if ($verifiedStatus) {
+                        // Use the verified status from API, not the webhook payload
+                        $payload['status'] = $verifiedStatus;
+                    }
+                } else {
+                    Log::warning('CinetPay webhook: Could not verify transaction via API', [
+                        'transaction_id' => $transactionId,
+                        'ip' => request()->ip(),
+                    ]);
+                }
+            } catch (\Exception) {
+                Log::warning('CinetPay webhook: API verification failed', [
+                    'transaction_id' => $transactionId,
+                ]);
+            }
         }
 
         $status = $this->mapStatus($payload['status'] ?? 'pending');

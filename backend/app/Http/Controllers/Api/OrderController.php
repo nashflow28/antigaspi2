@@ -528,7 +528,7 @@ class OrderController extends Controller
             DB::rollBack();
 
             Log::error('Order creation failed', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'user_id' => $user->id,
                 'items' => $items,
             ]);
@@ -536,7 +536,7 @@ class OrderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création de la commande',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 400);
         }
     }
@@ -621,7 +621,7 @@ class OrderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'annulation',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -677,7 +677,7 @@ class OrderController extends Controller
             // Never block the order creation due to SMS failure
             Log::error('SMS Service: Exception while sending SMS', [
                 'reservation_id' => $reservation->id,
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ]);
         }
     }

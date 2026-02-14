@@ -128,7 +128,7 @@ class AnalyticsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des statistiques',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -201,7 +201,7 @@ class AnalyticsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des revenus',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -255,7 +255,7 @@ class AnalyticsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des produits',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -312,7 +312,7 @@ class AnalyticsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des réservations',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

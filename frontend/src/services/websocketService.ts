@@ -36,7 +36,7 @@ class WebSocketService {
 
   constructor() {
     // Determine WebSocket URL based on environment
-    const apiUrl = import.meta.env.VITE_API_URL || 'https://antigaspi.jubtek.com'
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://antigaspi.jubtek.com'
     const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws'
     const wsHost = apiUrl.replace(/^https?:\/\//, '').replace(/\/api$/, '')
     this.wsUrl = `${wsProtocol}://${wsHost}/ws`

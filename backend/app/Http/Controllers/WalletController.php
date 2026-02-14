@@ -42,7 +42,7 @@ class WalletController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération du portefeuille',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -77,7 +77,7 @@ class WalletController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur du portefeuille'),
             ], 400);
         }
     }
@@ -114,7 +114,7 @@ class WalletController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur du portefeuille'),
             ], 400);
         }
     }
@@ -149,7 +149,7 @@ class WalletController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur du portefeuille'),
             ], 500);
         }
     }
@@ -190,7 +190,7 @@ class WalletController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur du portefeuille'),
             ], 500);
         }
     }
@@ -237,7 +237,7 @@ class WalletController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des transactions',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -269,7 +269,7 @@ class WalletController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des statistiques',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -334,7 +334,7 @@ class WalletController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur du portefeuille'),
             ], 400);
         }
     }
@@ -388,7 +388,7 @@ class WalletController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur du portefeuille'),
             ], 400);
         }
     }
@@ -528,13 +528,13 @@ class WalletController extends Controller
             ]);
         } catch (\Exception $e) {
             \Log::error('Wallet recharge failed', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'user_id' => Auth::id(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la recharge: '.$e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur lors de la recharge'),
             ], 500);
         }
     }
@@ -659,7 +659,7 @@ class WalletController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur du portefeuille'),
             ], 500);
         }
     }

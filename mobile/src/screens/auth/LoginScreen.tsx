@@ -287,8 +287,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
 
-        {/* DEV: Test accounts (only in development mode) */}
-        {__DEV__ && (
+        {/* SECURITY: Dev-only test accounts - tree-shaken out of production builds by Metro */}
+        {__DEV__ && process.env.NODE_ENV !== 'production' && (
           <>
             <TouchableOpacity
               onPress={() => setShowDevLogin(!showDevLogin)}
@@ -311,12 +311,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
                   fullWidth
                   style={{ marginBottom: theme.spacing.sm }}
                   onPress={() => {
-                    const consumerCreds = {
+                    handleDevLogin({
                       email: 'jean.dupont@email.com',
                       password: 'password'
-                    }
-                    setCredentials(consumerCreds)
-                    handleDevLogin(consumerCreds)
+                    })
                   }}
                   testID={TEST_IDS.loginConsumerQuick}
                   accessibilityLabel={TEST_IDS.loginConsumerQuick}
@@ -329,12 +327,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
                   size="md"
                   fullWidth
                   onPress={() => {
-                    const merchantCreds = {
+                    handleDevLogin({
                       email: 'boulangerie.martin@email.com',
                       password: 'password'
-                    }
-                    setCredentials(merchantCreds)
-                    handleDevLogin(merchantCreds)
+                    })
                   }}
                   testID={TEST_IDS.loginMerchantQuick}
                   accessibilityLabel={TEST_IDS.loginMerchantQuick}

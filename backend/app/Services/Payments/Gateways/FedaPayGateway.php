@@ -9,6 +9,7 @@ use App\Models\Reservation;
 use App\Services\Payments\Exceptions\PaymentException;
 use App\Services\Payments\PaymentGateway;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class FedaPayGateway implements PaymentGateway
@@ -109,6 +110,7 @@ class FedaPayGateway implements PaymentGateway
 
     public function handleCallback(array $payload): ?Payment
     {
+        // SECURITY: Verify FedaPay webhook by re-fetching transaction from API
         $transaction = $payload['transaction'] ?? $payload;
         $transactionId = $transaction['id'] ?? $payload['transaction_id'] ?? null;
         $reference = $transaction['reference'] ?? $payload['reference'] ?? null;
@@ -125,6 +127,32 @@ class FedaPayGateway implements PaymentGateway
 
         if (! $payment) {
             return null;
+        }
+
+        // Re-verify transaction status from FedaPay API (don't trust webhook payload alone)
+        $apiKey = $this->config['api_key'] ?? '';
+        if ($apiKey && $transactionId) {
+            try {
+                $verifyResponse = Http::withToken($apiKey)
+                    ->acceptJson()
+                    ->get(rtrim($this->config['base_url'] ?? '', '/').'/transactions/'.$transactionId);
+
+                if ($verifyResponse->successful()) {
+                    $verifiedData = $verifyResponse->json();
+                    $verifiedTransaction = $verifiedData['transaction'] ?? $verifiedData;
+                    // Use the verified status from API, not the webhook payload
+                    $transaction = $verifiedTransaction;
+                } else {
+                    Log::warning('FedaPay webhook: Could not verify transaction via API', [
+                        'transaction_id' => $transactionId,
+                        'ip' => request()->ip(),
+                    ]);
+                }
+            } catch (\Exception) {
+                Log::warning('FedaPay webhook: API verification failed', [
+                    'transaction_id' => $transactionId,
+                ]);
+            }
         }
 
         $status = $this->mapStatus($transaction['status'] ?? $payload['status'] ?? 'pending');

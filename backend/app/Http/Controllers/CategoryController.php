@@ -25,7 +25,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des catégories',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -48,7 +48,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Catégorie non trouvée',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 404);
         }
     }
@@ -94,7 +94,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création de la catégorie',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -141,7 +141,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour de la catégorie',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -174,7 +174,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la suppression de la catégorie',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -201,7 +201,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du changement de statut',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -231,7 +231,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des statistiques',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

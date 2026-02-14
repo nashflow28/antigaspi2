@@ -242,7 +242,7 @@ class CartController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la validation du panier.',
-                'error' => $exception->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($exception),
             ], 500);
         }
     }

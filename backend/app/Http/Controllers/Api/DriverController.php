@@ -95,8 +95,9 @@ class DriverController extends Controller
                 'is_verified' => false, // Will be verified by admin
             ]);
 
-            // Update user role
-            $user->update(['role' => 'driver']);
+            // SECURITY: Assign role explicitly (not mass-assignable)
+            $user->role = 'driver';
+            $user->save();
 
             DB::commit();
 

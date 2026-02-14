@@ -328,7 +328,7 @@ class LoyaltyPointController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des statistiques',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -470,7 +470,7 @@ class LoyaltyPointController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des informations de parrainage',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

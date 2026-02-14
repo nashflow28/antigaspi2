@@ -13,18 +13,20 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
+    /**
+     * SECURITY: 'role', 'is_active', 'status', 'pin' are intentionally excluded
+     * from $fillable to prevent mass-assignment privilege escalation.
+     * Use explicit assignment: $user->role = 'merchant'; $user->save();
+     */
     protected $fillable = [
         'email',
         'password',
         'first_name',
         'last_name',
         'phone',
-        'role',
         'city',
         'address',
         'photo_url',
-        'is_active',
-        'status',
         'last_login_at',
         'prefers_email_notifications',
         'prefers_sms_notifications',
@@ -37,7 +39,6 @@ class User extends Authenticatable implements JWTSubject
         'loyalty_tier',
         'lifetime_points',
         'tier_updated_at',
-        'pin',
         'pin_set_at',
         'current_device_id',
     ];
@@ -306,10 +307,10 @@ class User extends Authenticatable implements JWTSubject
      */
     public function setPin(string $pin): void
     {
-        $this->update([
-            'pin' => \Illuminate\Support\Facades\Hash::make($pin),
-            'pin_set_at' => now(),
-        ]);
+        // SECURITY: pin is not in $fillable, assign explicitly
+        $this->pin = \Illuminate\Support\Facades\Hash::make($pin);
+        $this->pin_set_at = now();
+        $this->save();
     }
 
     /**

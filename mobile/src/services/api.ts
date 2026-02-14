@@ -118,6 +118,11 @@ const getApiBaseUrl = (): string => {
 // Export pour utilisation dans d'autres services (ex: imageHelpers)
 export const API_BASE_URL = getApiBaseUrl()
 
+// SECURITY: Warn when using unencrypted HTTP in non-local contexts
+if (API_BASE_URL.startsWith('http://') && !API_BASE_URL.includes('localhost') && !API_BASE_URL.includes('127.0.0.1') && !API_BASE_URL.includes('10.0.2.2')) {
+  console.warn('[SECURITY] Using unencrypted HTTP connection:', API_BASE_URL)
+}
+
 // Helper pour transformer camelCase en snake_case (Laravel attend snake_case)
 const toSnakeCase = (obj: any): any => {
   if (obj === null || typeof obj !== 'object') {
@@ -884,6 +889,37 @@ class ApiService {
     return this.request<ApiResponse<MerchantLocation>>('PUT', '/merchants/location', payload)
   }
 
+  // === MERCHANT PAYMENTS ===
+
+  async getMerchantPayments(params?: {
+    page?: number
+    per_page?: number
+    status?: string
+    method?: string
+    date_from?: string
+    date_to?: string
+    min_amount?: number
+    max_amount?: number
+    search?: string
+  }): Promise<ApiResponse<MerchantPaymentsResponse>> {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.per_page) queryParams.append('per_page', params.per_page.toString())
+    if (params?.status && params.status !== 'all') queryParams.append('status', params.status)
+    if (params?.method && params.method !== 'all') queryParams.append('method', params.method)
+    if (params?.date_from) queryParams.append('date_from', params.date_from)
+    if (params?.date_to) queryParams.append('date_to', params.date_to)
+    if (params?.min_amount) queryParams.append('min_amount', params.min_amount.toString())
+    if (params?.max_amount) queryParams.append('max_amount', params.max_amount.toString())
+    if (params?.search) queryParams.append('search', params.search)
+
+    const query = queryParams.toString()
+    return this.request<ApiResponse<MerchantPaymentsResponse>>(
+      'GET',
+      `/merchant/payments${query ? `?${query}` : ''}`
+    )
+  }
+
   // === ADMIN ANALYTICS ===
 
   async getAdminAnalytics(filters?: AdminAnalyticsFilters): Promise<AdminAnalyticsData> {
@@ -914,6 +950,82 @@ class ApiService {
       `/admin/analytics/export?${params.toString()}`
     )
     return response.data
+  }
+
+  // === ADMIN AUDIT LOGS ===
+
+  async getAuditLogs(filters?: {
+    action?: string
+    entity_type?: string
+    admin_id?: number
+    start_date?: string
+    end_date?: string
+    search?: string
+    per_page?: number
+    page?: number
+  }): Promise<ApiResponse<{
+    data: Array<{
+      id: number
+      admin_id: number
+      action: string
+      entity_type: string
+      entity_id?: number | null
+      reason?: string | null
+      old_values?: Record<string, unknown> | null
+      new_values?: Record<string, unknown> | null
+      ip_address?: string | null
+      user_agent?: string | null
+      created_at: string
+      admin?: { id: number; first_name: string; last_name: string; email?: string | null } | null
+    }>
+    meta: { current_page: number; last_page: number; per_page: number; total: number }
+  }>> {
+    const params = new URLSearchParams()
+    if (filters?.action) params.append('action', filters.action)
+    if (filters?.entity_type) params.append('entity_type', filters.entity_type)
+    if (filters?.admin_id) params.append('admin_id', filters.admin_id.toString())
+    if (filters?.start_date) params.append('start_date', filters.start_date)
+    if (filters?.end_date) params.append('end_date', filters.end_date)
+    if (filters?.search) params.append('search', filters.search)
+    if (filters?.per_page) params.append('per_page', filters.per_page.toString())
+    if (filters?.page) params.append('page', filters.page.toString())
+
+    return this.request('GET', `/admin/audit?${params.toString()}`)
+  }
+
+  async getAuditLogStats(period: string = 'week'): Promise<ApiResponse<{
+    total_actions: number
+    today_actions: number
+    week_actions: number
+    active_admins: number
+    actions_by_type: Record<string, number>
+    actions_by_entity: Record<string, number>
+  }>> {
+    return this.request('GET', `/admin/audit/stats?period=${period}`)
+  }
+
+  async getAuditLogDetail(id: number): Promise<ApiResponse<{
+    id: number
+    admin_id: number
+    action: string
+    entity_type: string
+    entity_id?: number | null
+    reason?: string | null
+    old_values?: Record<string, unknown> | null
+    new_values?: Record<string, unknown> | null
+    ip_address?: string | null
+    user_agent?: string | null
+    created_at: string
+    admin?: { id: number; first_name: string; last_name: string; email?: string | null } | null
+  }>> {
+    return this.request('GET', `/admin/audit/${id}`)
+  }
+
+  async getAuditLogActions(): Promise<ApiResponse<{
+    actions: Array<{ value: string; label: string }>
+    entity_types: Array<{ value: string; label: string }>
+  }>> {
+    return this.request('GET', '/admin/audit/actions')
   }
 
   // === BROADCAST NOTIFICATIONS ===

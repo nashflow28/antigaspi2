@@ -97,14 +97,14 @@ class ConsumerController extends Controller
         } catch (\Exception $e) {
             Log::error('CONSUMER PROFILE UPDATE ERROR', [
                 'user_id' => $user->id ?? null,
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour du profil',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -231,14 +231,14 @@ class ConsumerController extends Controller
 
             Log::error('CONSUMER PHOTO UPLOAD ERROR', [
                 'user_id' => $user->id ?? null,
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => "Erreur lors de l'upload de la photo",
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

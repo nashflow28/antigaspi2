@@ -111,11 +111,13 @@ class AuthController extends Controller
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'phone' => $request->phone,
-                'role' => $request->role,
                 'city' => $request->city,
                 'address' => $request->address,
-                'is_active' => true,
             ]);
+            // SECURITY: Assign protected fields explicitly (not mass-assignable)
+            $user->role = $request->role;
+            $user->is_active = true;
+            $user->save();
 
             // Si c'est un commerçant, créer le profil merchant
             if ($request->role === 'merchant') {
@@ -164,13 +166,13 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'inscription',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'inscription',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -243,7 +245,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la connexion',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -269,7 +271,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Token invalide',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 401);
         }
     }
@@ -305,7 +307,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la déconnexion',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -328,7 +330,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du rafraîchissement du token',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 401);
         }
     }
@@ -415,7 +417,7 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Login error', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'email' => $request->email,
                 'ip' => $request->ip(),
             ]);
@@ -458,13 +460,13 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             Log::warning('Failed token refresh', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'ip' => $request->ip(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur lors du rafraîchissement du token'),
             ], 401);
         }
     }
@@ -676,14 +678,16 @@ class AuthController extends Controller
             $user = User::create([
                 'phone' => $phone,
                 'email' => $request->email,
-                'password' => $request->password ? Hash::make($request->password) : Hash::make(bin2hex(random_bytes(16))), // Random password if not provided
+                'password' => $request->password ? Hash::make($request->password) : Hash::make(bin2hex(random_bytes(16))),
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
-                'role' => $request->role,
                 'city' => $request->city ?? 'Lomé',
-                'is_active' => true,
-                'phone_verified_at' => now(), // Mark phone as verified
+                'phone_verified_at' => now(),
             ]);
+            // SECURITY: Assign protected fields explicitly (not mass-assignable)
+            $user->role = $request->role;
+            $user->is_active = true;
+            $user->save();
 
             // Si c'est un commerçant, créer le profil merchant
             if ($request->role === 'merchant') {
@@ -734,7 +738,7 @@ class AuthController extends Controller
             }
 
             Log::error('Phone registration DB error', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'phone' => substr($phone, 0, 5).'****',
             ]);
 
@@ -744,7 +748,7 @@ class AuthController extends Controller
             ], 500);
         } catch (\Exception $e) {
             Log::error('Phone registration error', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ]);
 
             return response()->json([

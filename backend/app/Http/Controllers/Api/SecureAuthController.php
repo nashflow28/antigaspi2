@@ -57,11 +57,13 @@ class SecureAuthController extends Controller
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'phone' => $request->phone,
-                'role' => $request->role,
                 'city' => $request->city,
                 'address' => $request->address,
-                'is_active' => true,
             ]);
+            // SECURITY: Assign protected fields explicitly (not mass-assignable)
+            $user->role = $request->role;
+            $user->is_active = true;
+            $user->save();
 
             if ($request->role === 'merchant') {
                 Merchant::create([
@@ -115,7 +117,7 @@ class SecureAuthController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Registration error', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'email' => $request->email,
             ]);
 
@@ -248,7 +250,7 @@ class SecureAuthController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Login error', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'email' => $request->email,
             ]);
 
@@ -349,7 +351,7 @@ class SecureAuthController extends Controller
 
         } catch (\Exception $e) {
             Log::warning('Token refresh failed', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'ip' => $request->ip(),
             ]);
 

@@ -107,7 +107,7 @@ class FavoriteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des favoris',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -139,7 +139,7 @@ class FavoriteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la modification du favori',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -162,7 +162,7 @@ class FavoriteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la vérification',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -187,7 +187,7 @@ class FavoriteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des favoris',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

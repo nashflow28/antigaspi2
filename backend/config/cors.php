@@ -20,7 +20,10 @@ return [
     'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
     'allowed_origins' => env('APP_ENV') === 'production'
-        ? [env('FRONTEND_URL', 'https://antigaspi.com')]
+        ? array_filter([
+            env('FRONTEND_URL', 'https://antigaspi.com'),
+            env('MOBILE_URL'),
+        ])
         : ['*'], // Allow all origins in development
 
     'allowed_origins_patterns' => [],

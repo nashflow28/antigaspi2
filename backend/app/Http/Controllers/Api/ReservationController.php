@@ -89,7 +89,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des réservations',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -183,7 +183,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Réservation non trouvée',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 404);
         }
     }
@@ -214,7 +214,7 @@ class ReservationController extends Controller
                     } catch (\Exception $e) {
                         \Log::warning('Notification failed but cancellation succeeded', [
                             'reservation_id' => $reservation->id,
-                            'error' => $e->getMessage(),
+                            'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                         ]);
                     }
 
@@ -234,7 +234,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'annulation',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -293,7 +293,7 @@ class ReservationController extends Controller
                     } catch (\Exception $e) {
                         \Log::warning('Notification failed but rejection succeeded', [
                             'reservation_id' => $reservation->id,
-                            'error' => $e->getMessage(),
+                            'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                         ]);
                     }
 
@@ -313,7 +313,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du refus',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -368,7 +368,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des réservations',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -413,7 +413,7 @@ class ReservationController extends Controller
                 } catch (\Exception $e) {
                     \Log::warning('Notification failed but confirmation succeeded', [
                         'reservation_id' => $reservation->id,
-                        'error' => $e->getMessage(),
+                        'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                     ]);
                 }
 
@@ -432,7 +432,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la confirmation',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -486,7 +486,7 @@ class ReservationController extends Controller
             } catch (\Exception $e) {
                 \Log::warning('Notification failed but ready status set', [
                     'reservation_id' => $reservation->id,
-                    'error' => $e->getMessage(),
+                    'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 ]);
             }
 
@@ -502,7 +502,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -561,7 +561,7 @@ class ReservationController extends Controller
                 } catch (\Exception $e) {
                     \Log::warning('Loyalty points award failed but completion succeeded', [
                         'reservation_id' => $reservation->id,
-                        'error' => $e->getMessage(),
+                        'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                     ]);
                 }
 
@@ -573,7 +573,7 @@ class ReservationController extends Controller
                 } catch (\Exception $e) {
                     \Log::warning('Notification failed but completion succeeded', [
                         'reservation_id' => $reservation->id,
-                        'error' => $e->getMessage(),
+                        'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                     ]);
                 }
 
@@ -592,7 +592,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la finalisation',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -677,7 +677,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la modification de la quantité',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -710,7 +710,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des statistiques',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -760,7 +760,7 @@ class ReservationController extends Controller
             // Log but don't fail the operation
             \Log::error('SMS Service: Exception sending ready SMS', [
                 'reservation_id' => $reservation->id,
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ]);
         }
     }

@@ -181,7 +181,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des données du dashboard',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -362,14 +362,14 @@ class AdminController extends Controller
 
         } catch (\Exception $e) {
             \Log::error('Admin analytics failed', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des analytics',
-                'error' => config('app.debug') ? $e->getMessage() : 'Erreur serveur interne',
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -420,7 +420,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la vérification de la santé du système',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -491,7 +491,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'export des données',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -940,7 +940,7 @@ class AdminController extends Controller
             ], 422);
         } catch (\Exception $e) {
             \Log::error('Admin payments fetch failed', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'trace' => $e->getTraceAsString(),
                 'user_id' => $user->id ?? null,
             ]);
@@ -948,7 +948,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des paiements',
-                'error' => config('app.debug') ? $e->getMessage() : 'Erreur serveur interne',
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -1042,7 +1042,7 @@ class AdminController extends Controller
 
         } catch (\Exception $e) {
             \Log::error('Admin settings fetch failed', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'trace' => $e->getTraceAsString(),
                 'user_id' => $user->id ?? null,
             ]);
@@ -1050,7 +1050,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des paramètres',
-                'error' => config('app.debug') ? $e->getMessage() : 'Erreur serveur interne',
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -1119,7 +1119,7 @@ class AdminController extends Controller
             ], 422);
         } catch (\Exception $e) {
             \Log::error('Admin settings update failed', [
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'trace' => $e->getTraceAsString(),
                 'user_id' => $user->id ?? null,
             ]);
@@ -1127,7 +1127,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour des paramètres',
-                'error' => config('app.debug') ? $e->getMessage() : 'Erreur serveur interne',
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

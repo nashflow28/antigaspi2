@@ -33,7 +33,8 @@
           :tab="tab"
           :index="index"
         >
-          <div v-html="tab.content" />
+          <!-- SECURITY: Use text interpolation instead of v-html to prevent XSS -->
+          <div>{{ tab.content }}</div>
         </slot>
       </div>
     </div>

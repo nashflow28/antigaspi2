@@ -83,7 +83,7 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement des avis en attente',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -123,7 +123,7 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'approbation de l\'avis',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -168,7 +168,7 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du rejet de l\'avis',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -277,7 +277,7 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement des signalements',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -338,7 +338,7 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du signalement',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -416,7 +416,7 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la résolution du signalement',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -476,7 +476,7 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement des statistiques',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

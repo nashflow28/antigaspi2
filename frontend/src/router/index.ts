@@ -630,16 +630,6 @@ router.beforeEach(async (to, _from, next) => {
   const shouldShowOnboarding = onboardingStore.shouldShowOnboarding
   const isOnboardingRoute = to.name === 'onboarding'
 
-  // TEMPORARILY DISABLED - Redirect to onboarding if needed (except for certain routes)
-  // if (shouldShowOnboarding && !isOnboardingRoute && !skipOnboardingForRoute) {
-  //   // Store the intended destination for after onboarding
-  //   if (to.path !== '/') {
-  //     sessionStorage.setItem('onboarding-redirect', to.fullPath)
-  //   }
-  //   next('/onboarding')
-  //   return
-  // }
-
   // If trying to access onboarding but already completed, redirect to home
   if (isOnboardingRoute && !shouldShowOnboarding) {
     next('/')

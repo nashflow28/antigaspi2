@@ -153,7 +153,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des commerçants',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -266,7 +266,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération du commerçant',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -330,7 +330,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour de la localisation',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -371,7 +371,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération de la localisation',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -443,7 +443,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la recherche de commerçants',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -490,7 +490,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des commerçants',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -611,7 +611,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour du profil',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -789,7 +789,7 @@ class MerchantController extends Controller
             // 🐛 BUG FIX #4: Conditionner trace logs à environnement local
             \Log::error('MERCHANT PHOTO UPLOAD ERROR', [
                 'merchant_id' => $merchant->id ?? null,
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
@@ -798,7 +798,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'upload de la photo',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -837,7 +837,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des heures d\'ouverture',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -969,7 +969,7 @@ class MerchantController extends Controller
             // 🐛 BUG FIX #4: Conditionner trace logs à environnement local
             \Log::error('MERCHANT OPENING HOURS UPDATE ERROR', [
                 'merchant_id' => $merchant->id ?? null,
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
@@ -978,7 +978,7 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour des heures d\'ouverture',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }

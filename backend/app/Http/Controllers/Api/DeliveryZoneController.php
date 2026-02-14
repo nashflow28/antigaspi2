@@ -75,7 +75,7 @@ class DeliveryZoneController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => \App\Helpers\ErrorHelper::safeMessage($e, 'Erreur de zone de livraison'),
             ], 400);
         }
     }

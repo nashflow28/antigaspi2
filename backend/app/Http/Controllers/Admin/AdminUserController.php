@@ -88,7 +88,7 @@ class AdminUserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des utilisateurs',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -159,7 +159,7 @@ class AdminUserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la suspension de l\'utilisateur',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -211,7 +211,7 @@ class AdminUserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la réactivation de l\'utilisateur',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 500);
         }
     }
@@ -255,7 +255,7 @@ class AdminUserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Utilisateur non trouvé',
-                'error' => $e->getMessage(),
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
             ], 404);
         }
     }

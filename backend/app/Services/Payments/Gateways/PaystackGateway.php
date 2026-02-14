@@ -9,6 +9,7 @@ use App\Services\Payments\Exceptions\PaymentException;
 use App\Services\Payments\PaymentGateway;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PaystackGateway implements PaymentGateway
 {
@@ -78,6 +79,23 @@ class PaystackGateway implements PaymentGateway
 
     public function handleCallback(array $payload): ?Payment
     {
+        // SECURITY: Verify Paystack webhook signature (HMAC-SHA512)
+        $secret = $this->config['secret_key'] ?? '';
+        if ($secret) {
+            $signature = request()->header('X-Paystack-Signature');
+            $rawBody = request()->getContent();
+            if ($rawBody && $signature) {
+                $computed = hash_hmac('sha512', $rawBody, $secret);
+                if (! hash_equals($computed, $signature)) {
+                    Log::warning('Paystack webhook: Invalid signature', [
+                        'ip' => request()->ip(),
+                    ]);
+
+                    return null;
+                }
+            }
+        }
+
         $reference = Arr::get($payload, 'data.reference', Arr::get($payload, 'reference'));
 
         if (! $reference) {
