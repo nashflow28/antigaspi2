@@ -583,18 +583,6 @@ const router = createRouter({
       }
     },
     {
-      path: '/gaspiz-demo',
-      name: 'gaspiz-demo',
-      component: () => import('@/views/GaspizInspiredHome.vue'),
-      meta: { requiresAuth: false }
-    },
-    {
-      path: '/topbar-test',
-      name: 'topbar-test',
-      component: () => import('@/views/TopBarTestView.vue'),
-      meta: { requiresAuth: false }
-    },
-    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/NotFoundView2025.vue')
