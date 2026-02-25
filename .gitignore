@@ -1,6 +1,9 @@
 # Node modules (root level - Playwright E2E)
 /node_modules
 
+# Deployment info (credentials, SSH, server details)
+DEPLOY.local.md
+
 # Claude Code - fichiers locaux (permissions, tokens, logs)
 .claude/settings.local.json
 .claude/statusline.log
