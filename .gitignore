@@ -1,3 +1,25 @@
+# Node modules (root level - Playwright E2E)
+/node_modules
+
+# Claude Code - fichiers locaux (permissions, tokens, logs)
+.claude/settings.local.json
+.claude/statusline.log
+
+# Playwright MCP - screenshots de debug locaux
+/.playwright-mcp/
+
+# Rapports de test Playwright (générés automatiquement)
+/playwright-report/
+
+# Archives et backups
+*.tar.gz
+*.zip
+*.tar
+
+# Fichiers Windows/OS artefacts
+*.stackdump
+/nul
+
 # Laravel Backend
 /backend/node_modules
 /backend/vendor
@@ -105,11 +127,14 @@ storybook-static
 lighthouse-*.json
 /playwright-report/
 
-# Screenshots and images at root
+# Screenshots et images à la racine (captures de debug)
 /*.png
 /*.jpg
 /*.jpeg
 /Screenshot_*.jpg
+
+# Fichiers dupliqués (Agents.md = agents.md)
+/Agents.md
 
 # Backup archives at root
 /*.tar.gz
