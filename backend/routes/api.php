@@ -103,8 +103,8 @@ Route::prefix('analytics')->middleware('jwt.auth')->group(function () {
     Route::get('/merchant-reservations-chart', [AnalyticsController::class, 'merchantReservationsChart']); // Tendance réservations
 });
 
-// Routes des produits - Rate limiting temporairement désactivé
-Route::prefix('products')->group(function () {
+// Routes des produits
+Route::prefix('products')->middleware('throttle:60,1')->group(function () {
     // Routes publiques (consultation)
     Route::get('/', [ProductController::class, 'index']); // Liste des produits
     Route::get('/categories/list', [ProductController::class, 'categories']); // Liste des catégories
@@ -302,19 +302,8 @@ Route::prefix('merchants')->middleware('jwt.auth')->group(function () {
     Route::get('/location', [MerchantController::class, 'getLocation']); // Obtenir coordonnées GPS
     Route::put('/location', [MerchantController::class, 'updateLocation']); // Mettre à jour coordonnées GPS
 
-    // Gestion des avis commerçant - BYPASS custom middleware for now
+    // Gestion des avis commerçant
     Route::prefix('reviews')->group(function () {
-        // Route de test
-        Route::get('/test', function () {
-            $user = Auth::user();
-
-            return response()->json([
-                'success' => true,
-                'user' => $user,
-                'auth_check' => Auth::check(),
-            ]);
-        });
-
         Route::get('/dashboard', [\App\Http\Controllers\Api\MerchantReviewController::class, 'dashboard']); // Dashboard avis
         Route::get('/list', [\App\Http\Controllers\Api\MerchantReviewController::class, 'list']); // Liste avis reçus
         Route::get('/products', [\App\Http\Controllers\Api\MerchantReviewController::class, 'products']); // Produits avec avis

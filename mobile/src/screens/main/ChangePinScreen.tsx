@@ -116,7 +116,7 @@ const ChangePinScreen: React.FC = () => {
     onChange: (text: string) => void,
     showPin: boolean,
     toggleShowPin: () => void,
-    ref?: React.RefObject<TextInput>,
+    ref?: React.RefObject<TextInput | null>,
     onSubmitEditing?: () => void,
     autoFocus?: boolean
   ) => (

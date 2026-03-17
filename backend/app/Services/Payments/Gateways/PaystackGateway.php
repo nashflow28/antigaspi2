@@ -79,20 +79,27 @@ class PaystackGateway implements PaymentGateway
 
     public function handleCallback(array $payload): ?Payment
     {
-        // SECURITY: Verify Paystack webhook signature (HMAC-SHA512)
+        // SECURITY: Verify Paystack webhook signature (HMAC-SHA512) — fail closed
         $secret = $this->config['secret_key'] ?? '';
         if ($secret) {
             $signature = request()->header('X-Paystack-Signature');
             $rawBody = request()->getContent();
-            if ($rawBody && $signature) {
-                $computed = hash_hmac('sha512', $rawBody, $secret);
-                if (! hash_equals($computed, $signature)) {
-                    Log::warning('Paystack webhook: Invalid signature', [
-                        'ip' => request()->ip(),
-                    ]);
 
-                    return null;
-                }
+            if (! $signature || ! $rawBody) {
+                Log::warning('Paystack webhook: Missing signature header — rejected', [
+                    'ip' => request()->ip(),
+                ]);
+
+                return null;
+            }
+
+            $computed = hash_hmac('sha512', $rawBody, $secret);
+            if (! hash_equals($computed, $signature)) {
+                Log::warning('Paystack webhook: Invalid signature', [
+                    'ip' => request()->ip(),
+                ]);
+
+                return null;
             }
         }
 

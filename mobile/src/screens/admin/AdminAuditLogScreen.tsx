@@ -230,10 +230,10 @@ const AdminAuditLogScreen: React.FC<AdminAuditLogScreenProps> = ({ navigation })
       })
 
       if (isMountedRef.current && response.success && response.data) {
-        const newLogs = response.data || []
+        const newLogs = response.data.data || []
         setLogs(prev => (reset ? newLogs : [...prev, ...newLogs]))
         setHasMore(
-          response.meta ? response.meta.current_page < response.meta.last_page : false
+          response.data.meta ? response.data.meta.current_page < response.data.meta.last_page : false
         )
         setPage(pageNum)
       }
@@ -576,7 +576,7 @@ const AdminAuditLogScreen: React.FC<AdminAuditLogScreenProps> = ({ navigation })
                     Anciennes valeurs
                   </Typography>
                   <Card
-                    variant="outlined"
+                    variant="outline"
                     style={[styles.jsonCard, { backgroundColor: theme.withOpacity(theme.colors.error, 0.05) }]}
                   >
                     <Typography variant="small" style={{ fontFamily: 'monospace' }}>
@@ -592,7 +592,7 @@ const AdminAuditLogScreen: React.FC<AdminAuditLogScreenProps> = ({ navigation })
                     Nouvelles valeurs
                   </Typography>
                   <Card
-                    variant="outlined"
+                    variant="outline"
                     style={[styles.jsonCard, { backgroundColor: theme.withOpacity(theme.colors.success, 0.05) }]}
                   >
                     <Typography variant="small" style={{ fontFamily: 'monospace' }}>

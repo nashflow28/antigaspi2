@@ -13,9 +13,13 @@ class Wallet extends Model
 {
     use HasFactory;
 
+    /**
+     * SECURITY: 'balance' is intentionally excluded from $fillable
+     * to prevent mass-assignment balance manipulation.
+     * Use credit()/debit() methods or increment()/decrement() instead.
+     */
     protected $fillable = [
         'user_id',
-        'balance',
         'currency',
         'is_active',
         'pin_hash',

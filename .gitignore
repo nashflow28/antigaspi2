@@ -107,7 +107,10 @@ storybook-static
 /mobile/.expo
 /mobile/dist
 /mobile/web-build
+/mobile/.env
 /mobile/.env.local
+/mobile/google-services.json
+/mobile/android/app/google-services.json
 /mobile/android/app/build
 /mobile/android/.gradle
 /mobile/ios/Pods

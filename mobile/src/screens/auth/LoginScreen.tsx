@@ -312,8 +312,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
                   style={{ marginBottom: theme.spacing.sm }}
                   onPress={() => {
                     handleDevLogin({
-                      email: 'jean.dupont@email.com',
-                      password: 'password'
+                      email: process.env.EXPO_PUBLIC_DEV_CONSUMER_EMAIL || '',
+                      password: process.env.EXPO_PUBLIC_DEV_PASSWORD || ''
                     })
                   }}
                   testID={TEST_IDS.loginConsumerQuick}
@@ -328,8 +328,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
                   fullWidth
                   onPress={() => {
                     handleDevLogin({
-                      email: 'boulangerie.martin@email.com',
-                      password: 'password'
+                      email: process.env.EXPO_PUBLIC_DEV_MERCHANT_EMAIL || '',
+                      password: process.env.EXPO_PUBLIC_DEV_PASSWORD || ''
                     })
                   }}
                   testID={TEST_IDS.loginMerchantQuick}

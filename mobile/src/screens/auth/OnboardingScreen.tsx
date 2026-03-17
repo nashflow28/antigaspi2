@@ -198,7 +198,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
               style={[
                 styles.pointCard,
                 {
-                  backgroundColor: theme.colors.surface,
+                  backgroundColor: theme.colors.surface.light,
                   borderColor: theme.colors.border,
                 },
               ]}
@@ -244,7 +244,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
           { paddingTop: insets.top + 16, paddingHorizontal: theme.spacing.lg },
         ]}
       >
-        <BrandLogo color={theme.colors.primary[500]} size={32} />
+        <BrandLogo color={theme.colors.primary[500]} style={{ fontSize: 32 }} />
 
         {/* Progress */}
         <View style={styles.progressContainer}>

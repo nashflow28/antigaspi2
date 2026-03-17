@@ -753,6 +753,7 @@ export interface AdminAnalyticsData {
     growth_rate: number
     total_transactions: number
     average_order_value: number
+    products_saved?: number
   }
   revenue_chart: {
     labels: string[]
@@ -766,6 +767,12 @@ export interface AdminAnalyticsData {
     reservations_count: number
     revenue: number
     percentage: number
+  }>
+  top_products?: Array<{
+    product_id: number
+    product_name: string
+    total_sold: number
+    revenue?: number
   }>
   merchant_performance: Array<{
     merchant_id: number
@@ -788,7 +795,9 @@ export interface AnalyticsExportResponse {
   success: boolean
   file_url?: string
   file_content?: string
+  filename?: string
   message: string
+  data?: AnalyticsExportResponse
 }
 
 // ============ FEATURE 1: MERCHANT MAP TYPES ============

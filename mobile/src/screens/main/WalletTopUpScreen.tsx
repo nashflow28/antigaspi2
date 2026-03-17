@@ -170,7 +170,7 @@ const WalletTopUpScreen: React.FC = () => {
                   borderColor: selectedAmount === amount ? theme.colors.primary[500] : theme.colors.border,
                   backgroundColor: selectedAmount === amount
                     ? `${theme.colors.primary[500]}15`
-                    : theme.colors.surface,
+                    : theme.colors.surface.light,
                 },
               ]}
               onPress={() => selectPreset(amount)}
@@ -282,7 +282,7 @@ const WalletTopUpScreen: React.FC = () => {
                   borderColor: selectedMethod === method.id ? theme.colors.primary[500] : theme.colors.border,
                   backgroundColor: selectedMethod === method.id
                     ? `${theme.colors.primary[500]}10`
-                    : theme.colors.surface,
+                    : theme.colors.surface.light,
                 },
               ]}
               onPress={() => setSelectedMethod(method.id)}
@@ -420,7 +420,7 @@ const WalletTopUpScreen: React.FC = () => {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar
-        backgroundColor={theme.colors.surface}
+        backgroundColor={theme.colors.surface.light}
         barStyle={theme.isDark ? 'light-content' : 'dark-content'}
       />
 
@@ -430,7 +430,7 @@ const WalletTopUpScreen: React.FC = () => {
           styles.header,
           {
             paddingTop: insets.top + 8,
-            backgroundColor: theme.colors.surface,
+            backgroundColor: theme.colors.surface.light,
             borderBottomColor: theme.colors.border,
           },
         ]}
@@ -446,7 +446,7 @@ const WalletTopUpScreen: React.FC = () => {
 
       {/* Progress Indicator */}
       {step !== 'success' && (
-        <View style={[styles.progressContainer, { backgroundColor: theme.colors.surface }]}>
+        <View style={[styles.progressContainer, { backgroundColor: theme.colors.surface.light }]}>
           <View style={styles.progressSteps}>
             {['Montant', 'Paiement'].map((label, index) => {
               const stepIndex = index

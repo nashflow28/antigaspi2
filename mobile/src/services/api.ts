@@ -57,6 +57,7 @@ import {
   Order,
   OrderCreationPayload,
   OrderCreationResponse,
+  MerchantPaymentsResponse,
 } from '../types'
 import { getExpoExtraValue } from '../utils/expoConfig'
 

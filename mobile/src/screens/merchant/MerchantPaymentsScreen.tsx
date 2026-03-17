@@ -319,7 +319,7 @@ const MerchantPaymentsScreen: React.FC = () => {
                 {
                   backgroundColor: statusFilter === filter.id
                     ? theme.colors.primary[500]
-                    : theme.colors.surface,
+                    : theme.colors.surface.light,
                   borderColor: statusFilter === filter.id
                     ? theme.colors.primary[500]
                     : theme.colors.border,

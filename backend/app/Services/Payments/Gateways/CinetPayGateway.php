@@ -154,9 +154,11 @@ class CinetPayGateway implements PaymentGateway
                     ]);
                 }
             } catch (\Exception) {
-                Log::warning('CinetPay webhook: API verification failed', [
+                Log::warning('CinetPay webhook: API verification failed — rejecting unverified webhook', [
                     'transaction_id' => $transactionId,
                 ]);
+
+                return null;
             }
         }
 

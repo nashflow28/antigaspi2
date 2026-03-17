@@ -127,8 +127,8 @@ export const checkoutCart = createAsyncThunk(
         })),
         payment_method: payload.paymentMethod,
         wallet_pin: payload.walletPin,
-        customer_phone: payload.customerPhone,
-        customer_email: payload.customerEmail,
+        customer_phone: payload.customerPhone ?? undefined,
+        customer_email: payload.customerEmail ?? undefined,
         pickup_date: payload.pickupDate ?? undefined,
         pickup_time: payload.pickupTime ?? undefined,
         notes: payload.notes ?? undefined

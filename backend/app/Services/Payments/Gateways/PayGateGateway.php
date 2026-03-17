@@ -587,31 +587,21 @@ class PayGateGateway implements PaymentGateway
     {
         $webhookSecret = $this->config['webhook_secret'] ?? null;
 
-        // If no webhook secret is configured, log warning but allow (for backwards compatibility)
-        // In production, PAYGATE_WEBHOOK_SECRET should ALWAYS be set
+        // SECURITY: Reject webhooks when secret is not configured in production
         if (empty($webhookSecret)) {
-            Log::warning('SEC-003: PayGate webhook secret not configured - signature verification skipped', [
+            if (app()->environment('production')) {
+                Log::error('SEC-003: PayGate webhook REJECTED — PAYGATE_WEBHOOK_SECRET not configured in production', [
+                    'ip' => request()->ip(),
+                ]);
+
+                return false;
+            }
+
+            Log::warning('SEC-003: PayGate webhook secret not configured — allowing in dev/testing only', [
                 'recommendation' => 'Set PAYGATE_WEBHOOK_SECRET in .env for production security',
             ]);
 
-            // Fallback: Verify by checking if identifier matches a known payment
-            // This provides minimal security but is better than nothing
-            $identifier = $payload['identifier'] ?? null;
-            if ($identifier) {
-                $paymentExists = Payment::where('reference', $identifier)
-                    ->where('provider', 'paygate')
-                    ->exists();
-
-                if (! $paymentExists) {
-                    Log::warning('SEC-003: Unknown identifier in webhook without signature', [
-                        'identifier' => $identifier,
-                    ]);
-
-                    return false;
-                }
-            }
-
-            return true; // Allow if identifier matches known payment
+            return true;
         }
 
         // Strategy 1: Check signature header (X-PayGate-Signature or similar)
