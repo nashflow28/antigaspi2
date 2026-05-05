@@ -463,6 +463,17 @@ class ApiService {
     }
   }
 
+  async deleteAccount(): Promise<void> {
+    try {
+      await this.request('DELETE', '/auth/account')
+    } catch (error) {
+      apiLogger.error('Delete account API call failed', error)
+      throw error;
+    } finally {
+      await this.clearAuthData()
+    }
+  }
+
   async getProfile(): Promise<ApiResponse<User>> {
     return this.request<ApiResponse<User>>('GET', '/auth/me')
   }

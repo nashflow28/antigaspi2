@@ -474,6 +474,65 @@ class AuthController extends Controller
     /**
      * Déconnexion sécurisée avec révocation du token
      */
+
+    /**
+     * Delete the user account and associated data.
+     * Required by app stores (Google Play, App Store).
+     */
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Utilisateur non trouvé',
+                ], 404);
+            }
+
+            // Begin transaction to ensure data integrity
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            try {
+                // Delete associated records if they are not automatically cascaded by the DB schema
+                // Deactivate devices
+                $user->devices()->delete();
+
+                // Clear sessions if any
+                $user->pushSubscriptions()->delete();
+
+                // Optional: anonymize user instead of hard delete, but for Play Store, hard delete or full anonymization is usually required.
+                // We will hard delete the user for simplicity and compliance, assuming DB cascades most things.
+                $user->delete();
+
+                // Revoke current token
+                try {
+                    JWTAuth::invalidate(JWTAuth::getToken());
+                } catch (\Exception $e) {
+                    // Ignore token invalidation errors (e.g. if already expired)
+                }
+
+                \Illuminate\Support\Facades\DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Compte supprimé avec succès',
+                ]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\DB::rollBack();
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Erreur lors de la suppression du compte : ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression du compte',
+                'error' => \App\Helpers\ErrorHelper::safeMessage($e),
+            ], 500);
+        }
+    }
+
     public function secureLogout(Request $request): JsonResponse
     {
         try {

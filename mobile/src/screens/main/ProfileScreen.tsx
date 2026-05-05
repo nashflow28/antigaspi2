@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
-import { logoutUser } from '../../store/slices/authSlice'
+import { logoutUser, deleteAccountUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { Ionicons } from '@expo/vector-icons'
 import { Card, Badge, Typography, Button } from '../../components/2025'
@@ -64,6 +64,45 @@ const ProfileScreen: React.FC = () => {
       await dispatch(logoutUser())
     } catch (error) {
       console.error('❌ Erreur déconnexion:', error)
+    }
+  }
+
+  const handleDeleteAccount = () => {
+    showAlert({
+      title: 'Supprimer mon compte',
+      message: 'Êtes-vous sûr de vouloir supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.',
+      type: 'error',
+      buttons: [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: confirmDeleteAccount
+        }
+      ]
+    })
+  }
+
+  const confirmDeleteAccount = async () => {
+    try {
+      await dispatch(deleteAccountUser()).unwrap()
+      // Only remove tokens and local storage data if the API call succeeds
+      await Promise.all([
+        secureStorage.removeToken(),
+        secureStorage.removeUserData(),
+      ])
+      await AsyncStorage.removeItem('cart_data')
+    } catch (error) {
+      console.error('❌ Erreur suppression compte:', error)
+      showAlert({
+        title: 'Erreur',
+        message: 'Une erreur est survenue lors de la suppression de votre compte.',
+        type: 'error',
+        buttons: [{ text: 'OK' }]
+      })
     }
   }
 
@@ -500,6 +539,29 @@ const ProfileScreen: React.FC = () => {
           Déconnexion
         </Typography>
         <Ionicons name="exit-outline" size={20} color={theme.colors.semantic.error} />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          styles.logoutButton,
+          {
+            marginHorizontal: theme.spacing.lg,
+            marginTop: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.lg,
+            paddingVertical: theme.spacing.md,
+            backgroundColor: 'transparent',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }
+        ]}
+        onPress={handleDeleteAccount}
+        activeOpacity={0.7}
+        accessibilityLabel="Supprimer mon compte"
+      >
+        <Typography variant="body" style={{ color: theme.colors.neutral[500], textDecorationLine: 'underline' }}>
+          Supprimer mon compte
+        </Typography>
       </TouchableOpacity>
     </ScrollView>
   )

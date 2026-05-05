@@ -69,6 +69,7 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
 
         // Routes sécurisées protégées
         Route::post('secure-logout', [AuthController::class, 'secureLogout']);
+        Route::delete('account', [AuthController::class, 'deleteAccount']); // Suppression de compte
         Route::get('sessions', [AuthController::class, 'getActiveSessions']);
         Route::delete('sessions/{session_id}', [AuthController::class, 'revokeSession']);
         Route::post('revoke-all-sessions', [AuthController::class, 'revokeAllOtherSessions']);
