@@ -42,6 +42,21 @@ export const loginUser = createAsyncThunk(
   }
 )
 
+export const deleteAccountUser = createAsyncThunk(
+  'auth/deleteAccount',
+  async (_, { rejectWithValue }) => {
+    try {
+      await apiService.deleteAccount()
+      // Clear all cached form data on delete account for security
+      await clearAllFormCaches()
+    } catch (error: any) {
+      // Still clear caches even if API fails
+      await clearAllFormCaches()
+      return rejectWithValue(error.message || 'Erreur lors de la suppression du compte')
+    }
+  }
+)
+
 export const registerUser = createAsyncThunk(
   'auth/register',
   async (data: RegisterData, { rejectWithValue }) => {
@@ -307,6 +322,21 @@ const authSlice = createSlice({
       .addCase(loadStoredAuth.rejected, (state) => {
         state.loading = false
         state.isAuthenticated = false
+      })
+      .addCase(deleteAccountUser.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(deleteAccountUser.fulfilled, (state) => {
+        state.loading = false
+        state.user = null
+        state.token = null
+        state.isAuthenticated = false
+      })
+      .addCase(deleteAccountUser.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+        // Do not clear state if API fails, so user knows it failed
       })
 
       // Refresh profile

@@ -17,7 +17,7 @@ import { useTheme } from '../../theme'
 import { useHaptics } from '../../hooks/useHaptics'
 import { RootState, AppDispatch } from '../../store'
 import { fetchDriverProfile } from '../../store/slices/driverSlice'
-import { logoutUser } from '../../store/slices/authSlice'
+import { logoutUser, deleteAccountUser } from '../../store/slices/authSlice'
 import LoadingSpinner from '../../components/LoadingSpinner'
 
 const DriverProfileScreen: React.FC = () => {
@@ -57,6 +57,28 @@ const DriverProfileScreen: React.FC = () => {
           onPress: () => {
             haptics.mediumTap()
             dispatch(logoutUser())
+          },
+        },
+      ]
+    )
+  }
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Supprimer mon compte',
+      'Êtes-vous sûr de vouloir supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            haptics.mediumTap()
+            try {
+              await dispatch(deleteAccountUser()).unwrap()
+            } catch (error) {
+              Alert.alert('Erreur', 'Une erreur est survenue lors de la suppression de votre compte.')
+            }
           },
         },
       ]
@@ -252,6 +274,12 @@ const DriverProfileScreen: React.FC = () => {
             icon="log-out-outline"
             label="Déconnexion"
             onPress={handleLogout}
+            color={theme.colors.error}
+          />
+          <MenuItem
+            icon="trash-outline"
+            label="Supprimer mon compte"
+            onPress={handleDeleteAccount}
             color={theme.colors.error}
           />
         </View>
