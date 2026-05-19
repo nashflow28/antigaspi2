@@ -347,6 +347,35 @@ class AuthControllerTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    // ==================== ACCOUNT DELETION TESTS ====================
+
+    public function test_authenticated_user_can_delete_account(): void
+    {
+        $user = User::factory()->create(['role' => 'consumer']);
+        $headers = $this->actingAsJwt($user);
+
+        $response = $this->deleteJson('/api/auth/account', [], $headers);
+
+        $response->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.deleted', true);
+
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
+
+    public function test_admin_cannot_delete_account_from_mobile_endpoint(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $headers = $this->actingAsJwt($admin);
+
+        $response = $this->deleteJson('/api/auth/account', [], $headers);
+
+        $response->assertForbidden()
+            ->assertJsonPath('success', false);
+
+        $this->assertDatabaseHas('users', ['id' => $admin->id]);
+    }
+
     // ==================== REFRESH TOKEN TESTS ====================
 
     public function test_user_can_refresh_token(): void

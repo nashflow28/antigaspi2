@@ -467,6 +467,10 @@ class ApiService {
     return this.request<ApiResponse<User>>('GET', '/auth/me')
   }
 
+  async deleteAccount(): Promise<ApiResponse<{ deleted: boolean }>> {
+    return this.request<ApiResponse<{ deleted: boolean }>>('DELETE', '/auth/account')
+  }
+
   // === PHONE-BASED AUTHENTICATION (OTP) ===
 
   /**

@@ -13,20 +13,20 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE, LatLng } from 'react-native-maps'
 import { useTheme } from '../../theme'
 import { useHaptics } from '../../hooks/useHaptics'
 import { RootState, AppDispatch } from '../../store'
 import { fetchDeliveryTracking, cancelDelivery, clearDeliveryError } from '../../store/slices/deliverySlice'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import DeliveryTrackingMap, { DeliveryTrackingMapRef, MapCoordinate } from '../../components/DeliveryTrackingMap'
 
 /**
  * Decode a Google-encoded polyline string into an array of LatLng coordinates
  * @param encoded - The encoded polyline string
  * @returns Array of {latitude, longitude} coordinates
  */
-const decodePolyline = (encoded: string): LatLng[] => {
-  const points: LatLng[] = []
+const decodePolyline = (encoded: string): MapCoordinate[] => {
+  const points: MapCoordinate[] = []
   let index = 0
   const len = encoded.length
   let lat = 0
@@ -93,7 +93,7 @@ const DeliveryTrackingScreen: React.FC = () => {
   const navigation = useNavigation<any>()
   const route = useRoute<any>()
   const dispatch = useDispatch<AppDispatch>()
-  const mapRef = useRef<MapView>(null)
+  const mapRef = useRef<DeliveryTrackingMapRef>(null)
   const pulseAnim = useRef(new Animated.Value(1)).current
 
   const { deliveryId } = route.params || {}
@@ -105,7 +105,7 @@ const DeliveryTrackingScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false)
 
   // Decode route polyline if available, otherwise fall back to straight line
-  const routeCoordinates = useMemo((): LatLng[] => {
+  const routeCoordinates = useMemo((): MapCoordinate[] => {
     // If we have an encoded polyline from the API, decode it
     if (trackingData?.route_polyline) {
       try {
@@ -349,68 +349,13 @@ const DeliveryTrackingScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Map */}
-      <MapView
+      <DeliveryTrackingMap
         ref={mapRef}
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={{
-          latitude: trackingData.delivery.delivery_latitude,
-          longitude: trackingData.delivery.delivery_longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        }}
+        trackingData={trackingData}
+        routeCoordinates={routeCoordinates}
+        theme={theme}
         onMapReady={fitToMarkers}
-      >
-        {/* Delivery destination marker */}
-        <Marker
-          coordinate={{
-            latitude: trackingData.delivery.delivery_latitude,
-            longitude: trackingData.delivery.delivery_longitude,
-          }}
-          title="Votre adresse"
-          description={trackingData.delivery.delivery_address}
-          pinColor={theme.colors.success}
-        />
-
-        {/* Pickup marker */}
-        {trackingData.delivery.pickup_latitude && trackingData.delivery.pickup_longitude && (
-          <Marker
-            coordinate={{
-              latitude: trackingData.delivery.pickup_latitude,
-              longitude: trackingData.delivery.pickup_longitude,
-            }}
-            title="Commerce"
-            description={trackingData.delivery.pickup_address}
-            pinColor={theme.colors.primary[500]}
-          />
-        )}
-
-        {/* Driver marker */}
-        {trackingData.driver_position && (
-          <Marker
-            coordinate={{
-              latitude: trackingData.driver_position.latitude,
-              longitude: trackingData.driver_position.longitude,
-            }}
-            title="Livreur"
-          >
-            <View style={styles.driverMarker}>
-              <Ionicons name="bicycle" size={24} color={theme.colors.primary[500]} />
-            </View>
-          </Marker>
-        )}
-
-        {/* Route line - uses real route polyline if available, otherwise straight line */}
-        {routeCoordinates.length >= 2 && (
-          <Polyline
-            coordinates={routeCoordinates}
-            strokeColor={theme.colors.primary[500]}
-            strokeWidth={4}
-            lineDashPattern={trackingData.route_polyline ? undefined : [10, 5]}
-          />
-        )}
-      </MapView>
+      />
 
       {/* Bottom panel */}
       <View style={[styles.bottomPanel, { backgroundColor: theme.colors.cardBackground }]}>
@@ -539,19 +484,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-  },
-  map: {
-    flex: 1,
-  },
-  driverMarker: {
-    backgroundColor: 'white',
-    padding: 8,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
   },
   bottomPanel: {
     padding: 16,

@@ -41,11 +41,11 @@ const FORMAT_CONFIG = {
     extension: 'html',
   },
   xlsx: {
-    label: 'Excel',
+    label: 'Excel CSV',
     icon: 'grid-outline' as const,
-    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    uti: 'org.openxmlformats.spreadsheetml.sheet',
-    extension: 'xlsx',
+    mimeType: 'text/csv',
+    uti: 'public.comma-separated-values-text',
+    extension: 'csv',
   },
 }
 

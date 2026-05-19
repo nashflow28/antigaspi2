@@ -11,6 +11,7 @@ import {
   StyleSheet,
   StatusBar,
   ScrollView,
+  Linking,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -48,6 +49,9 @@ const CITIES = [
   'Tsevie',
   'Autre',
 ]
+
+const TERMS_URL = 'https://geladal.com/terms'
+const PRIVACY_URL = 'https://geladal.com/privacy'
 
 const CompleteProfilePhoneScreen = ({ navigation, route }: any) => {
   const { phoneNumber, phoneVerified } = route.params as { phoneNumber: string; phoneVerified?: boolean }
@@ -138,6 +142,14 @@ const CompleteProfilePhoneScreen = ({ navigation, route }: any) => {
       }
     } finally {
       setLoading(false)
+    }
+  }
+
+  const openLegalLink = async (url: string) => {
+    try {
+      await Linking.openURL(url)
+    } catch {
+      showError('Lien indisponible', 'Impossible d\'ouvrir ce lien pour le moment')
     }
   }
 
@@ -462,16 +474,24 @@ const CompleteProfilePhoneScreen = ({ navigation, route }: any) => {
 
         {/* Terms */}
         <View style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing['2xl'] }}>
-          <Typography variant="caption" color="secondary" style={{ textAlign: 'center' }}>
-            En creant un compte, vous acceptez nos{' '}
-            <Typography variant="caption" style={{ color: theme.colors.primary[500] }}>
-              Conditions d'utilisation
-            </Typography>{' '}
-            et notre{' '}
-            <Typography variant="caption" style={{ color: theme.colors.primary[500] }}>
-              Politique de confidentialite
+          <View style={styles.termsContainer}>
+            <Typography variant="caption" color="secondary">
+              En creant un compte, vous acceptez nos
             </Typography>
-          </Typography>
+            <TouchableOpacity onPress={() => openLegalLink(TERMS_URL)}>
+              <Typography variant="caption" style={{ color: theme.colors.primary[500] }}>
+              Conditions d'utilisation
+              </Typography>
+            </TouchableOpacity>
+            <Typography variant="caption" color="secondary">
+              et notre
+            </Typography>
+            <TouchableOpacity onPress={() => openLegalLink(PRIVACY_URL)}>
+              <Typography variant="caption" style={{ color: theme.colors.primary[500] }}>
+              Politique de confidentialite
+              </Typography>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAwareContainer>
     </View>
@@ -524,6 +544,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
+  },
+  termsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 4,
   },
 })
 

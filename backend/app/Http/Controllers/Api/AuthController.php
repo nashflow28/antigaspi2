@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\JwtSecurityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
@@ -832,6 +833,67 @@ class AuthController extends Controller
                 'expires_in' => JWTAuth::factory()->getTTL() * 60,
             ],
         ]);
+    }
+
+    /**
+     * Supprimer définitivement le compte de l'utilisateur authentifié.
+     */
+    public function deleteAccount(): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (! $user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Utilisateur non authentifié',
+                ], 401);
+            }
+
+            if ($user->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La suppression d\'un compte administrateur doit être effectuée depuis le back-office.',
+                ], 403);
+            }
+
+            $userId = $user->id;
+
+            DB::transaction(function () use ($user) {
+                RefreshToken::where('user_id', $user->id)->delete();
+                $user->devices()->delete();
+                $user->delete();
+            });
+
+            try {
+                $token = JWTAuth::getToken();
+                if ($token) {
+                    JWTAuth::invalidate($token);
+                }
+            } catch (\Throwable $exception) {
+                Log::warning('Unable to invalidate JWT after account deletion', [
+                    'user_id' => $userId,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+
+            Log::info('User account deleted', ['user_id' => $userId]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Compte supprimé avec succès',
+                'data' => ['deleted' => true],
+            ]);
+        } catch (\Throwable $exception) {
+            Log::error('Account deletion failed', [
+                'error' => $exception->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Impossible de supprimer le compte pour le moment',
+            ], 500);
+        }
     }
 
     /**

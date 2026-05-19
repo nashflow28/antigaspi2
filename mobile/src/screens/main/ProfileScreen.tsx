@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
-import { logoutUser } from '../../store/slices/authSlice'
+import { clearAuth, logoutUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { Ionicons } from '@expo/vector-icons'
 import { Card, Badge, Typography, Button } from '../../components/2025'
@@ -21,6 +21,11 @@ import { secureStorage } from '../../services/secureStorage'
 import { TEST_IDS } from '../../utils/testIds'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { navigationRef } from '../../navigation/NavigationRef'
+import apiService from '../../services/api'
+
+const HELP_URL = 'https://geladal.support/help'
+const TERMS_URL = 'https://geladal.com/terms'
+const PRIVACY_URL = 'https://geladal.com/privacy'
 
 const ProfileScreen: React.FC = () => {
   const theme = useTheme()
@@ -29,6 +34,14 @@ const ProfileScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth)
   const { showAlert } = useAlert()
+
+  const clearLocalSession = async () => {
+    await Promise.all([
+      secureStorage.removeToken(),
+      secureStorage.removeUserData(),
+      AsyncStorage.removeItem('cart_data'),
+    ])
+  }
 
   const handleLogout = () => {
     // Utiliser l'alerte stylisée pour la confirmation de déconnexion
@@ -52,46 +65,80 @@ const ProfileScreen: React.FC = () => {
 
   const confirmLogout = async () => {
     try {
-      // BUG FIX #12: Use secureStorage for sensitive data removal
-      // Remove sensitive auth data securely
-      await Promise.all([
-        secureStorage.removeToken(),
-        secureStorage.removeUserData(),
-      ])
-      // Remove non-sensitive cart data from AsyncStorage
-      await AsyncStorage.removeItem('cart_data')
-      // Déconnexion
+      await clearLocalSession()
       await dispatch(logoutUser())
     } catch (error) {
       console.error('❌ Erreur déconnexion:', error)
     }
   }
 
-  const handleHelpPress = async () => {
-    const helpUrl = 'https://geladal.support/help'
+  const openExternalUrl = async (url: string, fallbackUrl?: string) => {
     try {
-      const supported = await Linking.canOpenURL(helpUrl)
+      const supported = await Linking.canOpenURL(url)
       if (supported) {
-        await Linking.openURL(helpUrl)
+        await Linking.openURL(url)
         return
       }
 
-      const fallback = 'mailto:support@geladal.com'
+      const fallback = fallbackUrl || 'mailto:support@geladal.com'
       const fallbackSupported = await Linking.canOpenURL(fallback)
       if (fallbackSupported) {
         await Linking.openURL(fallback)
       } else {
         showAlert({
-          title: 'Support indisponible',
-          message: 'Impossible d\'ouvrir le centre d\'aide pour le moment.',
+          title: 'Lien indisponible',
+          message: 'Impossible d\'ouvrir ce lien pour le moment.',
           type: 'info'
         })
       }
     } catch (error) {
       showAlert({
-        title: 'Support indisponible',
-        message: 'Impossible d\'ouvrir le centre d\'aide pour le moment.',
+        title: 'Lien indisponible',
+        message: 'Impossible d\'ouvrir ce lien pour le moment.',
         type: 'info'
+      })
+    }
+  }
+
+  const handleHelpPress = async () => {
+    await openExternalUrl(HELP_URL)
+  }
+
+  const handleDeleteAccount = () => {
+    showAlert({
+      title: 'Supprimer le compte',
+      message: 'Cette action supprime définitivement votre compte GÊLADAL et vos données associées. Elle ne peut pas être annulée.',
+      type: 'warning',
+      buttons: [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: confirmDeleteAccount,
+        }
+      ]
+    })
+  }
+
+  const confirmDeleteAccount = async () => {
+    try {
+      await apiService.deleteAccount()
+      await clearLocalSession()
+      dispatch(clearAuth())
+      showAlert({
+        title: 'Compte supprimé',
+        message: 'Votre compte a été supprimé.',
+        type: 'success',
+      })
+      navigationRef.navigate('Auth', { screen: 'Login' })
+    } catch (error: any) {
+      showAlert({
+        title: 'Suppression impossible',
+        message: error?.response?.data?.message || error?.message || 'Impossible de supprimer le compte pour le moment.',
+        type: 'error',
       })
     }
   }
@@ -223,6 +270,28 @@ const ProfileScreen: React.FC = () => {
             <Ionicons name="help-circle-outline" size={24} color={theme.colors.text} />
             <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
               Aide & Support
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderTopWidth: 1, borderTopColor: theme.colors.border }]}
+            onPress={() => openExternalUrl(TERMS_URL)}
+          >
+            <Ionicons name="document-text-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Conditions d'utilisation
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderTopWidth: 1, borderTopColor: theme.colors.border }]}
+            onPress={() => openExternalUrl(PRIVACY_URL)}
+          >
+            <Ionicons name="shield-checkmark-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Politique de confidentialité
             </Typography>
             <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
           </TouchableOpacity>
@@ -473,7 +542,54 @@ const ProfileScreen: React.FC = () => {
           </Typography>
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
+          onPress={() => openExternalUrl(TERMS_URL)}
+        >
+          <Ionicons name="document-text-outline" size={24} color={theme.colors.text} />
+          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+            Conditions d'utilisation
+          </Typography>
+          <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md }]}
+          onPress={() => openExternalUrl(PRIVACY_URL)}
+        >
+          <Ionicons name="shield-checkmark-outline" size={24} color={theme.colors.text} />
+          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+            Politique de confidentialité
+          </Typography>
+          <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+        </TouchableOpacity>
       </Card>
+
+      <TouchableOpacity
+        style={[
+          styles.logoutButton,
+          {
+            marginHorizontal: theme.spacing.lg,
+            marginTop: theme.spacing.md,
+            paddingHorizontal: theme.spacing.lg,
+            paddingVertical: theme.spacing.md,
+            backgroundColor: theme.withOpacity(theme.colors.semantic.error, 0.08),
+            borderRadius: theme.radius.lg,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }
+        ]}
+        onPress={handleDeleteAccount}
+        activeOpacity={0.7}
+        accessibilityLabel="Supprimer mon compte"
+      >
+        <Ionicons name="trash-outline" size={24} color={theme.colors.semantic.error} />
+        <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md, color: theme.colors.semantic.error, fontWeight: '600' }}>
+          Supprimer mon compte
+        </Typography>
+        <Ionicons name="chevron-forward" size={20} color={theme.colors.semantic.error} />
+      </TouchableOpacity>
 
       {/* Bouton déconnexion séparé pour éviter les conflits avec Card */}
       <TouchableOpacity

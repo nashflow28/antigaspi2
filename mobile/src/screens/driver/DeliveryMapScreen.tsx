@@ -12,17 +12,17 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps'
 import * as Location from 'expo-location'
 import { useTheme } from '../../theme'
 import { RootState } from '../../store'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import DriverDeliveryMap, { DriverDeliveryMapRef } from '../../components/DriverDeliveryMap'
 
 const DeliveryMapScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation<any>()
   const route = useRoute<any>()
-  const mapRef = useRef<MapView>(null)
+  const mapRef = useRef<DriverDeliveryMapRef>(null)
 
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null)
   const [loading, setLoading] = useState(true)
@@ -103,60 +103,13 @@ const DeliveryMapScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Map */}
-      <MapView
+      <DriverDeliveryMap
         ref={mapRef}
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        showsUserLocation
-        showsMyLocationButton
-        initialRegion={{
-          latitude: userLocation?.latitude || 6.1725,
-          longitude: userLocation?.longitude || 1.2314,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        }}
+        delivery={delivery}
+        userLocation={userLocation}
+        theme={theme}
         onMapReady={fitToMarkers}
-      >
-        {/* Pickup marker */}
-        {delivery && (
-          <Marker
-            coordinate={{
-              latitude: delivery.pickup_latitude,
-              longitude: delivery.pickup_longitude,
-            }}
-            title="Récupération"
-            description={delivery.pickup_address}
-            pinColor={theme.colors.primary[500]}
-          />
-        )}
-
-        {/* Delivery marker */}
-        {delivery && (
-          <Marker
-            coordinate={{
-              latitude: delivery.delivery_latitude,
-              longitude: delivery.delivery_longitude,
-            }}
-            title="Livraison"
-            description={delivery.delivery_address}
-            pinColor={theme.colors.success}
-          />
-        )}
-
-        {/* Route line */}
-        {delivery && (
-          <Polyline
-            coordinates={[
-              { latitude: delivery.pickup_latitude, longitude: delivery.pickup_longitude },
-              { latitude: delivery.delivery_latitude, longitude: delivery.delivery_longitude },
-            ]}
-            strokeColor={theme.colors.primary[500]}
-            strokeWidth={3}
-            lineDashPattern={[10, 5]}
-          />
-        )}
-      </MapView>
+      />
 
       {/* Bottom panel */}
       {delivery && (
@@ -210,9 +163,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-  },
-  map: {
-    flex: 1,
   },
   bottomPanel: {
     padding: 16,

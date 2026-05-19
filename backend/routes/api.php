@@ -66,6 +66,7 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('logout', [AuthController::class, 'logout']); // Legacy
         Route::post('refresh', [AuthController::class, 'refresh']); // Legacy
+        Route::delete('account', [AuthController::class, 'deleteAccount'])->middleware('throttle:write');
 
         // Routes sécurisées protégées
         Route::post('secure-logout', [AuthController::class, 'secureLogout']);
