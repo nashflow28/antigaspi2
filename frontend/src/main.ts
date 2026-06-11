@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { MotionPlugin } from '@vueuse/motion'
+import { registerSW } from 'virtual:pwa-register'
 import { pinia } from '@/stores'
 import router from '@/router'
 import { useThemeStore } from '@/stores/theme'
@@ -89,37 +90,20 @@ try {
 }
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', async () => {
-    try {
-      const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
-      })
+  const updateSW = registerSW({
+    immediate: true,
+    onNeedRefresh() {
+      console.log('New app version available!')
 
-      console.log('Service Worker registered successfully:', registration.scope)
-
-      registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing
-        if (newWorker) {
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('New app version available!')
-
-              if (confirm('Une nouvelle version est disponible. Voulez-vous actualiser maintenant ?')) {
-                newWorker.postMessage({ type: 'SKIP_WAITING' })
-                window.location.reload()
-              }
-            }
-          })
-        }
-      })
-
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'CACHE_UPDATED') {
-          console.log('Cache updated successfully')
-        }
-      })
-
-    } catch (error) {
+      if (confirm('Une nouvelle version est disponible. Voulez-vous actualiser maintenant ?')) {
+        // Envoie SKIP_WAITING au service worker en attente puis recharge la page
+        updateSW(true)
+      }
+    },
+    onRegisteredSW(swScriptUrl) {
+      console.log('Service Worker registered successfully:', swScriptUrl)
+    },
+    onRegisterError(error) {
       console.error('Service Worker registration failed:', error)
     }
   })

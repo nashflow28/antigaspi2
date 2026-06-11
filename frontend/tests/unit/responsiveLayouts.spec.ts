@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick, ref } from 'vue'
-import MainHomeView from '@/views/MainHomeView.vue'
 import ProductsView from '@/views/ProductsView2025.vue'
 import ReservationsView from '@/views/ReservationsView.vue'
 
@@ -120,18 +119,6 @@ describe('Responsive view layouts', () => {
       ok: true,
       json: async () => ({ success: true, data: [] })
     })) as any
-  })
-
-  it('applies responsive product grid on MainHomeView', async () => {
-    const wrapper = mount(MainHomeView, { global: { stubs: globalStubs } })
-    wrapper.vm.loading = false
-    wrapper.vm.displayProducts = [
-      { id: 1, name: 'Produit test', merchant: 'Marchand', price: 10, originalPrice: 12, discount: 20, emoji: '🥖' }
-    ]
-    await nextTick()
-    const grid = wrapper.find('[data-test="main-home-products"]')
-    expect(grid.exists()).toBe(true)
-    expect(grid.classes()).toEqual(expect.arrayContaining(['grid-cols-1', 'md:grid-cols-3', 'xl:grid-cols-4']))
   })
 
   it('applies responsive catalogue grid on ProductsView', async () => {

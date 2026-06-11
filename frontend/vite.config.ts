@@ -2,10 +2,33 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   plugins: [
     vue(),
+    // PWA service worker (Workbox injectManifest)
+    // - srcDir/filename: src/sw.js is bundled to dist/sw.js (same name/scope '/'
+    //   as the legacy manual SW so existing clients pick up the update)
+    // - registerType 'prompt': update applied via SKIP_WAITING when user confirms
+    // - injectRegister false: registration handled manually in src/main.ts
+    // - manifest false: public/manifest.json already exists and is linked in index.html
+    VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
+      registerType: 'prompt',
+      injectRegister: false,
+      manifest: false,
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,svg,png,woff2}'],
+        globIgnores: ['bundle-analysis.html', '**/node_modules/**'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024
+      },
+      devOptions: {
+        enabled: false
+      }
+    }),
     // Bundle analyzer plugin
     visualizer({
       filename: 'dist/bundle-analysis.html',
@@ -143,6 +166,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    include: ['tests/{unit,integration}/**/*.spec.ts']
+    include: [
+      'tests/{unit,integration}/**/*.spec.ts',
+      'src/**/__tests__/**/*.spec.ts'
+    ]
   }
 })

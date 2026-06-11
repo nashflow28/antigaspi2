@@ -363,7 +363,6 @@ import {
   UsersIcon
 } from '@heroicons/vue/24/outline'
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, BarElement, Title, Tooltip, Legend, LineController, BarController } from 'chart.js'
-import jsPDF from 'jspdf'
 import { apiService } from '@/services/api'
 import type { AnalyticsDailyBreakdownEntry, AnalyticsSummary } from '@/types'
 
@@ -888,6 +887,7 @@ const exportAnalytics = async (format: 'csv' | 'pdf') => {
       link.click()
       URL.revokeObjectURL(url)
     } else {
+      const { jsPDF } = await import('jspdf')
       const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' })
       const marginX = 40
       let cursorY = 60

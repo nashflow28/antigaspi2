@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-01-28T23:05:16.065Z",
+  "timestamp": "2026-06-11T09:56:35.435Z",
   "summary": {
-    "totalFiles": 274,
-    "filesWithComponentImports": 116,
+    "totalFiles": 270,
+    "filesWithComponentImports": 115,
     "filesWithLegacyImports": 2,
     "totalLegacyImports": 2,
-    "totalDS2025Imports": 281,
+    "totalDS2025Imports": 280,
     "migrationPercentage": 99,
     "intentionalLegacyCount": 2,
     "unintentionalLegacyCount": 0

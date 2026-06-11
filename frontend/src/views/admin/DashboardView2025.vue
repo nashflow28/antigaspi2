@@ -735,7 +735,6 @@ import type {
   AnalyticsGeographicDistributionEntry,
   AnalyticsMerchantPerformanceEntry
 } from '@/types'
-import jsPDF from 'jspdf'
 
 ChartJS.register(
   CategoryScale,
@@ -1386,7 +1385,8 @@ const downloadAnalyticsCsv = () => {
   URL.revokeObjectURL(url)
 }
 
-const exportAnalyticsPdf = () => {
+const exportAnalyticsPdf = async () => {
+  const { jsPDF } = await import('jspdf')
   const doc = new jsPDF({ unit: 'pt' })
   const marginX = 48
   const marginBottom = 40
@@ -1463,7 +1463,7 @@ const exportAnalyticsPdf = () => {
   doc.save(`analytics-${analyticsRange.start || 'start'}-${analyticsRange.end || 'end'}.pdf`)
 }
 
-const exportAnalytics = (format: 'csv' | 'pdf') => {
+const exportAnalytics = async (format: 'csv' | 'pdf') => {
   if (analyticsLoading.value) {
     return
   }
@@ -1471,7 +1471,7 @@ const exportAnalytics = (format: 'csv' | 'pdf') => {
   if (format === 'csv') {
     downloadAnalyticsCsv()
   } else {
-    exportAnalyticsPdf()
+    await exportAnalyticsPdf()
   }
 }
 

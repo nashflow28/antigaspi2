@@ -154,7 +154,7 @@ test.describe('Critical User Flows', () => {
 
     // Should redirect to dashboard
     await page.waitForURL(/dashboard/, { timeout: 15000 })
-    
+
     // Verify auth by checking for 'Bonjour' text in dashboard
     await expect(page.locator('body')).toContainText('Bonjour', { timeout: 10000 })
   })
@@ -164,7 +164,7 @@ test.describe('Critical User Flows', () => {
     await page.route('**/api/products*', route => {
       const url = route.request().url()
       // Match /api/products/123 but not /api/products?page=1
-      if (/[\/]api[\/]products[\/]\d+/.test(url)) {
+      if (/\/api\/products\/\d+/.test(url)) {
         route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -269,7 +269,7 @@ test.describe('Critical User Flows', () => {
     if (await switchToEmailBtn.isVisible()) {
       await switchToEmailBtn.click()
     }
-    
+
     await page.fill('[data-testid="email-input"]', 'jean.dupont@email.com')
     await page.fill('[data-testid="password-input"]', 'password')
     await page.click('[data-testid="submit-login"]')
@@ -279,7 +279,7 @@ test.describe('Critical User Flows', () => {
 
     // Navigate to products (avoid full load wait to reduce flakiness)
     await page.goto('http://localhost:3000/products', { waitUntil: 'domcontentloaded', timeout: 15000 })
-    
+
     // Ensure filters are cleared to see mock products
     const resetBtn = page.getByRole('button', { name: 'Réinitialiser' })
     if (await resetBtn.isVisible()) {
@@ -292,7 +292,7 @@ test.describe('Critical User Flows', () => {
 
     // Click to go to detail page (more reliable than list button)
     await productCard.click()
-    
+
     // Wait for detail page load
     await expect(page.locator('h1').getByText('Pain complet artisanal')).toBeVisible({ timeout: 15000 })
 
@@ -351,7 +351,7 @@ test.describe('Critical User Flows', () => {
       try {
         await page.getByRole('menuitem', { name: link.name }).first().click({ timeout: 5000 })
         // Allow some flexibility in URL matching
-        await page.waitForURL(new RegExp(link.expectedUrl.replace('/', '\/')), { timeout: 10000 })
+        await page.waitForURL(new RegExp(link.expectedUrl), { timeout: 10000 })
       } catch {
         // If specific navigation fails, just ensure page doesn't crash
         console.log(`Navigation to ${link.expectedUrl} not available or failed`)
