@@ -20,6 +20,9 @@ import { useHaptics } from '../../hooks/useHaptics'
 import { RootState, AppDispatch } from '../../store'
 import { estimateDelivery, requestDelivery, clearDeliveryError } from '../../store/slices/deliverySlice'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('DeliveryRequest')
 
 /**
  * Normalize phone number to +228 format (Togo)
@@ -125,7 +128,7 @@ const DeliveryRequestScreen: React.FC = () => {
       setUseCurrentLocation(true)
       haptics.success()
     } catch (err) {
-      console.error('Location error:', err)
+      log.error('Location error:', err)
       Alert.alert('Erreur', 'Impossible de récupérer votre position')
     }
     setLocationLoading(false)

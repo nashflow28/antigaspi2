@@ -19,6 +19,9 @@ import { RootState, AppDispatch } from '../../store'
 import { fetchDeliveryTracking, cancelDelivery, clearDeliveryError } from '../../store/slices/deliverySlice'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import DeliveryTrackingMap, { DeliveryTrackingMapRef, MapCoordinate } from '../../components/DeliveryTrackingMap'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('DeliveryTracking')
 
 /**
  * Decode a Google-encoded polyline string into an array of LatLng coordinates
@@ -112,7 +115,7 @@ const DeliveryTrackingScreen: React.FC = () => {
         const decoded = decodePolyline(trackingData.route_polyline)
         if (decoded.length > 0) return decoded
       } catch (e) {
-        console.warn('Failed to decode route polyline:', e)
+        log.warn('Failed to decode route polyline:', e)
       }
     }
 

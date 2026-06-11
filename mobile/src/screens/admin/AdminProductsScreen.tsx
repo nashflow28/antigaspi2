@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react'
 import {
   View,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   StatusBar,
   RefreshControl,
@@ -12,6 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { FlashList } from '@shopify/flash-list'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
@@ -836,7 +836,7 @@ const AdminProductsScreen: React.FC = () => {
           </Typography>
         </View>
       ) : (
-        <FlatList
+        <FlashList
           testID="products-flatlist"
           data={filteredProducts}
           renderItem={renderProduct}

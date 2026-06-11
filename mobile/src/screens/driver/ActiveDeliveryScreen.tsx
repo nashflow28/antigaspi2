@@ -32,6 +32,9 @@ import {
   updateDriverLocation,
 } from '../../store/slices/driverSlice'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('ActiveDelivery')
 
 const ActiveDeliveryScreen: React.FC = () => {
   const theme = useTheme()
@@ -71,7 +74,7 @@ const ActiveDeliveryScreen: React.FC = () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync()
         if (status !== 'granted') {
-          console.warn('Location permission not granted')
+          log.warn('Location permission not granted')
           return
         }
 
@@ -94,7 +97,7 @@ const ActiveDeliveryScreen: React.FC = () => {
           }
         )
       } catch (err) {
-        console.error('Location tracking error:', err)
+        log.error('Location tracking error:', err)
       }
     }
 

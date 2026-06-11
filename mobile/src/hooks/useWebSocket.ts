@@ -22,6 +22,9 @@ import {
   updateConversation,
 } from '../store/slices/messagingSlice'
 import { addBreadcrumb } from '../utils/sentryInit'
+import { createLogger } from '../utils/logger'
+
+const webSocketLogger = createLogger('useWebSocket')
 
 interface UseWebSocketOptions {
   /** Whether to auto-connect when authenticated (default: true) */
@@ -59,7 +62,7 @@ const useWebSocket = (options: UseWebSocketOptions = {}): UseWebSocketReturn => 
   const log = useCallback(
     (message: string, data?: any) => {
       if (debug) {
-        console.log(`[useWebSocket] ${message}`, data ?? '')
+        webSocketLogger.log(message, data ?? '')
       }
     },
     [debug]

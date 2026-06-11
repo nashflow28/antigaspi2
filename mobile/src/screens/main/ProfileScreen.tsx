@@ -22,6 +22,9 @@ import { TEST_IDS } from '../../utils/testIds'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { navigationRef } from '../../navigation/NavigationRef'
 import apiService from '../../services/api'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('Profile')
 
 const HELP_URL = 'https://geladal.support/help'
 const TERMS_URL = 'https://geladal.com/terms'
@@ -68,7 +71,7 @@ const ProfileScreen: React.FC = () => {
       await clearLocalSession()
       await dispatch(logoutUser())
     } catch (error) {
-      console.error('❌ Erreur déconnexion:', error)
+      log.error('❌ Erreur déconnexion:', error)
     }
   }
 

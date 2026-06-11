@@ -822,7 +822,7 @@ export interface MerchantMapMarker {
 
 /**
  * Map region for initial positioning and camera control
- * Used by react-native-maps for viewport management
+ * Used by map components for viewport management
  */
 export interface MerchantMapRegion {
   latitude: number

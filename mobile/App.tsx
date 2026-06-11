@@ -13,6 +13,9 @@ import apiService from './src/services/api'
 import usePushNotifications from './src/hooks/usePushNotifications'
 import { initSentry, wrapWithSentry, setUser } from './src/utils/sentryInit'
 import { initI18n } from './src/i18n'
+import { createLogger } from './src/utils/logger'
+
+const log = createLogger('App')
 
 // Initialize Sentry as early as possible
 initSentry()
@@ -28,7 +31,7 @@ const AppContent = () => {
   useEffect(() => {
     // Enregistrer le callback pour gérer l'expiration de session (401)
     apiService.setOnUnauthorizedCallback(() => {
-      console.log('🔒 Token expiré détecté - Nettoyage du Redux store')
+      log.log('🔒 Token expiré détecté - Nettoyage du Redux store')
       dispatch(clearAuth())
     })
   }, [dispatch])
@@ -42,7 +45,7 @@ const AppContent = () => {
 // Sentry wrap pour capture automatique des erreurs React
 function App() {
   if (__DEV__) {
-    console.log('✅ APP FINALE: Redux + Theme + Toast + Navigation + Sentry')
+    log.log('✅ APP FINALE: Redux + Theme + Toast + Navigation + Sentry')
   }
 
   return (

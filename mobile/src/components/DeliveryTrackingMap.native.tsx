@@ -1,77 +1,115 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps'
+import {
+  getMapLibreGL,
+  MapFallback,
+  isExpoGo,
+  OSM_RASTER_STYLE,
+  fitCameraToCoordinates,
+} from './MapLibreWrapper'
 import type { DeliveryTrackingMapProps, DeliveryTrackingMapRef, MapCoordinate } from './DeliveryTrackingMap'
+
+const MapLibreGL = getMapLibreGL()
 
 const DeliveryTrackingMap = forwardRef<DeliveryTrackingMapRef, DeliveryTrackingMapProps>(
   ({ trackingData, routeCoordinates, theme, onMapReady }, ref) => {
-    const mapRef = useRef<MapView>(null)
+    const cameraRef = useRef<any>(null)
 
     useImperativeHandle(ref, () => ({
       fitToCoordinates: (coordinates: MapCoordinate[], options?: unknown) => {
-        mapRef.current?.fitToCoordinates(coordinates, options as any)
+        fitCameraToCoordinates(cameraRef.current, coordinates, options)
       },
     }))
 
+    if (isExpoGo || !MapLibreGL) {
+      return <MapFallback style={styles.map} />
+    }
+
+    const routeShape = routeCoordinates.length >= 2
+      ? {
+          type: 'Feature' as const,
+          properties: {},
+          geometry: {
+            type: 'LineString' as const,
+            coordinates: routeCoordinates.map(c => [c.longitude, c.latitude]),
+          },
+        }
+      : null
+
     return (
-      <MapView
-        ref={mapRef}
+      <MapLibreGL.MapView
         style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={{
-          latitude: trackingData.delivery.delivery_latitude,
-          longitude: trackingData.delivery.delivery_longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        }}
-        onMapReady={onMapReady}
+        mapStyle={OSM_RASTER_STYLE}
+        logoEnabled={false}
+        attributionEnabled={true}
+        onDidFinishLoadingMap={onMapReady}
       >
-        <Marker
-          coordinate={{
-            latitude: trackingData.delivery.delivery_latitude,
-            longitude: trackingData.delivery.delivery_longitude,
+        <MapLibreGL.Camera
+          ref={cameraRef}
+          defaultSettings={{
+            centerCoordinate: [
+              trackingData.delivery.delivery_longitude,
+              trackingData.delivery.delivery_latitude,
+            ],
+            zoomLevel: 13,
           }}
-          title="Votre adresse"
-          description={trackingData.delivery.delivery_address}
-          pinColor={theme.colors.success}
         />
 
-        {trackingData.delivery.pickup_latitude && trackingData.delivery.pickup_longitude && (
-          <Marker
-            coordinate={{
-              latitude: trackingData.delivery.pickup_latitude,
-              longitude: trackingData.delivery.pickup_longitude,
-            }}
-            title="Commerce"
-            description={trackingData.delivery.pickup_address}
-            pinColor={theme.colors.primary[500]}
-          />
-        )}
+        {routeShape ? (
+          <MapLibreGL.ShapeSource id="delivery-route" shape={routeShape}>
+            <MapLibreGL.LineLayer
+              id="delivery-route-line"
+              style={{
+                lineColor: theme.colors.primary[500],
+                lineWidth: 4,
+                lineCap: 'round',
+                lineJoin: 'round',
+                ...(trackingData.route_polyline ? {} : { lineDasharray: [2, 1.5] }),
+              }}
+            />
+          </MapLibreGL.ShapeSource>
+        ) : null}
 
-        {trackingData.driver_position && (
-          <Marker
-            coordinate={{
-              latitude: trackingData.driver_position.latitude,
-              longitude: trackingData.driver_position.longitude,
-            }}
-            title="Livreur"
+        <MapLibreGL.MarkerView
+          coordinate={[
+            trackingData.delivery.delivery_longitude,
+            trackingData.delivery.delivery_latitude,
+          ]}
+          anchor={{ x: 0.5, y: 1 }}
+        >
+          <View style={styles.pinMarker}>
+            <Ionicons name="location" size={36} color={theme.colors.success} />
+          </View>
+        </MapLibreGL.MarkerView>
+
+        {trackingData.delivery.pickup_latitude && trackingData.delivery.pickup_longitude ? (
+          <MapLibreGL.MarkerView
+            coordinate={[
+              trackingData.delivery.pickup_longitude,
+              trackingData.delivery.pickup_latitude,
+            ]}
+            anchor={{ x: 0.5, y: 1 }}
+          >
+            <View style={styles.pinMarker}>
+              <Ionicons name="storefront" size={30} color={theme.colors.primary[500]} />
+            </View>
+          </MapLibreGL.MarkerView>
+        ) : null}
+
+        {trackingData.driver_position ? (
+          <MapLibreGL.MarkerView
+            coordinate={[
+              trackingData.driver_position.longitude,
+              trackingData.driver_position.latitude,
+            ]}
           >
             <View style={styles.driverMarker}>
               <Ionicons name="bicycle" size={24} color={theme.colors.primary[500]} />
             </View>
-          </Marker>
-        )}
-
-        {routeCoordinates.length >= 2 && (
-          <Polyline
-            coordinates={routeCoordinates}
-            strokeColor={theme.colors.primary[500]}
-            strokeWidth={4}
-            lineDashPattern={trackingData.route_polyline ? undefined : [10, 5]}
-          />
-        )}
-      </MapView>
+          </MapLibreGL.MarkerView>
+        ) : null}
+      </MapLibreGL.MapView>
     )
   }
 )
@@ -81,6 +119,10 @@ DeliveryTrackingMap.displayName = 'DeliveryTrackingMap'
 const styles = StyleSheet.create({
   map: {
     flex: 1,
+  },
+  pinMarker: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   driverMarker: {
     backgroundColor: 'white',

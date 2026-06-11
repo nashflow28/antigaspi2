@@ -8,6 +8,9 @@ import * as Application from 'expo-application'
 import * as SecureStore from 'expo-secure-store'
 import { Platform } from 'react-native'
 import api from './api'
+import { createLogger } from '../utils/logger'
+
+const log = createLogger('DeviceService')
 
 const DEVICE_ID_KEY = 'antigaspi_device_id'
 
@@ -91,7 +94,7 @@ class DeviceService {
       return newId
     } catch (error) {
       // Fallback if secure store fails
-      console.warn('SecureStore error, generating temporary device ID:', error)
+      log.warn('SecureStore error, generating temporary device ID:', error)
       return this.generateDeviceId()
     }
   }
@@ -158,7 +161,7 @@ class DeviceService {
 
       return response
     } catch (error: any) {
-      console.error('Check phone error:', error)
+      log.error('Check phone error:', error)
       return {
         success: false,
         message: error.message || 'Erreur lors de la vérification du numéro',
@@ -177,7 +180,7 @@ class DeviceService {
 
       return response
     } catch (error: any) {
-      console.error('Send OTP error:', error)
+      log.error('Send OTP error:', error)
       return {
         success: false,
         message: error.message || "Erreur lors de l'envoi du code OTP",
@@ -201,7 +204,7 @@ class DeviceService {
 
       return response
     } catch (error: any) {
-      console.error('Verify OTP error:', error)
+      log.error('Verify OTP error:', error)
       if (error.response?.data) {
         return error.response.data
       }
@@ -227,7 +230,7 @@ class DeviceService {
 
       return response
     } catch (error: any) {
-      console.error('PIN login error:', error)
+      log.error('PIN login error:', error)
       if (error.response?.data) {
         return error.response.data
       }
@@ -250,7 +253,7 @@ class DeviceService {
 
       return response
     } catch (error: any) {
-      console.error('Set PIN error:', error)
+      log.error('Set PIN error:', error)
       if (error.response?.data) {
         return error.response.data
       }
@@ -274,7 +277,7 @@ class DeviceService {
 
       return response
     } catch (error: any) {
-      console.error('Change PIN error:', error)
+      log.error('Change PIN error:', error)
       if (error.response?.data) {
         return error.response.data
       }

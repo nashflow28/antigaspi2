@@ -1,5 +1,34 @@
 // Setup for Jest tests
 
+// FlashList: mock des mesures de layout pour rendre les listes dans Jest
+// (équivalent de @shopify/flash-list/jestSetup, adapté à la v2.0.2 qui n'exporte pas RecyclerView)
+jest.mock('@shopify/flash-list/dist/recyclerview/utils/measureLayout', () => {
+  const originalModule = jest.requireActual(
+    '@shopify/flash-list/dist/recyclerview/utils/measureLayout'
+  )
+  return {
+    ...originalModule,
+    measureParentSize: jest.fn().mockImplementation(() => ({
+      x: 0,
+      y: 0,
+      width: 400,
+      height: 900,
+    })),
+    measureFirstChildLayout: jest.fn().mockImplementation(() => ({
+      x: 0,
+      y: 0,
+      width: 400,
+      height: 900,
+    })),
+    measureItemLayout: jest.fn().mockImplementation(() => ({
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    })),
+  }
+})
+
 // Silence noisy React "act(...)" warnings (tests still assert behavior)
 const originalConsoleError = console.error
 console.error = (...args) => {
@@ -152,25 +181,19 @@ jest.mock('react-native-webview', () => {
   }
 })
 
-// Mock react-native-maps
-jest.mock('react-native-maps', () => {
+// Mock @maplibre/maplibre-react-native
+jest.mock('@maplibre/maplibre-react-native', () => {
   const { View } = require('react-native')
-  const MockMapView = View
-  MockMapView.Marker = View
-  MockMapView.Polyline = View
-  MockMapView.Polygon = View
-  MockMapView.Circle = View
-  MockMapView.Callout = View
   return {
     __esModule: true,
-    default: MockMapView,
-    Marker: View,
-    Polyline: View,
-    Polygon: View,
-    Circle: View,
-    Callout: View,
-    PROVIDER_GOOGLE: 'google',
-    PROVIDER_DEFAULT: null,
+    MapView: View,
+    Camera: View,
+    MarkerView: View,
+    PointAnnotation: View,
+    ShapeSource: View,
+    LineLayer: View,
+    UserLocation: View,
+    setAccessToken: jest.fn(),
   }
 })
 

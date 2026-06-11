@@ -121,7 +121,7 @@ export const API_BASE_URL = getApiBaseUrl()
 
 // SECURITY: Warn when using unencrypted HTTP in non-local contexts
 if (API_BASE_URL.startsWith('http://') && !API_BASE_URL.includes('localhost') && !API_BASE_URL.includes('127.0.0.1') && !API_BASE_URL.includes('10.0.2.2')) {
-  console.warn('[SECURITY] Using unencrypted HTTP connection:', API_BASE_URL)
+  apiLogger.warn('[SECURITY] Using unencrypted HTTP connection:', API_BASE_URL)
 }
 
 // Helper pour transformer camelCase en snake_case (Laravel attend snake_case)

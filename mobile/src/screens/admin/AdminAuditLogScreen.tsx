@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback, useRef } from 'react'
 import {
   View,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   RefreshControl,
   StatusBar,
@@ -11,11 +10,15 @@ import {
   ScrollView,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { FlashList } from '@shopify/flash-list'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import { Typography, Card, Badge } from '../../components/2025'
+import { createLogger } from '../../utils/logger'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+
+const log = createLogger('AdminAuditLog')
 
 interface AuditLog {
   id: number
@@ -216,7 +219,7 @@ const AdminAuditLogScreen: React.FC<AdminAuditLogScreenProps> = ({ navigation })
         setStats(response.data)
       }
     } catch (error) {
-      console.error('Error loading audit stats:', error)
+      log.error('Error loading audit stats:', error)
     }
   }
 
@@ -238,7 +241,7 @@ const AdminAuditLogScreen: React.FC<AdminAuditLogScreenProps> = ({ navigation })
         setPage(pageNum)
       }
     } catch (error) {
-      console.error('Error loading audit logs:', error)
+      log.error('Error loading audit logs:', error)
     }
   }
 
@@ -653,7 +656,7 @@ const AdminAuditLogScreen: React.FC<AdminAuditLogScreenProps> = ({ navigation })
         </View>
       </View>
 
-      <FlatList
+      <FlashList
         data={logs}
         keyExtractor={item => item.id.toString()}
         renderItem={renderLogItem}

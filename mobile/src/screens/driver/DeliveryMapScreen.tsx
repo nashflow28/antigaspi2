@@ -17,6 +17,9 @@ import { useTheme } from '../../theme'
 import { RootState } from '../../store'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import DriverDeliveryMap, { DriverDeliveryMapRef } from '../../components/DriverDeliveryMap'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('DeliveryMap')
 
 const DeliveryMapScreen: React.FC = () => {
   const theme = useTheme()
@@ -46,7 +49,7 @@ const DeliveryMapScreen: React.FC = () => {
           longitude: location.coords.longitude,
         })
       } catch (error) {
-        console.error('Location error:', error)
+        log.error('Location error:', error)
       }
       setLoading(false)
     })()

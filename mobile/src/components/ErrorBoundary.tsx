@@ -1,6 +1,9 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { createLogger } from '../utils/logger'
+
+const log = createLogger('ErrorBoundary')
 
 interface Props {
   children: ReactNode
@@ -31,7 +34,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    log.error('ErrorBoundary caught an error:', error, errorInfo)
   }
 
   handleReset = () => {

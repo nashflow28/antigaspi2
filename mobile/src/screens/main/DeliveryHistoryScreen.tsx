@@ -3,11 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   RefreshControl,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { FlashList } from '@shopify/flash-list'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
@@ -206,7 +206,7 @@ const DeliveryHistoryScreen: React.FC = () => {
       {historyLoading && (!deliveryHistory || deliveryHistory.length === 0) ? (
         <LoadingSpinner />
       ) : (
-        <FlatList
+        <FlashList
           data={deliveryHistory}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderDeliveryItem}

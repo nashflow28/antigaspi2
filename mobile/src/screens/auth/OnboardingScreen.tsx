@@ -19,6 +19,9 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { Typography, Button } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('Onboarding')
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 const STORAGE_KEY = 'antigaspi_onboarding_completed'
@@ -136,7 +139,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
     try {
       await AsyncStorage.setItem(STORAGE_KEY, 'true')
     } catch (error) {
-      console.error('Failed to save onboarding status:', error)
+      log.error('Failed to save onboarding status:', error)
     }
     onComplete()
   }

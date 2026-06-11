@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   ScrollView,
   TouchableOpacity,
   StatusBar,
   RefreshControl,
 } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
@@ -502,7 +502,7 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
       </View>
 
       {/* Liste des réservations */}
-      <FlatList
+      <FlashList
         data={filteredReservations}
         renderItem={renderReservation}
         keyExtractor={(item) => item.id.toString()}

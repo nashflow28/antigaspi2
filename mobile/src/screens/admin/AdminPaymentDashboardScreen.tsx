@@ -17,6 +17,9 @@ import { AdminHeader } from '../../components/admin'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import apiService from '../../services/api'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('AdminPaymentDashboard')
 
 interface Payment {
   id: number
@@ -133,7 +136,7 @@ const AdminPaymentDashboardScreen: React.FC = () => {
         setPagination(response.pagination)
       }
     } catch (error: any) {
-      console.error('Error fetching payments:', error)
+      log.error('Error fetching payments:', error)
       if (isMountedRef.current) {
         showError('Erreur', error.response?.data?.message || 'Impossible de charger les paiements')
       }

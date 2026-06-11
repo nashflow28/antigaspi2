@@ -11,6 +11,7 @@ import {
   Modal,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { FlashList } from '@shopify/flash-list'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -511,7 +512,7 @@ export default function RewardsScreen() {
   return (
     <SafeAreaView style={[styles.container, dynamicStyles.container]} edges={['top']}>
       {activeTab === 'catalog' ? (
-        <FlatList<Reward>
+        <FlashList<Reward>
           data={rewards}
           keyExtractor={(item) => String(item.id)}
           renderItem={renderRewardItem}
@@ -535,7 +536,7 @@ export default function RewardsScreen() {
           }
         />
       ) : (
-        <FlatList<RewardRedemption>
+        <FlashList<RewardRedemption>
           data={redemptions}
           keyExtractor={(item) => String(item.id)}
           renderItem={renderRedemptionItem}

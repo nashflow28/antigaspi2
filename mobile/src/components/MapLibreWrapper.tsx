@@ -6,7 +6,7 @@
  */
 
 import React, { useRef, useImperativeHandle, forwardRef } from 'react'
-import { View, Text, StyleSheet, Platform } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import Constants from 'expo-constants'
 
@@ -20,13 +20,13 @@ if (!isExpoGo) {
   try {
     MapLibreGL = require('@maplibre/maplibre-react-native')
     MapLibreGL.setAccessToken(null) // Pas besoin de token pour OSM
-  } catch (error) {
+  } catch {
     // MapLibre load error handled silently
   }
 }
 
 // Style OpenStreetMap - tuiles standard OSM
-const OSM_RASTER_STYLE = {
+export const OSM_RASTER_STYLE = {
   version: 8,
   sources: {
     osm: {
@@ -64,6 +64,56 @@ interface MapLibreWrapperProps {
 export interface MapLibreRef {
   flyTo: (center: [number, number], zoom?: number) => void
   getCenter: () => [number, number] | null
+}
+
+export interface MapLatLng {
+  latitude: number
+  longitude: number
+}
+
+interface FitCameraOptions {
+  edgePadding?: { top?: number; right?: number; bottom?: number; left?: number }
+  animated?: boolean
+}
+
+/**
+ * Ajuste une caméra MapLibre pour englober une liste de coordonnées,
+ * avec la même sémantique que fitToCoordinates de react-native-maps.
+ */
+export const fitCameraToCoordinates = (
+  camera: any,
+  coordinates: MapLatLng[],
+  options?: unknown
+): void => {
+  if (!camera || coordinates.length === 0) return
+
+  const opts = (options ?? {}) as FitCameraOptions
+  const duration = opts.animated === false ? 0 : 600
+
+  if (coordinates.length === 1) {
+    camera.setCamera?.({
+      centerCoordinate: [coordinates[0].longitude, coordinates[0].latitude],
+      zoomLevel: 15,
+      animationDuration: duration,
+    })
+    return
+  }
+
+  const longitudes = coordinates.map(c => c.longitude)
+  const latitudes = coordinates.map(c => c.latitude)
+  const padding = [
+    opts.edgePadding?.top ?? 50,
+    opts.edgePadding?.right ?? 50,
+    opts.edgePadding?.bottom ?? 50,
+    opts.edgePadding?.left ?? 50,
+  ]
+
+  camera.fitBounds?.(
+    [Math.max(...longitudes), Math.max(...latitudes)],
+    [Math.min(...longitudes), Math.min(...latitudes)],
+    padding,
+    duration
+  )
 }
 
 interface FallbackProps {
@@ -157,7 +207,7 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
       <MapLibreGL.MapView
         ref={mapRef}
         style={styles.map}
-        styleJSON={JSON.stringify(OSM_RASTER_STYLE)}
+        mapStyle={OSM_RASTER_STYLE}
         onPress={handlePress}
         logoEnabled={false}
         attributionEnabled={true}

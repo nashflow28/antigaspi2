@@ -44,6 +44,9 @@ import searchService, {
 import { getCategoryIcon, getCategoryIconConfig, IoniconName } from '../../constants/categoryIcons'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('Products')
 
 interface Props {
   navigation: any
@@ -358,7 +361,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           }
         }
       } catch (error) {
-        console.error('Erreur initialisation géolocalisation (produits):', error)
+        log.error('Erreur initialisation géolocalisation (produits):', error)
       }
     }
 
@@ -402,7 +405,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       }
 
     } catch (error) {
-      console.error('❌ Error loading data:', error)
+      log.error('❌ Error loading data:', error)
     }
   }
 
@@ -439,7 +442,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
       return true
     } catch (error) {
-      console.error('Erreur récupération localisation:', error)
+      log.error('Erreur récupération localisation:', error)
       return false
     } finally {
       if (promptUser) {
@@ -568,7 +571,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           return
         }
 
-        console.error('Erreur lors de la recherche distante:', error)
+        log.error('Erreur lors de la recherche distante:', error)
         setRemoteProductResults(null)
         setRemoteMerchantResults(null)
         setSearchError(error instanceof Error ? error.message : 'Recherche indisponible pour le moment.')

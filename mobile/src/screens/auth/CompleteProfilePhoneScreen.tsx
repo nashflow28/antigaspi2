@@ -24,6 +24,9 @@ import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 import { useTheme } from '../../theme'
 import { useAlert } from '../../contexts/AlertContext'
 import { reset as navigationReset } from '../../navigation/NavigationRef'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('CompleteProfilePhone')
 
 type UserRole = 'consumer' | 'merchant'
 
@@ -129,7 +132,7 @@ const CompleteProfilePhoneScreen = ({ navigation, route }: any) => {
         })
       }
     } catch (error: any) {
-      console.error('Registration error:', error)
+      log.error('Registration error:', error)
       if (typeof error === 'object' && error.errors) {
         // Show first validation error
         const firstField = Object.keys(error.errors)[0]

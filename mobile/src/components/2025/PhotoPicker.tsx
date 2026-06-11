@@ -26,6 +26,9 @@ import * as Haptics from 'expo-haptics'
 import * as ImagePicker from 'expo-image-picker'
 import { useTheme } from '../../theme'
 import AlertModal, { AlertType, AlertButton } from '../AlertModal'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('PhotoPicker')
 
 interface PhotoPickerProps {
   value: string[]
@@ -130,7 +133,7 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
         }
       }
     } catch (error) {
-      console.error('Error taking photo:', error)
+      log.error('Error taking photo:', error)
       showAlert('error', 'Erreur', 'Impossible de prendre la photo.')
     }
   }
@@ -169,7 +172,7 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
         }
       }
     } catch (error) {
-      console.error('Error picking images:', error)
+      log.error('Error picking images:', error)
       showAlert('error', 'Erreur', 'Impossible de sélectionner les photos.')
     }
   }
