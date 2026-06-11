@@ -8,6 +8,9 @@ DEPLOY.local.md
 .claude/settings.local.json
 .claude/statusline.log
 
+# Codex CLI - configuration locale (agents, config)
+/.codex/
+
 # Playwright MCP - screenshots de debug locaux
 /.playwright-mcp/
 
